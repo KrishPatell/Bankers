@@ -1,0 +1,1094 @@
+#!/usr/bin/env python3
+"""Build the deployable site from the Webflow export + the CMS CSVs.
+
+    python tools/build.py [--skip-assets]
+
+Reads the untouched export in the repo root and writes a complete static site
+into dist/. Source files are never modified, so any run is reproducible and a
+bad run is undone by deleting dist/.
+"""
+
+import argparse
+import html as htmllib
+import json
+import os
+import re
+import shutil
+import sys
+import urllib.parse
+from datetime import datetime, timezone
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import cmsdata
+import wfconfig as CFG
+import wfhtml as W
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DIST = os.path.join(ROOT, "dist")
+
+STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
+
+# Root pages copied through the shell-rewrite pass.
+def shell_pages():
+    return sorted(
+        f for f in os.listdir(ROOT)
+        if f.endswith(".html") and f not in CFG.EXCLUDE_PAGES
+    )
+
+
+warnings = []
+
+
+def warn(msg):
+    warnings.append(msg)
+
+
+# --------------------------------------------------------------- URL rewriting
+
+# index.html -> /, everything else -> /<name>, with the three directory pages
+# mapped to their folder form.
+def page_url(filename):
+    if filename == "index.html":
+        return "/"
+    if filename in CFG.DIRECTORY_PAGES:
+        return "/" + CFG.DIRECTORY_PAGES[filename].rsplit("/", 1)[0]
+    return "/" + filename[:-len(".html")]
+
+
+PAGE_URLS = None  # filled in main()
+
+
+def rewrite_links(html):
+    """Make every in-page reference root-absolute.
+
+    Generated CMS pages live one directory deep, so the export's relative
+    'css/…' / 'images/…' / 'about.html' references would resolve wrongly there.
+    Root-absolute paths remove the whole class of depth bugs at once. The CSS
+    file is left alone: its '../images/' is already correct relative to /css/.
+    """
+    def fix(url):
+        u = url.strip()
+        if not u or u.startswith((
+            "#", "/", "http://", "https://", "mailto:", "tel:", "data:",
+            "javascript:",
+        )):
+            return url
+        u = re.sub(r"^\./", "", u)
+        u = re.sub(r"^(\.\./)+", "", u)
+        base = u.split("?")[0].split("#")[0]
+        tail = u[len(base):]
+        if base in PAGE_URLS:
+            return PAGE_URLS[base] + tail
+        for d in STATIC_DIRS:
+            if base.startswith(d + "/"):
+                return "/" + u
+        if base.endswith(".html"):
+            return "/" + base[:-len(".html")] + tail
+        return url
+
+    def attr_sub(m):
+        return '%s="%s"' % (m.group(1), fix(m.group(2)))
+
+    html = re.sub(r'\b(href|src)="([^"]*)"', attr_sub, html)
+
+    def srcset_sub(m):
+        parts = []
+        for chunk in m.group(1).split(","):
+            chunk = chunk.strip()
+            if not chunk:
+                continue
+            bits = chunk.split(None, 1)
+            bits[0] = fix(bits[0])
+            parts.append(" ".join(bits))
+        return 'srcset="%s"' % ", ".join(parts)
+
+    html = re.sub(r'srcset="([^"]*)"', srcset_sub, html)
+
+    # Keep in-content links to the live domain on-site.
+    html = re.sub(
+        r'https?://(?:www\.)?bankersvascular\.com(?=[/"\'\s])',
+        "", html,
+    )
+    html = html.replace('href=""', 'href="/"')
+    return html
+
+
+# ------------------------------------------------------------------- head meta
+
+def _esc_attr(s):
+    return htmllib.escape(s or "", quote=True)
+
+
+def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
+                  noindex=False):
+    if title is not None:
+        html = re.sub(r"<title>.*?</title>",
+                      lambda m: "<title>%s</title>" % htmllib.escape(title),
+                      html, count=1, flags=re.S)
+    def meta(pattern, value):
+        nonlocal html
+        if value is None:
+            return
+        rx = re.compile(r'<meta content="[^"]*"\s+%s>' % pattern)
+        repl = '<meta content="%s" %s>' % (_esc_attr(value), pattern.replace("\\", ""))
+        if rx.search(html):
+            html = rx.sub(lambda m: repl, html, count=1)
+
+    meta('name="description"', desc)
+    meta('property="og:title"', title)
+    meta('property="og:description"', desc)
+    meta('property="og:image"', image)
+    meta('name="twitter:title"', title)
+    meta('name="twitter:description"', desc)
+    meta('name="twitter:image"', image)
+
+    if canonical is not None:
+        html = re.sub(r'<link href="[^"]*" rel="canonical">',
+                      '<link href="%s" rel="canonical">' % _esc_attr(canonical),
+                      html, count=1)
+    if noindex and "<title>" in html:
+        html = html.replace("</head>", '  <meta name="robots" content="noindex">\n</head>', 1)
+    return html
+
+
+# ------------------------------------------------------------------- rich text
+
+_BARE_HOST = re.compile(r"^https?://[^/]+/?$", re.I)
+
+
+def meaningful_url(u):
+    """False for empty values and bare domains like 'https://www.facebook.com/'.
+
+    Linking a doctor's 'profile' at facebook.com's homepage is worse than
+    showing no icon, so those get dropped.
+    """
+    u = (u or "").strip()
+    return bool(u) and not _BARE_HOST.match(u)
+
+
+def clean_richtext(rt, assets):
+    """Prepare CMS rich text for static hosting."""
+    if not rt:
+        return ""
+    rt = assets.rewrite(rt)
+    # Webflow leaves empty id="" on every element; they are noise and
+    # duplicate ids are invalid HTML.
+    rt = re.sub(r'\s+id=""', "", rt)
+    # Keep internal links on-site; open external ones safely.
+    rt = re.sub(r'https?://(?:www\.)?bankersvascular\.com(?=[/"\'])', "", rt)
+
+    def anchor(m):
+        tag = m.group(0)
+        href = W.get_attr(tag, "href") or ""
+        if href.startswith(("http://", "https://")):
+            if 'target=' not in tag:
+                tag = W.set_attr(tag, "target", "_blank")
+            tag = W.set_attr(tag, "rel", "noopener")
+        return tag
+
+    rt = re.sub(r"<a\s[^>]*>", anchor, rt)
+    # CMS images must not block first paint.
+    rt = re.sub(r"<img\s(?![^>]*loading=)", '<img loading="lazy" ', rt)
+    return rt
+
+
+# ------------------------------------------------------------- item rendering
+
+class Binder:
+    """Applies a binding set to one cloned collection item."""
+
+    def __init__(self, assets):
+        self.assets = assets
+
+    def value(self, item, field):
+        """Resolve a field spec: a name, a fallback list, or an @-expression."""
+        if isinstance(field, list):
+            for f in field:
+                v = self.value(item, f)
+                if v:
+                    return v
+            return ""
+        if field == "@date":
+            d = item.get("_date")
+            return d.strftime("%B %d, %Y") if d else ""
+        if isinstance(field, str) and field.startswith("@author."):
+            author = item.get("_author")
+            if not author:
+                return ""
+            return (author.get(field[len("@author."):]) or "").strip()
+        return (item.get(field) or "").strip()
+
+    def apply(self, frag, item, bindings, url=None):
+        url = url if url is not None else item.get("_url")
+        for b in bindings:
+            kind = b["kind"]
+            if kind == "link":
+                target = self.value(item, b["field"]) if b.get("field") else url
+                frag = self._links(frag, target)
+            elif kind == "self_text_link":
+                frag = self._links(frag, url)
+                frag = self._set_text_root(frag, item.name)
+            elif kind == "price":
+                frag = self._price(frag, self.value(item, b["field"]))
+            else:
+                frag = self._one(frag, item, b, url)
+        return frag
+
+    # -- individual binding kinds
+
+    def _one(self, frag, item, b, url):
+        start = W.find_bound(frag, b["cls"])
+        if start < 0:
+            return frag
+        val = self.value(item, b["field"])
+        kind = b["kind"]
+
+        # An empty value with on_empty drops the element - or a named ancestor -
+        # rather than leaving an empty node or Webflow's grey placeholder image.
+        if not val and b.get("on_empty"):
+            mode = b["on_empty"]
+            if mode == "remove":
+                s, e = W.find_block(frag, start)
+                return frag[:s] + frag[e:]
+            if mode.startswith("remove:"):
+                wrapper = mode.split(":", 1)[1]
+                blk = W.block_by_class(frag, wrapper)
+                if blk:
+                    return frag[:blk[0]] + frag[blk[1]:]
+                s, e = W.find_block(frag, start)
+                return frag[:s] + frag[e:]
+
+        if kind == "img":
+            if not val:
+                return frag  # leave the placeholder rather than emit src=""
+            src = self.assets.url(val)
+            alt = self.value(item, b["alt"]) if b.get("alt") else ""
+            def fix_img(tag):
+                tag = W.set_attr(tag, "src", _esc_attr(src))
+                tag = W.del_attr(tag, "srcset")
+                tag = W.del_attr(tag, "sizes")
+                tag = W.set_attr(tag, "alt", _esc_attr(alt))
+                if "loading=" not in tag:
+                    tag = W.set_attr(tag, "loading", "lazy")
+                return W.drop_class(tag, "w-dyn-bind-empty")
+            return W.edit_open_tag(frag, start, fix_img)
+
+        if kind == "bg":
+            if not val:
+                return frag
+            src = self.assets.url(val)
+            style = 'background-image:url(&quot;%s&quot;)' % _esc_attr(src)
+            return W.edit_open_tag(frag, start,
+                                   lambda t: W.set_attr(t, "style", style))
+
+        if kind == "richtext":
+            body = clean_richtext(val, self.assets)
+        elif kind == "text":
+            body = htmllib.escape(val)
+        else:
+            raise ValueError("unknown binding kind %r" % kind)
+
+        if not val:
+            return frag
+        frag = W.edit_open_tag(frag, start,
+                              lambda t: W.drop_class(t, "w-dyn-bind-empty"))
+        return W.set_inner(frag, W.find_block(frag, start), body)
+
+    def _links(self, frag, target):
+        if not target:
+            return frag
+        out, pos = [], 0
+        for m in re.finditer(r'<a\s[^>]*href="#"[^>]*>', frag):
+            tag = m.group(0)
+            new = W.set_attr(tag, "href", _esc_attr(target))
+            new = W.drop_class(new, "w-dyn-bind-empty")
+            if target.startswith("http"):
+                new = W.set_attr(new, "target", "_blank")
+                new = W.set_attr(new, "rel", "noopener")
+            out.append(frag[pos:m.start()])
+            out.append(new)
+            pos = m.end()
+        out.append(frag[pos:])
+        return "".join(out)
+
+    def _set_text_root(self, frag, text):
+        """Set the label on the item's anchor.
+
+        Target the <a> specifically: in the Treatment dropdown the wrapping
+        toggle <div> carries the same `nav-dropdown-link` class, and writing to
+        that would wipe out the anchor inside it.
+        """
+        m = re.search(r"<a\s[^>]*>", frag)
+        if not m:
+            return frag
+        start = m.start()
+        frag = W.edit_open_tag(frag, start,
+                              lambda t: W.drop_class(t, "w-dyn-bind-empty"))
+        return W.set_inner(frag, W.find_block(frag, start),
+                           htmllib.escape(text))
+
+    def _price(self, frag, price):
+        """The price <p> has no class of its own; it is the bound <p> inside the
+        'Rs.' link block."""
+        blk = W.block_by_class(frag, "link-block-15")
+        if not blk:
+            return frag
+        seg = frag[blk[0]:blk[1]]
+        i = W.find_by_class(seg, "w-dyn-bind-empty")
+        if i < 0:
+            return frag
+        if not price:
+            # No price on file: drop the whole "Rs. ___" link rather than
+            # showing a bare "Rs." with nothing after it.
+            return frag[:blk[0]] + frag[blk[1]:]
+        try:
+            shown = "{:,}".format(int(float(price)))
+        except ValueError:
+            shown = price
+        seg = W.edit_open_tag(seg, i, lambda t: W.drop_class(t, "w-dyn-bind-empty"))
+        seg = W.set_inner(seg, W.find_block(seg, i), htmllib.escape(shown))
+        return frag[:blk[0]] + seg + frag[blk[1]:]
+
+
+# ------------------------------------------------------------- list population
+
+def find_list(html, spec):
+    """Locate (dyn_list_block, items_block) for a list spec."""
+    if spec.get("container_cls"):
+        outer = W.block_by_class(html, spec["container_cls"])
+        if not outer:
+            return None
+        base = outer[0]
+        lst = W.block_by_class(html, "w-dyn-list", base, outer[1])
+    elif spec.get("items_cls"):
+        i = W.find_by_class(html, spec["items_cls"])
+        if i < 0:
+            return None
+        lst_start = W.open_tag_start(html, html.rfind("w-dyn-list", 0, i))
+        lst = W.find_block(html, lst_start)
+    else:
+        i = W.find_by_class(html, spec["item_cls"])
+        if i < 0:
+            return None
+        lst_start = W.open_tag_start(html, html.rfind("w-dyn-list", 0, i))
+        lst = W.find_block(html, lst_start)
+    if not lst:
+        return None
+    items = W.block_by_class(html, "w-dyn-items", lst[0], lst[1])
+    return lst, items
+
+
+def populate(html, spec, items, binder, urls=None, occurrence=0):
+    """Fill one w-dyn-list with `items`, cloning its placeholder item."""
+    found = find_list(html, spec)
+    if not found:
+        warn("list not found: %r" % (spec.get("items_cls") or spec.get("item_cls")
+                                     or spec.get("container_cls")))
+        return html
+    lst, items_block = found
+    seg = html[lst[0]:lst[1]]
+
+    tpl_rel = W.block_by_class(seg, "w-dyn-item")
+    if not tpl_rel:
+        warn("no w-dyn-item template in list %r" % spec.get("items_cls"))
+        return html
+    template = seg[tpl_rel[0]:tpl_rel[1]]
+
+    bindings = CFG.ITEM_BINDINGS[spec["bindings"]]
+    rendered = []
+    for n, it in enumerate(items):
+        url = urls[n] if urls else None
+        rendered.append(binder.apply(template, it, bindings, url=url))
+    body = "".join(rendered)
+
+    # Replace the items container's contents, then drop the "No items found."
+    # sibling now that the list is populated.
+    items_rel = (items_block[0] - lst[0], items_block[1] - lst[0])
+    seg = W.set_inner(seg, items_rel, body)
+    empty = W.block_by_class(seg, "w-dyn-empty")
+    if empty:
+        if items:
+            seg = seg[:empty[0]] + seg[empty[1]:]
+        else:
+            # A genuinely empty list keeps its empty-state block, but Webflow's
+            # default "No items found." reads like a bug to a visitor.
+            seg = W.set_inner(seg, empty,
+                              "<div>%s</div>" % spec.get(
+                                  "empty_text", "Nothing here yet."))
+    if spec.get("drop_pagination"):
+        pg = W.block_by_class(seg, "w-pagination-wrapper")
+        if pg:
+            seg = seg[:pg[0]] + seg[pg[1]:]
+    return html[:lst[0]] + seg + html[lst[1]:]
+
+
+def remove_dead_lists(html):
+    """Delete Webflow template lists that have no CMS binding at all."""
+    for cls in CFG.DEAD_LISTS:
+        blk = W.block_by_class(html, cls)
+        if blk:
+            html = html[:blk[0]] + html[blk[1]:]
+    return html
+
+
+def remove_template_junk(html):
+    """Remove the hidden nav <li> full of dead medicio.webflow.io demo links."""
+    while True:
+        i = html.find('<li class="nav-list-item position-relative hide">')
+        if i < 0:
+            break
+        s, e = W.find_block(html, i)
+        html = html[:s] + html[e:]
+    # Any stragglers pointing at the template demo site.
+    if "medicio.webflow.io" in html:
+        html = re.sub(r'href="https?://medicio\.webflow\.io[^"]*"', 'href="/"', html)
+    return html
+
+
+def order_items(cms, spec):
+    key = spec["collection"]
+    order = spec.get("order")
+    if order == "newest":
+        items = cms.blogs_newest()
+    elif isinstance(order, tuple):
+        field, mode = order
+        items = cms.sorted_by(key, field, numeric=(mode == "numeric"))
+    else:
+        items = list(cms.published[key])
+    items = items[spec.get("offset", 0):]
+    if spec.get("limit"):
+        items = items[:spec["limit"]]
+    return items
+
+
+def apply_nav(html, cms, binder):
+    # 401/404 are Webflow utility pages with no navbar at all.
+    if "nav-menu-list-wrapper" not in html:
+        return html
+    for spec in CFG.NAV_LISTS:
+        items = order_items(cms, spec)
+        html = populate(html, spec, items, binder)
+    return html
+
+
+# ------------------------------------------------------------------ pagination
+
+PAGINATION_TEMPLATE = None  # lifted from detail_treatment.html at startup
+
+
+def load_pagination_template():
+    src = read(os.path.join(ROOT, "detail_treatment.html"))
+    blk = W.block_by_class(src, "w-pagination-wrapper")
+    return src[blk[0]:blk[1]] if blk else None
+
+
+def build_pagination(page, total_pages, base):
+    """Real prev/next controls using the export's own pagination markup."""
+    if total_pages < 2 or not PAGINATION_TEMPLATE:
+        return ""
+    def href(p):
+        return base if p == 1 else "%s/page/%d" % (base.rstrip("/"), p)
+    frag = PAGINATION_TEMPLATE
+    out, pos = [], 0
+    for m in re.finditer(r'<a\s[^>]*href="#"[^>]*>', frag):
+        tag = m.group(0)
+        cls = W.get_attr(tag, "class") or ""
+        if "w-pagination-previous" in cls:
+            tag = (W.set_attr(tag, "href", href(page - 1)) if page > 1
+                   else W.add_class(W.set_attr(tag, "href", "#"), "w-condition-invisible"))
+        elif "w-pagination-next" in cls:
+            tag = (W.set_attr(tag, "href", href(page + 1)) if page < total_pages
+                   else W.add_class(W.set_attr(tag, "href", "#"), "w-condition-invisible"))
+        out.append(frag[pos:m.start()]); out.append(tag); pos = m.end()
+    out.append(frag[pos:])
+    frag = "".join(out)
+    # Hidden controls must not be clickable.
+    frag = frag.replace('href="#"', 'href="#" aria-disabled="true" tabindex="-1"')
+    return frag
+
+
+# ------------------------------------------------------------------- utilities
+
+def read(path):
+    with open(path, encoding="utf-8") as fh:
+        return fh.read()
+
+
+def dir_size(path):
+    return sum(os.path.getsize(os.path.join(b, f))
+               for b, _d, fs in os.walk(path) for f in fs)
+
+
+def write(rel, content):
+    path = os.path.join(DIST, rel)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(content)
+
+
+# ----------------------------------------------------------------- form wiring
+
+HONEYPOT = ('<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" '
+            'aria-hidden="true" style="position:absolute;left:-9999px;'
+            'width:1px;height:1px;opacity:0">')
+
+
+def canonical_field(tag, tagname):
+    """Map the export's inconsistent field names onto one API contract.
+
+    The same logical field is named four different ways across the site
+    (Name / Name-2 / name-2 / name-3), and the phone input on 13 pages is
+    misnamed 'email-2' while being type="tel". Normalising here means the
+    endpoint has a single, checkable contract.
+    """
+    name = (W.get_attr(tag, "name") or "").strip()
+    itype = (W.get_attr(tag, "type") or "").lower()
+    low = name.lower()
+    if tagname == "textarea":
+        return "Message"
+    if itype == "email":
+        return "Email"
+    if itype == "tel":
+        return "Phone-Number"
+    if low.startswith("name"):
+        return "Name"
+    if "email" in low:
+        return "Email"
+    if "phone" in low or "mobile" in low:
+        return "Phone-Number"
+    if "date" in low:
+        return "Date"
+    if "message" in low or low.startswith("field"):
+        return "Message"
+    return name
+
+
+def normalize_form_fields(seg):
+    out, pos = [], 0
+    for m in re.finditer(r"<(input|textarea|select)\s[^>]*>", seg):
+        tag = m.group(0)
+        if (W.get_attr(tag, "type") or "").lower() in ("submit", "hidden"):
+            out.append(seg[pos:m.end()]); pos = m.end()
+            continue
+        if W.get_attr(tag, "name") == "_gotcha":
+            out.append(seg[pos:m.end()]); pos = m.end()
+            continue
+        canon = canonical_field(tag, m.group(1))
+        if canon:
+            tag = W.set_attr(tag, "name", canon)
+        out.append(seg[pos:m.start()]); out.append(tag); pos = m.end()
+    out.append(seg[pos:])
+    return "".join(out)
+
+
+def ensure_submit(seg, page_label):
+    """Give the contact form a real submit control.
+
+    Four forms have no <input type="submit"> at all - their only button is
+    <a href="#" class="outline-button">Send Message</a>, an anchor that cannot
+    submit anything. Converting it to <button type="submit"> keeps every class
+    (so the styling and hover interaction are unchanged) and makes the form
+    actually work.
+    """
+    if 'type="submit"' in seg:
+        return seg, False
+    i = W.find_by_class(seg, "outline-button")
+    if i < 0:
+        warn("form on %s has no submit control and no outline-button to convert"
+             % page_label)
+        return seg, False
+    s, e = W.find_block(seg, i)
+    anchor = seg[s:e]
+    open_m = re.match(r"<a\s[^>]*>", anchor)
+    attrs = open_m.group(0)
+    inner = anchor[open_m.end():anchor.rfind("</a>")]
+    cls = W.get_attr(attrs, "class") or ""
+    wid = W.get_attr(attrs, "data-w-id")
+    btn = '<button type="submit" class="%s"%s data-wait="Please wait...">%s</button>' % (
+        cls, ' data-w-id="%s"' % wid if wid else "", inner)
+    return seg[:s] + btn + seg[e:], True
+
+
+def wire_forms(html, page_label):
+    """Point Webflow's dead forms at the serverless endpoint.
+
+    Every form in the export is method="get" with no action, so submissions are
+    silently dropped once the site leaves Webflow. They keep their existing
+    markup and their `w-form-done` / `w-form-fail` blocks; js/forms.js drives
+    those states from the POST result.
+    """
+    count = 0
+    out, pos = [], 0
+    for m in re.finditer(r"<form\s[^>]*>", html):
+        if m.start() < pos:
+            continue
+        tag = m.group(0)
+        if "/.wf_auth" in tag:          # Webflow password page, not a lead form
+            out.append(html[pos:m.end()]); pos = m.end()
+            continue
+        fstart, fend = W.find_block(html, m.start())
+        seg = html[fstart:fend]
+        name = W.get_attr(tag, "data-name") or W.get_attr(tag, "name") or "Form"
+
+        new_tag = W.set_attr(tag, "method", "post")
+        new_tag = W.set_attr(new_tag, "action", "/api/contact")
+        new_tag = W.set_attr(new_tag, "data-form-name", _esc_attr(name))
+        new_tag = W.set_attr(new_tag, "data-form-page", _esc_attr(page_label))
+        for dead in ("data-wf-page-id", "data-wf-element-id", "redirect",
+                     "data-redirect"):
+            new_tag = W.del_attr(new_tag, dead)
+
+        seg = new_tag + HONEYPOT + seg[m.end() - fstart:]
+        seg = normalize_form_fields(seg)
+        seg, _converted = ensure_submit(seg, page_label)
+
+        out.append(html[pos:fstart])
+        out.append(seg)
+        pos = fend
+        count += 1
+    out.append(html[pos:])
+    html = "".join(out)
+    if count and "/js/forms.js" not in html:
+        html = html.replace("</body>",
+                            '  <script src="/js/forms.js" defer></script>\n</body>', 1)
+    return html
+
+
+# ------------------------------------------------------- dead-link repairs
+
+def fix_dead_links(html):
+    """Repair anchors the export left pointing at '#'.
+
+    Only unambiguous cases: brand logos, the single-locale switcher, and the
+    footer 'Training' link whose target page exists. Interaction-driven toggles
+    (the chat widget) legitimately keep href="#".
+    """
+    # Brand logos in the mobile nav and the footer.
+    html = re.sub(r'<a href="#"(\s+class="navbar-brand)', r'<a href="/"\1', html)
+    # Single-locale switcher.
+    html = re.sub(r'<a hreflang="en" href="#"', '<a hreflang="en" href="/"', html)
+
+    # Footer link whose label names a page that exists.
+    labels = {"Training": "/training", "Home": "/", "Blog": "/blog",
+              "Contact Us": "/contact-us", "Departments": "/departments",
+              "About Us": "/about-banker-vascular-center"}
+    def footer_link(m):
+        block = m.group(0)
+        label = re.search(r"<div>([^<]+)</div>\s*</a>\s*$", block)
+        if label:
+            target = labels.get(label.group(1).strip())
+            if target:
+                return block.replace('href="#"', 'href="%s"' % target, 1)
+        return block
+
+    html = re.sub(r'<a href="#"\s+class="footer-link-two[^"]*"[^>]*>.*?</a>',
+                  footer_link, html, flags=re.S)
+    return html
+
+
+# ------------------------------------------------------------------- shell pass
+
+def prepare_shell(html, cms, binder, page_label):
+    """Transforms every page gets, CMS shells and detail templates alike."""
+    html = remove_template_junk(html)
+    html = remove_dead_lists(html)
+    html = rewrite_links(html)
+    html = fix_dead_links(html)
+    html = apply_nav(html, cms, binder)
+    html = wire_forms(html, page_label)
+    return html
+
+
+def build_shells(pages, cms, binder, assets):
+    written = []
+    for page in pages:
+        html = prepare_shell(read(os.path.join(ROOT, page)), cms, binder, page)
+        out_rel = CFG.DIRECTORY_PAGES.get(page, page)
+        url = page_url(page)
+        specs = CFG.PAGE_LISTS.get(page, [])
+
+        paginated = [s for s in specs if s.get("paginate")]
+        plain = [s for s in specs if not s.get("paginate")]
+        for spec in plain:
+            html = populate(html, spec, order_items(cms, spec), binder)
+
+        if not paginated:
+            html = set_head_meta(html, canonical=CFG.SITE_URL + url,
+                                 noindex=page in CFG.NOINDEX_PAGES)
+            write(out_rel, html)
+            written.append((out_rel, url, page not in CFG.NOINDEX_PAGES))
+            continue
+
+        spec = paginated[0]
+        items = order_items(cms, spec)
+        per = spec["paginate"]
+        total = max(1, -(-len(items) // per))
+        for p in range(1, total + 1):
+            chunk = items[(p - 1) * per: p * per]
+            page_html = populate(html, spec, chunk, binder)
+            controls = build_pagination(p, total, url)
+            if controls:
+                found = find_list(page_html, spec)
+                if found:
+                    lst = found[0]
+                    page_html = (page_html[:lst[1] - len("</div>")] + controls
+                                 + page_html[lst[1] - len("</div>"):])
+            rel = out_rel if p == 1 else "%s/page/%d.html" % (
+                out_rel.rsplit("/", 1)[0] if "/" in out_rel else out_rel[:-5], p)
+            purl = url if p == 1 else "%s/page/%d" % (url.rstrip("/"), p)
+            page_html = set_head_meta(
+                page_html, canonical=CFG.SITE_URL + purl,
+                title=None if p == 1 else "Blog - Page %d %s" % (p, CFG.BRAND_TITLE))
+            write(rel, page_html)
+            written.append((rel, purl, True))
+    return written
+
+
+# ------------------------------------------------------------------ detail pass
+
+def build_details(cms, binder, assets):
+    written = []
+    for spec in CFG.COLLECTIONS:
+        tpl = spec.get("template")
+        if not tpl:
+            continue
+        key = spec["key"]
+        # The nav/junk/link/form work is identical for every item, so do it
+        # once per template rather than 282 times.
+        base = prepare_shell(read(os.path.join(ROOT, tpl)), cms, binder, tpl)
+        items = cms.published[key]
+        for item in items:
+            html = render_detail(base, spec, item, cms, binder, assets)
+            rel = "%s/%s.html" % (spec["folder"], item.slug)
+            write(rel, html)
+            written.append((rel, item.url, True))
+        print("  %-24s %3d pages" % (key, len(items)))
+    return written
+
+
+def render_detail(base, spec, item, cms, binder, assets):
+    html = base
+
+    for b in spec.get("bind", []):
+        html = binder._one(html, item, b, item.url) if b["kind"] != "link" else html
+
+    html = fill_repeated_richtext(html, spec, item, assets)
+    html = fill_author_block(html, spec, item, assets)
+    html = fill_socials(html, spec, item)
+    html = fill_detail_lists(html, spec, item, cms, binder)
+
+    title_txt = item.get_text(*spec.get("title", ["Name"]))
+    tpl_title = re.search(r"<title>(.*?)</title>", base, re.S).group(1).strip()
+    if tpl_title.startswith("|"):
+        full_title = "%s %s" % (title_txt, tpl_title)
+    else:
+        full_title = "%s %s" % (title_txt, CFG.BRAND_TITLE)
+    desc = item.get_text(*spec.get("desc", []))
+    desc = re.sub(r"<[^>]+>", " ", desc)
+    desc = re.sub(r"\s+", " ", htmllib.unescape(desc)).strip()[:300]
+    og = item.get_text(*spec.get("og_image", []))
+    html = set_head_meta(
+        html,
+        title=full_title.strip(),
+        desc=desc,
+        image=assets.url(og) if og else None,
+        canonical=CFG.SITE_URL + item.url,
+    )
+    return add_article_schema(html, spec, item, assets)
+
+
+def fill_repeated_richtext(html, spec, item, assets):
+    """Fill N identically-classed rich-text blocks in document order."""
+    conf = spec.get("repeated_richtext")
+    if not conf:
+        return html
+    cls, fields = conf["cls"], conf["fields"]
+    # A cursor is essential here: the blocks keep their shared class after being
+    # filled, so searching from 0 each time would rewrite the first block over
+    # and over and leave the rest unbound.
+    cursor = 0
+    for field in fields:
+        start = W.find_by_class(html, cls, cursor)
+        if start < 0:
+            break
+        val = (item.get(field) or "").strip()
+        if not val:
+            # No content for this slot: remove the empty block so the page does
+            # not render a stray gap.
+            s, e = W.find_block(html, start)
+            html = html[:s] + html[e:]
+            cursor = s
+            continue
+        html = W.edit_open_tag(html, start,
+                               lambda t: W.drop_class(t, "w-dyn-bind-empty"))
+        block = W.find_block(html, start)
+        html = W.set_inner(html, block, clean_richtext(val, assets))
+        cursor = W.find_block(html, start)[1]
+    return html
+
+
+def fill_author_block(html, spec, item, assets):
+    conf = spec.get("author_block")
+    if not conf:
+        return html
+    author = item.get("_author")
+    block = W.block_by_class(html, conf["container"])
+    if not block:
+        return html
+    if not author:
+        # No author, or the author is a draft: drop the block rather than show
+        # an empty avatar and a link to nowhere.
+        return html[:block[0]] + html[block[1]:]
+    seg = html[block[0]:block[1]]
+    pic = (author.get("Picture") or "").strip()
+    i = W.find_by_class(seg, conf["image"])
+    if i >= 0 and pic:
+        src = assets.url(pic)
+        seg = W.edit_open_tag(seg, i, lambda t: W.drop_class(
+            W.set_attr(W.set_attr(W.del_attr(t, "srcset"), "src", _esc_attr(src)),
+                       "alt", _esc_attr(author.name)), "w-dyn-bind-empty"))
+    j = W.find_by_class(seg, conf["link"])
+    if j >= 0:
+        seg = W.edit_open_tag(seg, j, lambda t: W.drop_class(
+            W.set_attr(t, "href", author.url), "w-dyn-bind-empty"))
+        seg = W.set_inner(seg, W.find_block(seg, j), htmllib.escape(author.name))
+    return html[:block[0]] + seg + html[block[1]:]
+
+
+def fill_socials(html, spec, item):
+    conf = spec.get("socials")
+    if not conf:
+        return html
+    cls, fields = conf["cls"], conf["fields"]
+    # Walk right-to-left so removing one anchor cannot shift the others.
+    starts = list(W.iter_by_class(html, cls))[:len(fields)]
+    for start, field in reversed(list(zip(starts, fields))):
+        url = (item.get(field) or "").strip()
+        s, e = W.find_block(html, start)
+        if meaningful_url(url):
+            seg = W.edit_open_tag(html[s:e], 0, lambda t: W.set_attr(
+                W.set_attr(W.set_attr(t, "href", _esc_attr(url)),
+                           "target", "_blank"), "rel", "noopener"))
+            html = html[:s] + seg + html[e:]
+        else:
+            html = html[:s] + html[e:]
+    return html
+
+
+def fill_detail_lists(html, spec, item, cms, binder):
+    for lspec in CFG.DETAIL_LISTS.get(spec.get("template"), []):
+        source = lspec["source"]
+        if source == "recent_blogs":
+            items = [b for b in cms.blogs_newest() if b.slug != item.slug]
+        elif source == "author_posts":
+            items = cms.posts_by_author(item.slug)
+        elif source == "category_posts":
+            items = cms.posts_by_category(item.slug)
+        elif source == "siblings":
+            items = [x for x in cms.published[spec["key"]] if x.slug != item.slug]
+        else:
+            continue
+        if lspec.get("limit"):
+            items = items[:lspec["limit"]]
+        html = populate(html, lspec, items, binder)
+    return html
+
+
+def add_article_schema(html, spec, item, assets):
+    """BlogPosting schema for blog posts; the export ships none."""
+    if spec["key"] != "blog":
+        return html
+    author = item.get("_author")
+    img = item.get_text("Main Image", "Blog Thumbnail")
+    data = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": item.name,
+        "url": CFG.SITE_URL + item.url,
+        "mainEntityOfPage": CFG.SITE_URL + item.url,
+        "publisher": {"@type": "Organization", "name": "Bankers Vascular Centre",
+                      "url": CFG.SITE_URL},
+    }
+    if img:
+        data["image"] = CFG.SITE_URL + assets.url(img) if assets.url(img).startswith("/") \
+            else assets.url(img)
+    if item.get("_date"):
+        data["datePublished"] = item["_date"].strftime("%Y-%m-%d")
+    if author:
+        data["author"] = {"@type": "Person", "name": author.name,
+                          "url": CFG.SITE_URL + author.url}
+    desc = re.sub(r"\s+", " ", item.get_text("Short Details"))[:300]
+    if desc:
+        data["description"] = desc
+    tag = ('  <script type="application/ld+json">%s</script>\n</head>'
+           % json.dumps(data, ensure_ascii=False))
+    return html.replace("</head>", tag, 1)
+
+
+# ------------------------------------------------------------ static + sitemap
+
+def prune_unused_cms_assets():
+    """Ship only the CMS images that published pages actually reference.
+
+    images/cms/ is the download cache and holds assets belonging to drafts,
+    archived items and unused Webflow template leftovers too. Copying all of it
+    would bloat the deployment with files nothing links to.
+    """
+    cms_dir = os.path.join(DIST, "images", "cms")
+    if not os.path.isdir(cms_dir):
+        return 0, 0
+    used = set()
+    for base, _dirs, files in os.walk(DIST):
+        for f in files:
+            if not f.endswith((".html", ".xml")):
+                continue
+            # Unescape first: hero backgrounds are written as
+            # style="background-image:url(&quot;/images/cms/x.avif&quot;)", and
+            # matching the raw text captured the trailing &quot; as part of the
+            # filename - which made a referenced file look unused and deleted it.
+            text = htmllib.unescape(read(os.path.join(base, f)))
+            for m in re.finditer(r"/images/cms/([^\"'\s>)&]+)", text):
+                used.add(urllib.parse.unquote(m.group(1)))
+    removed = freed = 0
+    for f in os.listdir(cms_dir):
+        if f in used:
+            continue
+        p = os.path.join(cms_dir, f)
+        freed += os.path.getsize(p)
+        os.remove(p)
+        removed += 1
+    return removed, freed
+
+
+def strip_missing_refs(missing):
+    """Remove <img> tags pointing at assets that no longer exist anywhere.
+
+    Two conference photos were lost in the export and are not on the live site
+    either. A removed image is better than a broken-image icon in production.
+    """
+    if not missing:
+        return 0
+    targets = ["/" + m for m in missing]
+    removed = 0
+    for base, _dirs, files in os.walk(DIST):
+        for f in files:
+            if not f.endswith(".html"):
+                continue
+            path = os.path.join(base, f)
+            html = read(path)
+            if not any(t in html for t in targets):
+                continue
+            out, pos, hits = [], 0, 0
+            for m in re.finditer(r"<img\s[^>]*>", html):
+                src = W.get_attr(m.group(0), "src") or ""
+                if urllib.parse.unquote(src) not in targets:
+                    continue
+                out.append(html[pos:m.start()])
+                pos = m.end()
+                hits += 1
+            if hits:
+                out.append(html[pos:])
+                with open(path, "w", encoding="utf-8", newline="\n") as fh:
+                    fh.write("".join(out))
+                removed += hits
+    return removed
+
+
+def copy_static(assets):
+    for d in STATIC_DIRS:
+        src = os.path.join(ROOT, d)
+        if os.path.isdir(src):
+            shutil.copytree(src, os.path.join(DIST, d), dirs_exist_ok=True)
+    assets.static_report = assets.repair_static_images(DIST)
+    for extra in ("vercel.json",):
+        p = os.path.join(ROOT, extra)
+        if os.path.exists(p):
+            shutil.copy2(p, os.path.join(DIST, extra))
+    api_src = os.path.join(ROOT, "api")
+    if os.path.isdir(api_src):
+        shutil.copytree(api_src, os.path.join(DIST, "api"), dirs_exist_ok=True)
+
+    # api/contact.js is ESM. Vercel's Node runtime treats a .js function as
+    # CommonJS unless "type": "module" is declared, and would fail on
+    # `export default`. Deliberately no "scripts" here: dist/ is already built,
+    # and a build script would make Vercel try to rebuild it in CI.
+    write("package.json", json.dumps({
+        "name": "bankersvascular-site",
+        "private": True,
+        "type": "module",
+        "engines": {"node": ">=20"},
+    }, indent=2) + "\n")
+
+
+def write_sitemap(written):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    urls = []
+    for _rel, url, indexable in written:
+        if not indexable:
+            continue
+        urls.append("  <url><loc>%s%s</loc><lastmod>%s</lastmod></url>"
+                    % (CFG.SITE_URL, urllib.parse.quote(url, safe="/-_.~"), today))
+    write("sitemap.xml",
+          '<?xml version="1.0" encoding="UTF-8"?>\n'
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+          + "\n".join(urls) + "\n</urlset>\n")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--skip-assets", action="store_true",
+                    help="reuse already-downloaded CMS assets")
+    args = ap.parse_args()
+
+    global PAGE_URLS, PAGINATION_TEMPLATE
+    os.chdir(ROOT)
+
+    import assets as assets_mod
+    assets = assets_mod.AssetMap(skip_download=args.skip_assets)
+    assets.prefetch()
+
+    cms = cmsdata.Collections(CFG.COLLECTIONS, CFG.SITE_URL)
+    print(cms.report())
+    print()
+
+    pages = shell_pages()
+    PAGE_URLS = {f: page_url(f) for f in pages}
+    PAGE_URLS.update({"index.html": "/"})
+    PAGINATION_TEMPLATE = load_pagination_template()
+
+    binder = Binder(assets)
+
+    if os.path.isdir(DIST):
+        shutil.rmtree(DIST)
+    os.makedirs(DIST)
+
+    written = []
+    written += build_shells(pages, cms, binder, assets)
+    written += build_details(cms, binder, assets)
+
+    copy_static(assets)
+    write_sitemap(written)
+    write("robots.txt", "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n"
+          % CFG.SITE_URL)
+
+    gone = strip_missing_refs(assets.static_report.get("still_missing", []))
+    if gone:
+        print("stripped %d <img> ref(s) to assets that no longer exist" % gone)
+
+    removed, freed = prune_unused_cms_assets()
+    if removed:
+        print("pruned %d unreferenced CMS images from dist (%.0f MB)"
+              % (removed, freed / 1e6))
+    print("dist size: %.0f MB" % (dir_size(DIST) / 1e6))
+    print("pages written: %d" % len(written))
+    if warnings:
+        print("\n%d warning(s):" % len(warnings))
+        for w in sorted(set(warnings)):
+            print("  !", w)
+    assets.write_report(os.path.join(ROOT, "tools", "asset-report.txt"))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
