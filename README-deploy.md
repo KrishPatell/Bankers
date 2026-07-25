@@ -33,13 +33,31 @@ that fails to download keeps its original Webflow CDN URL and is listed in
 
 ## Deploy
 
+Vercel builds this project **from the repo root** — push to `main` and it
+deploys itself. `vercel.json` tells it everything it needs:
+
+```jsonc
+"buildCommand": "python3 tools/build.py",   // Python 3 is on Vercel's build image
+"outputDirectory": "dist"                   // where the generated site lands
+```
+
+Leave the project's Root Directory as the repository root. Do **not** set it to
+`dist` — `dist/` is gitignored, and `api/`, `package.json` and `vercel.json` all
+live at the root, so pointing Vercel at `dist` would lose the form endpoint.
+
 ```bash
 npx vercel            # preview deploy
 npx vercel --prod     # production
 ```
 
-Set the **root directory to `dist`** in the Vercel project settings (or run the
-commands from inside `dist/`). `vercel.json` is copied into `dist/` by the build.
+### Every deploy re-downloads the CMS images
+
+There is no build cache for `images/cms/`, so each CI build fetches all ~1,466
+assets from Webflow's CDN again. In practice that takes about 15 seconds from
+Vercel's build region. If the CDN throttles (it answers **403**, not 429, when it
+decides you are asking too fast), `tools/assets.py` retries with backoff and then
+falls back to leaving that image on the CDN URL — so a bad patch degrades a few
+images to remote loads rather than failing the deploy.
 
 ### Required environment variables
 

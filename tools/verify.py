@@ -67,7 +67,7 @@ def check_placeholders(pages):
 
 def redirect_sources():
     """Paths that resolve via a 301 in vercel.json rather than a file."""
-    p = os.path.join(DIST, "vercel.json")
+    p = os.path.join(ROOT, "vercel.json")
     if not os.path.exists(p):
         return set()
     cfg = json.load(open(p, encoding="utf-8"))
@@ -349,14 +349,22 @@ def check_encoding():
 
 
 def check_vercel():
-    p = os.path.join(DIST, "vercel.json")
+    p = os.path.join(ROOT, "vercel.json")
     if not os.path.exists(p):
-        return fail("vercel.json not in dist/")
+        return fail("vercel.json missing from the repo root")
     cfg = json.load(open(p, encoding="utf-8"))
     if not cfg.get("cleanUrls"):
         fail("vercel.json: cleanUrls must be true for /blog/<slug> to resolve")
     if cfg.get("trailingSlash") is not False:
         fail("vercel.json: trailingSlash should be false")
+    # Vercel builds from the repo root, so it has to be told where the
+    # generated site lands or it looks for public/ and fails the deploy.
+    if cfg.get("outputDirectory") != "dist":
+        fail('vercel.json: outputDirectory must be "dist"')
+    if not cfg.get("buildCommand"):
+        fail("vercel.json: buildCommand missing")
+    if not os.path.isdir(os.path.join(ROOT, "api")):
+        fail("api/ missing from the repo root - the form endpoint would 404")
     # Directory-page collision guard.
     for page in CFG.DIRECTORY_PAGES:
         if os.path.exists(os.path.join(DIST, page)):

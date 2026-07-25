@@ -5,7 +5,7 @@
   "description": "Bankers Vascular Centre - static site generated from the Webflow export plus the CMS CSV exports.",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   },
   "scripts": {
     "build": "python tools/build.py",

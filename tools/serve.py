@@ -26,7 +26,7 @@ mimetypes.add_type("image/webp", ".webp")
 mimetypes.add_type("font/otf", ".otf")
 mimetypes.add_type("application/json", ".json")
 
-with open(os.path.join(DIST, "vercel.json"), encoding="utf-8") as fh:
+with open(os.path.join(ROOT, "vercel.json"), encoding="utf-8") as fh:
     CFG = json.load(fh)
 
 REDIRECTS = {r["source"].rstrip("/") or "/": r["destination"]

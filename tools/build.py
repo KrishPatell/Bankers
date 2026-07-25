@@ -1001,24 +1001,11 @@ def copy_static(assets):
         if os.path.isdir(src):
             shutil.copytree(src, os.path.join(DIST, d), dirs_exist_ok=True)
     assets.static_report = assets.repair_static_images(DIST)
-    for extra in ("vercel.json",):
-        p = os.path.join(ROOT, extra)
-        if os.path.exists(p):
-            shutil.copy2(p, os.path.join(DIST, extra))
-    api_src = os.path.join(ROOT, "api")
-    if os.path.isdir(api_src):
-        shutil.copytree(api_src, os.path.join(DIST, "api"), dirs_exist_ok=True)
-
-    # api/contact.js is ESM. Vercel's Node runtime treats a .js function as
-    # CommonJS unless "type": "module" is declared, and would fail on
-    # `export default`. Deliberately no "scripts" here: dist/ is already built,
-    # and a build script would make Vercel try to rebuild it in CI.
-    write("package.json", json.dumps({
-        "name": "bankersvascular-site",
-        "private": True,
-        "type": "module",
-        "engines": {"node": ">=20"},
-    }, indent=2) + "\n")
+    # Nothing else is copied in. Vercel builds this project from the repo root
+    # with outputDirectory "dist", so vercel.json, package.json and the
+    # api/ functions are read from the root - copying them into dist/ would
+    # only publish the function's source at /api/contact.js and serve the
+    # config as a static file.
 
 
 def write_sitemap(written):
