@@ -53,7 +53,7 @@ Vercel builds this project **from the repo root** — push to `main` and it
 deploys itself. `vercel.json` tells it everything it needs:
 
 ```jsonc
-"buildCommand": "python3 tools/build.py",   // Python 3 is on Vercel's build image
+"buildCommand": "python tools/build.py",    // proven to work on Vercel's build image
 "outputDirectory": "dist"                   // where the generated site lands
 ```
 
@@ -66,7 +66,7 @@ these right:
 | Setting | Value |
 |---|---|
 | Root Directory | **empty** (the repository root) — *not* `dist` |
-| Build Command | blank — `vercel.json` supplies `python3 tools/build.py` |
+| Build Command | blank — `vercel.json` supplies `python tools/build.py` |
 | Output Directory | blank — `vercel.json` supplies `dist` |
 | Install Command | blank |
 
