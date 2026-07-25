@@ -1,0 +1,11 @@
+The following files failed to download during site export. Please check them in the designer assets view (images) or dashboard (fonts).
+
+images/department-details-highlighter.svg
+images/engagement.svg
+images/facebook.svg
+images/favicon.png
+images/improvement.svg
+images/instagram.svg
+images/integrity.svg
+images/like.svg
+images/twitter.svg

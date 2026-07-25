@@ -1,0 +1,16 @@
+# Generated site — rebuilt from scratch by tools/build.py on every run.
+/dist/
+
+# CMS image download cache. Re-fetchable with `python tools/build.py`, and large
+# (~800 MB), so it is kept out of git.
+/images/cms/
+
+# Build byproducts
+/tools/__pycache__/
+/tools/asset-report.txt
+*.part
+
+.DS_Store
+Thumbs.db
+.vercel
+node_modules/
