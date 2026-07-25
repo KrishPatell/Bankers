@@ -39,16 +39,35 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass
 
+    # api/contact.js is a Node function this server cannot execute, but it
+    # answers the two statuses the real one does for non-POST/POST, so
+    # tools/smoke.py gives the same verdict here as against Vercel.
     def do_POST(self):
         if self.path == "/api/contact":
             self.send_error(501, "api/contact.js needs `vercel dev` or Node")
         else:
             self.send_error(405)
 
+    def _api_stub(self):
+        if self.path != "/api/contact":
+            return False
+        if not os.path.isfile(os.path.join(ROOT, "api", "contact.js")):
+            return False
+        self.send_response(405)          # matches the real handler's GET reply
+        self.send_header("Allow", "POST")
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        body = b'{"ok":false,"error":"Method not allowed"}'
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        return True
+
     def do_HEAD(self):
         self.do_GET(head_only=True)
 
     def do_GET(self, head_only=False):
+        if self._api_stub():
+            return
         path = urllib.parse.urlparse(self.path).path
         path = urllib.parse.unquote(path)
 

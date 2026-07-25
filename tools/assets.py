@@ -3,7 +3,7 @@
 Two jobs:
 
 1. CMS assets. Every image in the CSVs lives on cdn.prod.website-files.com.
-   They are downloaded into images/cms/ so the site does not depend on Webflow's
+   They are downloaded into src/images/cms/ so the site does not depend on Webflow's
    CDN once the site has moved off Webflow. Any download that fails keeps its
    original CDN URL - a working remote image beats a broken local one.
 
@@ -22,7 +22,8 @@ import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMAGES = os.path.join(ROOT, "images")
+# The export, including its images, lives under src/ - see the note in build.py.
+IMAGES = os.path.join(ROOT, "src", "images")
 CMS_CACHE = os.path.join(IMAGES, "cms")
 
 CDN_HOSTS = (
@@ -64,7 +65,7 @@ _SHARED = "https://cdn.prod.website-files.com/6890521b31848ff8d5bc902a/"
 # Assets listed in MISSING.txt that never downloaded during the Webflow export.
 # The source URLs were recovered by reading the live pages that reference each
 # one, so these are the real files rather than lookalikes. Where the original is
-# no longer served anywhere, a visually equivalent asset already in images/ is
+# no longer served anywhere, a visually equivalent asset already in src/images/ is
 # substituted; `None` means neither is available and the reference is stripped.
 #
 #   local name -> (real CDN url or None, local substitute or None)

@@ -1,17 +1,33 @@
 # Bankers Vascular — build & deploy
 
-This repo holds the **Webflow static export** (the source templates) plus a
-generator that fills it with the CMS data from `cms/*.csv` and writes a
+This repo holds the **Webflow static export** in `src/` (the source templates)
+plus a generator that fills it with the CMS data from `cms/*.csv` and writes a
 deployable site into `dist/`.
 
+```
+src/     the untouched Webflow export — templates, css, js, images, fonts
+cms/     the CSV collection exports
+tools/   the generator and its checks
+api/     the form endpoint (Vercel reads this from the repo root)
+dist/    generated; gitignored; what actually gets served
+```
+
 **Never edit `dist/` by hand** — it is deleted and rebuilt on every run. Edit the
-templates in the repo root, or the config in `tools/wfconfig.py`.
+templates in `src/`, or the config in `tools/wfconfig.py`.
+
+The export deliberately lives in `src/` and **not** at the repository root. A
+root containing a ready-looking `index.html` is a trap: point a host at it and it
+will serve the *unbound* templates — empty collection lists, "No items found."
+on every section — and the deploy will look successful. That is exactly what
+happened once (see below). With the export under `src/`, that misconfiguration
+404s instead. `tools/verify.py` fails the build if an `index.html` ever
+reappears at the root.
 
 ## Build
 
 ```bash
 python tools/build.py                 # full build, downloads CMS images on first run
-python tools/build.py --skip-assets   # fast rebuild (~20s), reuses images/cms/
+python tools/build.py --skip-assets   # fast rebuild (~20s), reuses src/images/cms/
 python tools/verify.py                # production checks; exits non-zero on failure
 python tools/serve.py 3111            # preview dist/ the way Vercel serves it
 ```
@@ -26,7 +42,7 @@ works there works on Vercel. It does not execute `api/contact.js`; use
 `vercel dev` (needs an authenticated Vercel account) to exercise the form
 endpoint locally.
 
-The first build downloads ~1,400 CMS images into `images/cms/` (a few hundred MB).
+The first build downloads ~1,466 CMS images into `src/images/cms/` (a few hundred MB).
 They are cached, so later builds reuse them and take a few seconds. Any image
 that fails to download keeps its original Webflow CDN URL and is listed in
 `tools/asset-report.txt`.
@@ -41,9 +57,36 @@ deploys itself. `vercel.json` tells it everything it needs:
 "outputDirectory": "dist"                   // where the generated site lands
 ```
 
-Leave the project's Root Directory as the repository root. Do **not** set it to
-`dist` — `dist/` is gitignored, and `api/`, `package.json` and `vercel.json` all
-live at the root, so pointing Vercel at `dist` would lose the form endpoint.
+### Vercel project settings
+
+`vercel.json` overrides the dashboard for Build Command and Output Directory, but
+**Root Directory is dashboard-only and cannot be set from `vercel.json`**. Get
+these right:
+
+| Setting | Value |
+|---|---|
+| Root Directory | **empty** (the repository root) — *not* `dist` |
+| Build Command | blank — `vercel.json` supplies `python3 tools/build.py` |
+| Output Directory | blank — `vercel.json` supplies `dist` |
+| Install Command | blank |
+
+If any field was overridden in the dashboard, clear the override so
+`vercel.json` governs. Do **not** set Root Directory to `dist`: it is gitignored
+so it is not in the checkout, and `api/`, `package.json` and `vercel.json` all
+live at the repository root — pointing Vercel at `dist` loses the form endpoint.
+
+### After every deploy, run the smoke test
+
+```bash
+python tools/smoke.py https://your-deployment.vercel.app
+```
+
+`tools/verify.py` inspects `dist/` on disk and **cannot** catch a deployment that
+publishes the wrong directory — it passed all its checks while production was
+serving the raw export. `smoke.py` fetches the live URL and asserts the built
+site is what is being served: 9 doctors, 12 departments, zero "No items found",
+the CMS item pages reachable, pagination and redirects working, and
+`/api/contact` deployed. Treat a deploy as unverified until it passes.
 
 ```bash
 npx vercel            # preview deploy
@@ -52,7 +95,7 @@ npx vercel --prod     # production
 
 ### Every deploy re-downloads the CMS images
 
-There is no build cache for `images/cms/`, so each CI build fetches all ~1,466
+There is no build cache for `src/images/cms/`, so each CI build fetches all ~1,466
 assets from Webflow's CDN again. In practice that takes about 15 seconds from
 Vercel's build region. If the CDN throttles (it answers **403**, not 429, when it
 decides you are asking too fast), `tools/assets.py` retries with backoff and then
@@ -218,10 +261,11 @@ cases on the live site), not things the CMS fill introduced:
 - **~20 dead links to `medicio.webflow.io`** — the Webflow template's demo site —
   shipped inside a hidden nav block on every page. Removed. These are still live
   on the production site today.
-- **Lorem ipsum in a CMS list.** `fancy-columns-wrap-copy` on the home page
-  rendered "Item Heading / Subtitle / eros dolor interdum nulla…". Removed, along
-  with `staff-collection`, whose item template is empty so it could only ever
-  render "No items found."
+- **Dead template markup removed.** `fancy-columns-wrap-copy` carried Webflow's
+  "Item Heading / Subtitle / eros dolor interdum nulla…" lorem ipsum, and
+  `staff-collection` had an empty item template. Both are `display: none` in the
+  CSS, so this was dead DOM and indexable text rather than anything visible —
+  worth removing, but it was not a visible bug.
 - **Dead links repaired**: the mobile and footer brand logos, the locale
   switcher, and the footer "Training" link all pointed at `#` despite their
   targets existing.

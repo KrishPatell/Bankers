@@ -348,6 +348,28 @@ def check_encoding():
     note("UTF-8 clean; curly punctuation preserved on %d pages" % hits)
 
 
+def check_repo_layout():
+    """The export must stay under src/, never at the repository root.
+
+    This is what stops a misconfigured deploy from silently publishing the
+    unbound templates. It happened once: Vercel served the repo root, so the
+    live site showed empty collection lists and "No items found." on every
+    section while dist/ was perfectly correct. With no index.html at the root
+    that mistake 404s instead of looking like a successful deploy.
+    """
+    if not os.path.exists(os.path.join(ROOT, "src", "index.html")):
+        return fail("src/index.html missing - the export is not where the "
+                    "build expects it")
+    stray = [n for n in ("index.html", "css", "js", "images", "fonts")
+             if os.path.exists(os.path.join(ROOT, n))]
+    if stray:
+        fail("the repository root contains %s - a deploy pointed at the root "
+             "would publish the unbound export instead of dist/"
+             % ", ".join(stray))
+    else:
+        note("export is under src/; the repo root cannot be served as a site")
+
+
 def check_vercel():
     p = os.path.join(ROOT, "vercel.json")
     if not os.path.exists(p):
@@ -389,6 +411,7 @@ def main():
     check_animations(pages)
     check_sitemap(pages)
     check_encoding()
+    check_repo_layout()
     check_vercel()
 
     print("=" * 70)

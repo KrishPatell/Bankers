@@ -3,9 +3,9 @@
 
     python tools/build.py [--skip-assets]
 
-Reads the untouched export in the repo root and writes a complete static site
-into dist/. Source files are never modified, so any run is reproducible and a
-bad run is undone by deleting dist/.
+Reads the untouched Webflow export in src/ and writes a complete static site
+into dist/. src/ is never modified, so any run is reproducible and a bad run is
+undone by deleting dist/.
 """
 
 import argparse
@@ -27,12 +27,20 @@ import wfhtml as W
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
 
+# The Webflow export lives in src/, deliberately not at the repository root.
+# A root full of ready-looking index.html/css/images is dangerous: if Vercel is
+# ever pointed at the root it will happily publish the *unbound* templates -
+# empty collection lists, "No items found." everywhere - and the deploy looks
+# successful. With the export under src/ that misconfiguration 404s instead.
+SRC = os.path.join(ROOT, "src")
+
 STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
 
-# Root pages copied through the shell-rewrite pass.
+
+# Shell pages copied through the shell-rewrite pass.
 def shell_pages():
     return sorted(
-        f for f in os.listdir(ROOT)
+        f for f in os.listdir(SRC)
         if f.endswith(".html") and f not in CFG.EXCLUDE_PAGES
     )
 
@@ -478,7 +486,7 @@ PAGINATION_TEMPLATE = None  # lifted from detail_treatment.html at startup
 
 
 def load_pagination_template():
-    src = read(os.path.join(ROOT, "detail_treatment.html"))
+    src = read(os.path.join(SRC, "detail_treatment.html"))
     blk = W.block_by_class(src, "w-pagination-wrapper")
     return src[blk[0]:blk[1]] if blk else None
 
@@ -703,7 +711,7 @@ def prepare_shell(html, cms, binder, page_label):
 def build_shells(pages, cms, binder, assets):
     written = []
     for page in pages:
-        html = prepare_shell(read(os.path.join(ROOT, page)), cms, binder, page)
+        html = prepare_shell(read(os.path.join(SRC, page)), cms, binder, page)
         out_rel = CFG.DIRECTORY_PAGES.get(page, page)
         url = page_url(page)
         specs = CFG.PAGE_LISTS.get(page, [])
@@ -756,7 +764,7 @@ def build_details(cms, binder, assets):
         key = spec["key"]
         # The nav/junk/link/form work is identical for every item, so do it
         # once per template rather than 282 times.
-        base = prepare_shell(read(os.path.join(ROOT, tpl)), cms, binder, tpl)
+        base = prepare_shell(read(os.path.join(SRC, tpl)), cms, binder, tpl)
         items = cms.published[key]
         for item in items:
             html = render_detail(base, spec, item, cms, binder, assets)
@@ -997,7 +1005,7 @@ def strip_missing_refs(missing):
 
 def copy_static(assets):
     for d in STATIC_DIRS:
-        src = os.path.join(ROOT, d)
+        src = os.path.join(SRC, d)
         if os.path.isdir(src):
             shutil.copytree(src, os.path.join(DIST, d), dirs_exist_ok=True)
     assets.static_report = assets.repair_static_images(DIST)

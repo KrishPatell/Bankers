@@ -2,8 +2,8 @@
 /dist/
 
 # CMS image download cache. Re-fetchable with `python tools/build.py`, and large
-# (~800 MB), so it is kept out of git.
-/images/cms/
+# (~900 MB), so it is kept out of git.
+/src/images/cms/
 
 # Build byproducts
 /tools/__pycache__/
