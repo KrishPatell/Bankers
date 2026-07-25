@@ -1,0 +1,16 @@
+{
+  "name": "bankersvascular-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Bankers Vascular Centre - static site generated from the Webflow export plus the CMS CSV exports.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "python tools/build.py",
+    "build:fast": "python tools/build.py --skip-assets",
+    "verify": "python tools/verify.py",
+    "serve": "python tools/serve.py 3111"
+  }
+}

@@ -1,0 +1,26 @@
+# The root *.html files and css/js are machine-generated Webflow output and are
+# read as build templates. Keep them byte-stable across platforms rather than
+# letting autocrlf rewrite line endings on checkout.
+*.html   text eol=lf
+*.css    text eol=lf
+*.js     text eol=lf
+*.json   text eol=lf
+*.py     text eol=lf
+*.md     text eol=lf
+*.txt    text eol=lf
+
+# CMS exports: never normalise. Some cells contain literal newlines inside
+# quoted rich text, and rewriting them would corrupt the data.
+*.csv    -text
+
+# Binary assets
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.webp   binary
+*.avif   binary
+*.pdf    binary
+*.otf    binary
+*.ttf    binary
+*.woff   binary
+*.woff2  binary
