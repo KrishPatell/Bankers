@@ -12834,3 +12834,58 @@ figure {
   font-style: normal;
   font-display: swap;
 }
+
+/* Production guardrails for real CMS copy. Webflow placeholder titles are
+   short; live CMS titles, doctor names, and product names are not. */
+.blog-archive-item,
+.blog-content-wrapper,
+.blog-small-item-content-block,
+.department-archive-item,
+.department-archive-card,
+.doctor-archive-item,
+.doctor-archive-card,
+.doctor-info-block,
+.product-card,
+.div-block-44,
+.featured-articles {
+  min-width: 0;
+}
+
+.blog-archive-name,
+.blog-small-item-name,
+.blog-short-details,
+.department-name,
+.department-short-details,
+.doctor-name,
+.doctor-designation,
+.heading-13,
+.paragraph-13,
+.title-small {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.blog-archive-thumbnail.animation-image,
+.blog-small-item-image,
+.doctor-thumbnail.animation-image,
+.doctor-main-image,
+.image-449 {
+  max-width: 100%;
+}
+
+@media screen and (max-width: 767px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    padding-bottom: 1.5rem;
+  }
+
+  .heading-13 {
+    font-size: 1.35rem;
+    line-height: 1.25;
+  }
+}
