@@ -270,6 +270,8 @@ ITEM_BINDINGS = {
         {"kind": "self_text_link"},
     ],
     "featured-link": [
+        {"cls": "feature-image", "field": "Department Icon", "kind": "img",
+         "alt": "Name", "on_empty": "remove"},
         {"cls": "title-small", "field": "Name", "kind": "text"},
         {"kind": "link"},
     ],
