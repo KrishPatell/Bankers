@@ -12965,3 +12965,148 @@ figure {
     grid-column: auto;
   }
 }
+
+/* Blog titles and SEO descriptions vary substantially in length. Keep the
+   breadcrumb inside the text side of the hero instead of letting CMS copy run
+   across the people in the background artwork. */
+.blog-breadcrumb-section .main-container {
+  position: relative;
+  z-index: 1;
+}
+
+.blog-breadcrumb-wrapper {
+  align-items: flex-start;
+  width: 52%;
+  max-width: 580px;
+  overflow: visible !important;
+}
+
+.blog-breadcrumb-wrapper .breadcrumb-heading-3.blog {
+  text-align: left;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.blog-breadcrumb-trail.container-21.center {
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+
+.blog-breadcrumb-trail .container-20,
+.blog-breadcrumb-trail .horizontal-divider-2 {
+  flex: 0 0 auto;
+}
+
+.blog-breadcrumb-trail .horizontal-divider-2 {
+  margin-top: 8px;
+}
+
+.blog-breadcrumb-trail > .link-block-4:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.blog-breadcrumb-trail .text-102 {
+  text-align: left;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 991px) {
+  .blog-breadcrumb-wrapper {
+    width: 58%;
+    max-width: 520px;
+  }
+
+  .blog-breadcrumb-wrapper .breadcrumb-heading-3.blog {
+    font-size: 36px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .blog-breadcrumb-section {
+    height: auto;
+    min-height: 430px;
+    padding-top: 140px;
+    padding-bottom: 72px;
+  }
+
+  .blog-breadcrumb-section .main-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .blog-breadcrumb-wrapper {
+    align-items: flex-start !important;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .blog-breadcrumb-wrapper .breadcrumb-heading-3.blog {
+    text-align: left;
+    font-size: 28px;
+    line-height: 1.18;
+  }
+
+  .blog-breadcrumb-trail.container-21.center {
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .blog-breadcrumb-trail .text-101,
+  .blog-breadcrumb-trail .text-102 {
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .blog-breadcrumb-trail .vectors-wrapper-5 {
+    height: 18px;
+  }
+
+  .blog-breadcrumb-trail .horizontal-divider-2 {
+    width: 14px;
+    height: 3px;
+    margin-top: 7px;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .blog-breadcrumb-section {
+    min-height: 480px;
+    padding-top: 126px;
+    padding-bottom: 56px;
+  }
+
+  .blog-breadcrumb-section.about {
+    background-position: 70% 100%;
+    background-size: 120%;
+  }
+
+  .blog-breadcrumb-wrapper .breadcrumb-heading-3.blog {
+    font-size: 25px;
+  }
+
+  .blog-breadcrumb-section .main-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .blog-breadcrumb-trail .text-102 {
+    -webkit-line-clamp: 1;
+  }
+}
