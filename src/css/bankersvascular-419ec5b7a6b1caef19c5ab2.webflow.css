@@ -12869,3 +12869,99 @@ figure {
     line-height: 1.25;
   }
 }
+
+/* Keep the department archive readable when CMS descriptions vary in length.
+   The first eight services remain scannable cards; the remaining four use the
+   full row so longer copy never clips or overlaps adjacent content. */
+.department-archive-list {
+  grid-template-areas: none;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: none;
+}
+
+.department-archive-item:nth-child(-n + 8) .department-archive-card.size {
+  height: 100%;
+  min-height: 285px;
+}
+
+.department-archive-item:nth-child(n + 9) {
+  grid-column: 1 / -1;
+}
+
+.department-archive-item:nth-child(n + 9) .department-archive-card.size {
+  flex-flow: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: auto;
+  min-height: 150px;
+  padding: 28px 32px;
+}
+
+.department-archive-item:nth-child(n + 9) .department-icon-wrapper {
+  flex: 0 0 auto;
+}
+
+.department-archive-item:nth-child(n + 9) .department-slider-content {
+  grid-template-columns: minmax(190px, .75fr) minmax(0, 2fr) auto;
+  align-items: center;
+  width: 100%;
+  display: grid;
+}
+
+.department-archive-item:nth-child(n + 9) .department-short-details {
+  line-height: 1.55;
+}
+
+.department-archive-item:nth-child(n + 9) .department-link {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 991px) {
+  .department-archive-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .department-archive-item:nth-child(n + 9) .department-slider-content {
+    grid-template-columns: minmax(160px, .8fr) minmax(0, 2fr);
+  }
+
+  .department-archive-item:nth-child(n + 9) .department-link {
+    grid-column: 1 / -1;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .department-archive-list {
+    gap: 20px;
+    grid-template-columns: 1fr;
+    width: 100%;
+    display: grid;
+  }
+
+  .department-archive-item {
+    width: auto;
+  }
+
+  .department-archive-item:nth-child(-n + 8) .department-archive-card.size {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 24px;
+  }
+
+  .department-archive-item:nth-child(n + 9) .department-archive-card.size {
+    flex-flow: column;
+    align-items: flex-start;
+    min-height: 0;
+    padding: 24px;
+  }
+
+  .department-archive-item:nth-child(n + 9) .department-slider-content {
+    grid-template-columns: 1fr;
+  }
+
+  .department-archive-item:nth-child(n + 9) .department-link {
+    grid-column: auto;
+  }
+}

@@ -253,6 +253,7 @@ ITEM_BINDINGS = {
     # as a heading above a real testimonial, so the Subtext label is used instead.
     # Flagged in the build report for real names to be supplied.
     "testimonial-card": [
+        {"cls": "column-item", "field": "BG Image", "kind": "bg"},
         {"cls": "heading", "field": "Subtext", "kind": "text"},
         {"cls": "paragraph-2", "field": "Short Description", "kind": "text"},
         {"kind": "link", "field": "YT"},
