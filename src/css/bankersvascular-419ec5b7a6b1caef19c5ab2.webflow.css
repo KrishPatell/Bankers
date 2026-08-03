@@ -13110,3 +13110,80 @@ figure {
     -webkit-line-clamp: 1;
   }
 }
+
+/* The Webflow export combines a 250%-wide grid, shrinking flex items, and
+   intrinsic image widths in the home-page team carousel. With nine CMS cards,
+   the outer items shrink below the fixed card width and overlap. Give the
+   carousel explicit, non-shrinking tracks and deterministic image frames. */
+.team-member-section .doctor-archive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+}
+
+.team-member-section .doctor-archive-list {
+  gap: 20px;
+  grid-template: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 270px;
+  width: max-content;
+  min-width: 100%;
+  display: grid;
+}
+
+.team-member-section .doctor-archive-item {
+  width: auto;
+  min-width: 0;
+}
+
+.team-member-section .doctor-archive-card {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.team-member-section .doctor-thumbnail-wrapper {
+  flex: 0 0 16rem;
+  width: 100%;
+  height: 16rem;
+}
+
+.team-member-section .doctor-thumbnail.animation-image {
+  object-fit: contain;
+  object-position: 50% 100%;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.team-member-section .image-animation-overlay {
+  display: none !important;
+}
+
+.team-member-section .doctor-name,
+.team-member-section .doctor-designation {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media screen and (max-width: 991px) {
+  .team-member-section .doctor-archive-list {
+    grid-auto-columns: 260px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .team-member-section .doctor-archive-list {
+    gap: 16px;
+    grid-auto-columns: min(82vw, 320px);
+  }
+
+  .team-member-section .doctor-thumbnail-wrapper {
+    flex-basis: 220px;
+    height: 220px;
+  }
+}
