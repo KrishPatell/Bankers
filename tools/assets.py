@@ -24,7 +24,33 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # The export, including its images, lives under src/ - see the note in build.py.
 IMAGES = os.path.join(ROOT, "src", "images")
+
+# Two CMS asset directories, with different jobs:
+#
+#   cms/      raw downloads straight from Webflow's CDN. 955 MB, gitignored,
+#             purely a re-fetchable cache.
+#   cms-opt/  the same images re-encoded as WebP, ~95% smaller. This is what
+#             ships, and it IS committed.
+#
+# The split exists because Vercel refused to build otherwise: a 978 MB
+# deployment came back BLOCKED on the Hobby plan with an empty build log and
+# could not even be redeployed. Committing the optimised copies also means the
+# CI build neither re-downloads ~1,500 CDN assets nor needs Pillow installed -
+# it just copies files, so deploys are deterministic and fast.
 CMS_CACHE = os.path.join(IMAGES, "cms")
+CMS_OPT = os.path.join(IMAGES, "cms-opt")
+
+# Raster formats worth re-encoding. SVG is vector, AVIF and WebP are already
+# compressed, so those are copied through untouched.
+CONVERTIBLE = (".png", ".jpg", ".jpeg")
+
+# q90 is perceptually lossless for photographs while cutting ~90% of the bytes.
+# Strict lossless WebP was measured on a 40-image sample and only reached 49%
+# (954 MB -> 491 MB), because 39 of those 40 are photographs saved as PNG -
+# PNG is already lossless, so a lossless re-encode has very little to remove.
+# 491 MB would not have cleared the deployment limit that blocked the build.
+WEBP_QUALITY = 90
+WEBP_METHOD = 6          # slowest/smallest; these files are built once and committed
 
 CDN_HOSTS = (
     "cdn.prod.website-files.com",
@@ -117,6 +143,62 @@ def local_name(url):
     return "%s_%s%s" % (digest, stem[:60], ext)
 
 
+def shipped_name(url):
+    """The filename actually served for `url`.
+
+    Convertible rasters are served as WebP, so this is the name every page,
+    stylesheet and sitemap entry refers to. Deriving it up front means the
+    generated HTML points at the shipped file from the start - there is no
+    post-hoc rewriting pass over 350 pages to get wrong.
+    """
+    name = local_name(url)
+    stem, ext = os.path.splitext(name)
+    return stem + ".webp" if ext.lower() in CONVERTIBLE else name
+
+
+def optimise(raw_path, opt_dir, raw_name, quality=WEBP_QUALITY):
+    """Write the shippable copy of `raw_name` into `opt_dir`.
+
+    Returns (shipped_name, src_bytes, out_bytes). Normally that is a WebP
+    re-encode; if the image cannot be decoded, is animated, or does not
+    actually get smaller, the original is copied through *under its original
+    name* instead. Keeping the real extension matters: Vercel sets
+    Content-Type from it, so a PNG living at a .webp path would be served as
+    image/webp.
+    """
+    src_size = os.path.getsize(raw_path)
+    stem, ext = os.path.splitext(raw_name)
+
+    if ext.lower() in CONVERTIBLE:
+        webp_name = stem + ".webp"
+        dest = os.path.join(opt_dir, webp_name)
+        tmp = "%s.%d.part" % (dest, os.getpid())
+        try:
+            from PIL import Image
+
+            with Image.open(raw_path) as im:
+                if getattr(im, "n_frames", 1) > 1:   # animated - keep as-is
+                    raise ValueError("animated")
+                # Palette images carry their alpha in im.info rather than the
+                # mode, so testing the mode alone flattens them onto an opaque
+                # background - logos and icons then render inside a white box.
+                has_alpha = (im.mode in ("RGBA", "LA", "PA")
+                             or "transparency" in im.info)
+                im = im.convert("RGBA" if has_alpha else "RGB")
+                im.save(tmp, "WEBP", quality=quality, method=WEBP_METHOD)
+            out = os.path.getsize(tmp)
+            if out >= src_size:                      # already well compressed
+                raise ValueError("no gain")
+            os.replace(tmp, dest)
+            return webp_name, src_size, out
+        except Exception:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+
+    shutil.copyfile(raw_path, os.path.join(opt_dir, raw_name))
+    return raw_name, src_size, src_size
+
+
 def fetch(url, dest, timeout=30, attempts=4):
     """Download `url` to `dest`, retrying on throttling and transient errors.
 
@@ -164,7 +246,12 @@ class AssetMap:
         self.failures = []     # (url, reason)
         self.downloaded = 0
         self.reused = 0
+        self.converted = 0
+        self.opt_bytes_in = 0
+        self.opt_bytes_out = 0
+        self.home_urls = set()   # populated by the build; see _priority()
         os.makedirs(CMS_CACHE, exist_ok=True)
+        os.makedirs(CMS_OPT, exist_ok=True)
 
     # ------------------------------------------------------------------ public
     def url(self, raw):
@@ -177,24 +264,35 @@ class AssetMap:
         if raw in self.map:
             return self.map[raw]
 
+        # Already optimised on a previous run (or committed to the repo): serve
+        # it without touching the network or Pillow. This is the path the Vercel
+        # build takes for every asset, which is why CI needs neither.
+        shipped = shipped_name(raw)
+        if os.path.exists(os.path.join(CMS_OPT, shipped)):
+            self.reused += 1
+            self.map[raw] = "/images/cms/" + shipped
+            return self.map[raw]
+
         name = local_name(raw)
         dest = os.path.join(CMS_CACHE, name)
-        rel = "/images/cms/" + name
 
-        if os.path.exists(dest) and os.path.getsize(dest) > 0:
-            self.reused += 1
-            self.map[raw] = rel
-            return rel
-        if self.skip_download:
-            self.map[raw] = raw
-            return raw
-        try:
-            fetch(raw, dest)
-            self.downloaded += 1
-            self.map[raw] = rel
-        except Exception as exc:                      # keep the CDN URL working
-            self.failures.append((raw, "%s: %s" % (type(exc).__name__, exc)))
-            self.map[raw] = raw
+        if not (os.path.exists(dest) and os.path.getsize(dest) > 0):
+            if self.skip_download:
+                self.map[raw] = raw
+                return raw
+            try:
+                fetch(raw, dest)
+                self.downloaded += 1
+            except Exception as exc:                  # keep the CDN URL working
+                self.failures.append((raw, "%s: %s" % (type(exc).__name__, exc)))
+                self.map[raw] = raw
+                return raw
+
+        actual, a, b = optimise(dest, CMS_OPT, name)
+        self.converted += 1
+        self.opt_bytes_in += a
+        self.opt_bytes_out += b
+        self.map[raw] = "/images/cms/" + actual
         return self.map[raw]
 
     def rewrite(self, text):
@@ -265,15 +363,14 @@ class AssetMap:
         urls = self.urls_in_csvs(cms_dir)
 
         todo = []
-        for u in sorted(urls):
-            dest = os.path.join(CMS_CACHE, local_name(u))
-            if os.path.exists(dest) and os.path.getsize(dest) > 0:
-                self.map[u] = "/images/cms/" + os.path.basename(dest)
+        for u in sorted(urls, key=self._priority):
+            if os.path.exists(os.path.join(CMS_OPT, shipped_name(u))):
+                self.map[u] = "/images/cms/" + shipped_name(u)
                 self.reused += 1
             else:
-                todo.append((u, dest))
+                todo.append((u, os.path.join(CMS_CACHE, local_name(u))))
 
-        print("CMS assets: %d referenced, %d cached, %d to download"
+        print("CMS assets: %d referenced, %d already optimised, %d to process"
               % (len(urls), self.reused, len(todo)))
         if not todo or self.skip_download:
             return
@@ -281,23 +378,36 @@ class AssetMap:
         def one(job):
             u, dest = job
             try:
-                fetch(u, dest)
-                return u, "/images/cms/" + os.path.basename(dest), None
+                fetched = 0
+                if not (os.path.exists(dest) and os.path.getsize(dest) > 0):
+                    fetch(u, dest)
+                    fetched = 1
+                actual, a, b = optimise(dest, CMS_OPT, os.path.basename(dest))
+                return u, "/images/cms/" + actual, None, fetched, a, b
             except Exception as exc:
-                return u, u, "%s: %s" % (type(exc).__name__, exc)
+                return u, u, "%s: %s" % (type(exc).__name__, exc), 0, 0, 0
 
         done = 0
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            for u, mapped, err in pool.map(one, todo):
+            for u, mapped, err, fetched, a, b in pool.map(one, todo):
                 self.map[u] = mapped
                 if err:
                     self.failures.append((u, err))
                 else:
-                    self.downloaded += 1
+                    self.downloaded += fetched
+                    self.converted += 1
+                    self.opt_bytes_in += a
+                    self.opt_bytes_out += b
                 done += 1
                 if done % 100 == 0 or done == len(todo):
-                    print("  %d/%d downloaded (%d failed)"
-                          % (done, len(todo), len(self.failures)))
+                    print("  %d/%d processed (%d failed)  %.0f MB -> %.0f MB"
+                          % (done, len(todo), len(self.failures),
+                             self.opt_bytes_in / 1e6, self.opt_bytes_out / 1e6))
+
+    def _priority(self, url):
+        """Home-page images first, so the most-viewed page is done earliest and
+        an interrupted run still leaves the landing page fully optimised."""
+        return (0 if url in self.home_urls else 1, url)
 
     # ---------------------------------------------------------- export repairs
     def repair_static_images(self, dist_root):

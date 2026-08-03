@@ -1003,11 +1003,40 @@ def strip_missing_refs(missing):
     return removed
 
 
+def home_page_assets(cms):
+    """CDN URLs the home page renders: the doctor gallery, the testimonial
+    backdrops and the four newest blog cards (plus their author avatars)."""
+    urls = set()
+
+    def add(*vals):
+        for v in vals:
+            v = (v or "").strip()
+            if v.startswith("http"):
+                urls.add(v)
+
+    for d in cms.published.get("our-doctors", []):
+        add(d.get("Doctor Thumbnail"), d.get("Doctor Details Image"))
+    for t in cms.published.get("testimonials", []):
+        add(t.get("BG Image"))
+    for p in cms.blogs_newest()[:4]:
+        add(p.get("Blog Thumbnail"), p.get("Main Image"))
+        if p.get("_author"):
+            add(p["_author"].get("Picture"))
+    return urls
+
+
 def copy_static(assets):
     for d in STATIC_DIRS:
         src = os.path.join(SRC, d)
         if os.path.isdir(src):
-            shutil.copytree(src, os.path.join(DIST, d), dirs_exist_ok=True)
+            # cms/ is the raw download cache and cms-opt/ holds the WebP copies
+            # actually referenced by the pages. Ship the latter, as images/cms/.
+            shutil.copytree(src, os.path.join(DIST, d), dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns("cms", "cms-opt"))
+    opt = os.path.join(SRC, "images", "cms-opt")
+    if os.path.isdir(opt):
+        shutil.copytree(opt, os.path.join(DIST, "images", "cms"),
+                        dirs_exist_ok=True)
     assets.static_report = assets.repair_static_images(DIST)
     # Nothing else is copied in. Vercel builds this project from the repo root
     # with outputDirectory "dist", so vercel.json, package.json and the
@@ -1041,9 +1070,14 @@ def main():
 
     import assets as assets_mod
     assets = assets_mod.AssetMap(skip_download=args.skip_assets)
+
+    # Load the CMS before prefetching so the home page's images can be
+    # optimised first - it is the page most people see, and an interrupted run
+    # then still leaves the landing page complete.
+    cms = cmsdata.Collections(CFG.COLLECTIONS, CFG.SITE_URL)
+    assets.home_urls = home_page_assets(cms)
     assets.prefetch()
 
-    cms = cmsdata.Collections(CFG.COLLECTIONS, CFG.SITE_URL)
     print(cms.report())
     print()
 

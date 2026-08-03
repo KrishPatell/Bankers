@@ -1,9 +1,13 @@
 # Generated site — rebuilt from scratch by tools/build.py on every run.
 /dist/
 
-# CMS image download cache. Re-fetchable with `python tools/build.py`, and large
-# (~900 MB), so it is kept out of git.
+# Raw CMS image download cache: ~955 MB of originals straight off Webflow's
+# CDN. Re-fetchable with `python tools/build.py`, so it stays out of git.
 /src/images/cms/
+
+# NOTE: src/images/cms-opt/ is deliberately NOT ignored. It holds the WebP
+# copies that actually ship (~90 MB), and committing them is what lets the
+# Vercel build run without re-downloading ~1,500 CDN assets or needing Pillow.
 
 # Build byproducts
 /tools/__pycache__/

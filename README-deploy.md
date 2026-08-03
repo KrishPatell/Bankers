@@ -42,10 +42,22 @@ works there works on Vercel. It does not execute `api/contact.js`; use
 `vercel dev` (needs an authenticated Vercel account) to exercise the form
 endpoint locally.
 
-The first build downloads ~1,466 CMS images into `src/images/cms/` (a few hundred MB).
-They are cached, so later builds reuse them and take a few seconds. Any image
-that fails to download keeps its original Webflow CDN URL and is listed in
-`tools/asset-report.txt`.
+### CMS images: two directories
+
+```
+src/images/cms/       raw downloads from Webflow's CDN. ~955 MB. GITIGNORED.
+src/images/cms-opt/   the WebP copies that ship. ~115 MB. COMMITTED.
+```
+
+The first build downloads ~1,466 CMS images into `src/images/cms/`, re-encodes
+each one as WebP into `src/images/cms-opt/`, and references only the latter.
+Because `cms-opt/` is committed, **a clean checkout needs neither the downloads
+nor Pillow** — CI just copies the files. That keeps deploys fast and
+deterministic. Any image that fails to download keeps its Webflow CDN URL and is
+listed in `tools/asset-report.txt`.
+
+Re-run `python tools/build.py` after adding CMS content; it fetches and converts
+only what is new, and you commit the resulting `cms-opt/` files.
 
 ## Deploy
 
@@ -93,14 +105,14 @@ npx vercel            # preview deploy
 npx vercel --prod     # production
 ```
 
-### Every deploy re-downloads the CMS images
+### CI does not re-download the CMS images
 
-There is no build cache for `src/images/cms/`, so each CI build fetches all ~1,466
-assets from Webflow's CDN again. In practice that takes about 15 seconds from
-Vercel's build region. If the CDN throttles (it answers **403**, not 429, when it
-decides you are asking too fast), `tools/assets.py` retries with backoff and then
-falls back to leaving that image on the CDN URL — so a bad patch degrades a few
-images to remote loads rather than failing the deploy.
+`src/images/cms-opt/` is committed, so a Vercel build finds every asset already
+present and skips the network entirely. Only genuinely new CMS content triggers a
+download, and if the CDN throttles (it answers **403**, not 429, when it decides
+you are asking too fast) `tools/assets.py` retries with backoff and then leaves
+that image on its CDN URL — degrading a few images to remote loads rather than
+failing the deploy.
 
 ### Required environment variables
 
@@ -186,27 +198,44 @@ Slugs are preserved **exactly** as they are in the CSVs, including awkward ones
 like `knee-pain-` (trailing hyphen) and the 23 slugs containing `---`. They are
 indexed URLs; normalising them would break live traffic.
 
-## Image weight — worth addressing before launch
+## Image weight — fixed
 
-Localising the CMS images means the site no longer depends on Webflow's CDN, but
-it also means it no longer benefits from Webflow's automatic image resizing. Two
-consequences:
+Vercel returned **BLOCKED** for three consecutive deploys, with an empty build
+log and a refusal to redeploy (*"This deployment can not be redeployed. Please
+try again from a fresh commit."*). The cause was size: `dist/` was **978 MB**,
+of which **955 MB was 1,392 photographs saved as PNG** — several at 4–5 MB each.
 
-- Some CMS uploads are genuinely large — the biggest are **4–5 MB PNGs**.
-- The generator drops `srcset` from CMS images, because the responsive variants
-  Webflow generated (`…-p-500.png`, `…-p-800.png`) live on its CDN, not here. So
-  a phone now downloads the full-size original.
+`tools/assets.py` now re-encodes them to WebP at quality 90:
 
-This does not break anything, and every page renders correctly, but it will hurt
-Largest Contentful Paint on image-heavy pages. Nothing was silently changed to
-mask it. Two ways to fix, in order of effort:
+| | before | after |
+|---|---|---|
+| CMS images | 955 MB | 115 MB |
+| whole `dist/` | 978 MB | **146 MB** |
 
-1. **Vercel Image Optimization** — add an `images` block to `vercel.json` and
-   route CMS `<img src>` through `/_vercel/image?url=…&w=…&q=…`. Config plus a
-   small change in `Binder._one`; keeps one copy of each original.
-2. **Pre-compress at build time** — add a Pillow pass in `tools/assets.py` to
-   re-encode anything over ~300 KB and emit `-p-500` / `-p-800` variants plus a
-   real `srcset`. Adds a dependency but produces a fully static, fast site.
+Measured PSNR against the originals is **37–43 dB** on the largest files, i.e.
+visually indistinguishable.
+
+**Why not strictly lossless?** It was measured, not assumed. On a 40-image
+sample, 39 were photographs — and PNG is *already* lossless, so a lossless WebP
+re-encode only reached 49% (954 MB → 491 MB). That would not have cleared the
+limit and would still have been slow on mobile. q90 is perceptually lossless and
+reaches 88%.
+
+Details worth knowing:
+
+- Only `.png/.jpg/.jpeg` are converted. SVG is vector; AVIF and WebP are already
+  compressed; animated images are skipped. Anything that fails to decode, or that
+  does not actually get smaller, is copied through **under its original name** —
+  the extension has to keep matching the bytes, because Vercel sets
+  `Content-Type` from it.
+- Palette PNGs keep their alpha. They carry transparency in `im.info` rather than
+  in `im.mode`, so testing the mode alone flattened 36 logos onto an opaque
+  background before this was caught.
+- `srcset` is still dropped from CMS images (Webflow's `-p-500`/`-p-800` variants
+  live on its CDN, not here), so a phone downloads the full-size WebP. At ~80 KB
+  average that is now acceptable. If you want to go further, add an `images`
+  block to `vercel.json` and route CMS `<img src>` through
+  `/_vercel/image?url=…&w=…&q=…`.
 
 ## Known content issues
 
