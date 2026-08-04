@@ -552,19 +552,27 @@ def canonical_field(tag, tagname):
     """
     name = (W.get_attr(tag, "name") or "").strip()
     itype = (W.get_attr(tag, "type") or "").lower()
-    low = name.lower()
+    # Webflow reused `email-3` for several plain-text message inputs. The
+    # visible placeholder/class is the reliable signal, not that export name.
+    low = " ".join(filter(None, [
+        name,
+        W.get_attr(tag, "id"),
+        W.get_attr(tag, "placeholder"),
+        W.get_attr(tag, "class"),
+        W.get_attr(tag, "data-name"),
+    ])).lower()
     if tagname == "textarea":
         return "Message"
-    if itype == "email":
-        return "Email"
-    if itype == "tel":
+    if "message" in low or "text-area" in low:
+        return "Message"
+    if "phone" in low or "mobile" in low or itype == "tel":
         return "Phone-Number"
     if low.startswith("name"):
         return "Name"
+    if itype == "email":
+        return "Email"
     if "email" in low:
         return "Email"
-    if "phone" in low or "mobile" in low:
-        return "Phone-Number"
     if "date" in low:
         return "Date"
     if "message" in low or low.startswith("field"):
