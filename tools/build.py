@@ -100,6 +100,13 @@ def rewrite_links(html):
 
     html = re.sub(r'\b(href|src)="([^"]*)"', attr_sub, html)
 
+    # The exported sidebar and CTA links use a Bitly redirect. Point visitors
+    # directly to WhatsApp so the destination is transparent and dependable.
+    html = html.replace(
+        "https://bit.ly/4cMeFYa",
+        "https://api.whatsapp.com/send/?phone=%2B919909908428&amp;text=&amp;type=phone_number&amp;app_absent=0",
+    )
+
     def srcset_sub(m):
         parts = []
         for chunk in m.group(1).split(","):
