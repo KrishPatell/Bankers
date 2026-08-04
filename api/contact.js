@@ -114,12 +114,12 @@ export default async function handler(req, res) {
 
   const rows = [
     ["Name", name],
-    ["Phone", phone],
-    ["Email", email || "-"],
-    ["Preferred date", preferredDate || "-"],
-    ["Message", message || "-"],
+    ...(phone ? [["Phone", phone]] : []),
+    ...(email ? [["Email", email]] : []),
+    ...(preferredDate ? [["Preferred date", preferredDate]] : []),
+    ...(message ? [["Message", message]] : []),
     ["Form", formName],
-    ["Page", pageName || "-"],
+    ...(pageName ? [["Page", pageName]] : []),
   ];
 
   try {

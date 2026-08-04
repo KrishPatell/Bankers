@@ -61,7 +61,15 @@ async function contact(request, env) {
   if (!phone && !email) return json({ ok: false, error: "Please enter a phone number or email address." }, 400);
   if (!env.RESEND_API_KEY || !env.CONTACT_TO_EMAIL) return json({ ok: false, error: "Form is not configured yet. Please call or message us on WhatsApp." }, 503);
 
-  const rows = [["Name", name], ["Phone", phone || "-"], ["Email", email || "-"], ["Preferred date", preferredDate || "-"], ["Message", message || "-"], ["Form", formName], ["Page", pageName || "-"]];
+  const rows = [
+    ["Name", name],
+    ...(phone ? [["Phone", phone]] : []),
+    ...(email ? [["Email", email]] : []),
+    ...(preferredDate ? [["Preferred date", preferredDate]] : []),
+    ...(message ? [["Message", message]] : []),
+    ["Form", formName],
+    ...(pageName ? [["Page", pageName]] : []),
+  ];
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",

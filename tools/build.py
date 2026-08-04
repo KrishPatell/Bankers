@@ -635,6 +635,11 @@ def wire_forms(html, page_label):
     those states from the POST result.
     """
     count = 0
+    # Form metadata is displayed in notification emails. Use reader-friendly
+    # labels instead of Webflow's export names such as "Email Form 2".
+    page_display = {
+        "contact-us.html": "Contact page",
+    }.get(page_label, page_label.removesuffix(".html").replace("-", " ").title() + " page")
     out, pos = [], 0
     for m in re.finditer(r"<form\s[^>]*>", html):
         if m.start() < pos:
@@ -646,11 +651,13 @@ def wire_forms(html, page_label):
         fstart, fend = W.find_block(html, m.start())
         seg = html[fstart:fend]
         name = W.get_attr(tag, "data-name") or W.get_attr(tag, "name") or "Form"
+        if page_label == "contact-us.html":
+            name = "Contact"
 
         new_tag = W.set_attr(tag, "method", "post")
         new_tag = W.set_attr(new_tag, "action", "/api/contact")
         new_tag = W.set_attr(new_tag, "data-form-name", _esc_attr(name))
-        new_tag = W.set_attr(new_tag, "data-form-page", _esc_attr(page_label))
+        new_tag = W.set_attr(new_tag, "data-form-page", _esc_attr(page_display))
         for dead in ("data-wf-page-id", "data-wf-element-id", "redirect",
                      "data-redirect"):
             new_tag = W.del_attr(new_tag, dead)
