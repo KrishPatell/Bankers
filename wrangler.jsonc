@@ -4,7 +4,8 @@
   "main": "worker.js",
   "compatibility_date": "2026-08-04",
   "vars": {
-    "CONTACT_TO_EMAIL": "support@bng.thinkowl.com"
+    "CONTACT_TO_EMAIL": "support@bng.thinkowl.com",
+    "CONTACT_FROM_EMAIL": "Bankers Vascular Centre <noreply@bankersvascular.com>"
   },
   "assets": {
     "directory": "./dist",
