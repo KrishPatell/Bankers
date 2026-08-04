@@ -13187,3 +13187,33 @@ figure {
     height: 220px;
   }
 }
+/* Doctor detail: patient gallery
+ *
+ * The Webflow export shipped this image with a `height="0"` attribute and a
+ * scroll interaction that can leave the image transparent. Keep the gallery
+ * visible, proportionate and independently safe on all breakpoints.
+ */
+.paitents .image-animation-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.paitents .patient-gallery-image {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  max-width: 100%;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.paitents .image-animation-overlay {
+  display: none !important;
+}
+
+.paitents .subtitle-line,
+.paitents .large-subtitle-text,
+.paitents .section-heading {
+  opacity: 1 !important;
+  transform: none !important;
+}
