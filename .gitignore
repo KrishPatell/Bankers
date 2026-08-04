@@ -17,4 +17,6 @@
 .DS_Store
 Thumbs.db
 .vercel
+.dev.vars
+.env*
 node_modules/

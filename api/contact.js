@@ -85,13 +85,21 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: "Please enter your name." });
   }
   const digits = phone.replace(/\D/g, "");
-  if (digits.length < 7 || digits.length > 15) {
+  // Some treatment appointment forms request an email and preferred date rather
+  // than a phone number. Every enquiry needs one usable return channel.
+  if (phone && (digits.length < 7 || digits.length > 15)) {
     return res
       .status(400)
       .json({ ok: false, error: "Please enter a valid phone number." });
   }
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     return res.status(400).json({ ok: false, error: "Please enter a valid email." });
+  }
+  if (!phone && !email) {
+    return res.status(400).json({
+      ok: false,
+      error: "Please enter a phone number or email address.",
+    });
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -125,16 +133,8 @@ export default async function handler(req, res) {
         from: process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev",
         to: to.split(",").map((s) => s.trim()).filter(Boolean),
         reply_to: email || undefined,
-        subject: `${formName} - ${name} (${phone})`,
-        html:
-          `<h2>New enquiry from bankersvascular.com</h2><table cellpadding="6">` +
-          rows
-            .map(
-              ([k, v]) =>
-                `<tr><td><strong>${esc(k)}</strong></td><td>${esc(v)}</td></tr>`
-            )
-            .join("") +
-          `</table>`,
+        subject: `New website enquiry — ${formName}`,
+        html: renderEmail(rows, formName),
         text: rows.map(([k, v]) => `${k}: ${v}`).join("\n"),
       }),
     });
@@ -154,4 +154,26 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ ok: true });
+}
+
+function renderEmail(rows, formName) {
+  const rowHtml = rows.map(([label, value]) => `
+    <tr>
+      <td style="padding:12px 16px;border-bottom:1px solid #e6edf0;color:#58717d;font:600 12px/18px Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;vertical-align:top;width:132px">${esc(label)}</td>
+      <td style="padding:12px 16px;border-bottom:1px solid #e6edf0;color:#152b36;font:400 15px/22px Arial,sans-serif;word-break:break-word">${esc(value)}</td>
+    </tr>`).join("");
+
+  return `<!doctype html><html><body style="margin:0;padding:24px;background:#f2f7f8">
+    <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,49,63,.10)">
+      <div style="padding:28px 32px;background:#24586b;color:#ffffff">
+        <div style="font:700 14px/20px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bde4e3">Bankers Vascular Centre</div>
+        <h1 style="margin:8px 0 0;font:700 26px/34px Arial,sans-serif">New website enquiry</h1>
+      </div>
+      <div style="padding:28px 32px 32px">
+        <p style="margin:0 0 20px;color:#58717d;font:400 15px/22px Arial,sans-serif">A visitor submitted the <strong style="color:#152b36">${esc(formName)}</strong>.</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #e6edf0;border-radius:10px;border-spacing:0;overflow:hidden">${rowHtml}</table>
+        <p style="margin:22px 0 0;color:#7a9099;font:400 12px/18px Arial,sans-serif">Sent from bankersvascular.com</p>
+      </div>
+    </div>
+  </body></html>`;
 }
