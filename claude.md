@@ -401,6 +401,9 @@ contract.
 ## Redirects, SEO, and sitemap
 
 - Canonical base: `https://bankersvascular.com`.
+- Use only non-www URLs in all user-facing links, CMS content, metadata,
+  canonicals, redirects, and generated output. Never introduce or present
+  `https://www.bankersvascular.com/...`.
 - `cleanUrls: true` and `trailingSlash: false` are part of the URL contract.
 - Redirects in `vercel.json` protect old `.html`, raw detail-template, and
   known legacy URLs. Preserve them when refactoring.
