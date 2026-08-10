@@ -299,7 +299,12 @@ NAV_LISTS = [
 PAGE_LISTS = {
     "index.html": [
         {"items_cls": "doctor-archive-list", "collection": "our-doctors",
-         "order": ("Order", "numeric"), "bindings": "doctor-card"},
+         "order": ("Order", "numeric"), "bindings": "doctor-card",
+         "field_overrides": {
+             "dr-disha-soni": {"Doctor Thumbnail": "/images/doctor-card-disha-soni-scrub-sample.png"},
+             "dr-janvi": {"Doctor Thumbnail": "/images/doctor-card-janvi-scrub-sample.png"},
+             "dr-tensi-trevedi": {"Doctor Thumbnail": "/images/doctor-card-tensi-trivedi-scrub-sample.png"},
+         }},
         {"items_cls": "fancy-columns", "collection": "testimonials",
          "order": ("Sort Order", "numeric"), "bindings": "testimonial-card"},
         {"items_cls": "blog-list-left", "collection": "blog",

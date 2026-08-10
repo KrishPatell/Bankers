@@ -411,10 +411,15 @@ def populate(html, spec, items, binder, urls=None, occurrence=0):
     template = seg[tpl_rel[0]:tpl_rel[1]]
 
     bindings = CFG.ITEM_BINDINGS[spec["bindings"]]
+    field_overrides = spec.get("field_overrides", {})
     rendered = []
     for n, it in enumerate(items):
         url = urls[n] if urls else None
-        rendered.append(binder.apply(template, it, bindings, url=url))
+        overrides = field_overrides.get(it.get("Slug"), {})
+        render_item = dict(it) if overrides else it
+        if overrides:
+            render_item.update(overrides)
+        rendered.append(binder.apply(template, render_item, bindings, url=url))
     body = "".join(rendered)
 
     # Replace the items container's contents, then drop the "No items found."
