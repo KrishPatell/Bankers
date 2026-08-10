@@ -214,6 +214,21 @@ def check_meta(pages):
         note("every indexable page has a filled title and a unique canonical")
 
 
+def check_blog_featured_image_policy(pages, cms):
+    """Thumbnails belong on blog cards and social metadata, never article bodies."""
+    bad = []
+    for item in cms.published["blog"]:
+        path = os.path.join(DIST, "blog", item.slug + ".html")
+        html = pages.get(path, "")
+        if ('class="blog-main-image' in html or 'blog-main-image-wapper' in html
+                or 'class="blog-meta-wrapper' in html):
+            bad.append("/blog/%s" % item.slug)
+    for url in bad:
+        fail("%s renders a featured thumbnail on the article page" % url)
+    if not bad:
+        note("blog pages flow directly into content; thumbnails and author/date blocks stay off-page")
+
+
 def check_forms(pages):
     """Every lead form must POST to the endpoint and have a real submit control."""
     total = 0
@@ -405,6 +420,7 @@ def main():
     cms = check_publish_rules(pages)
     check_nav(pages, cms)
     check_meta(pages)
+    check_blog_featured_image_policy(pages, cms)
     check_forms(pages)
     check_submit_controls(pages)
     check_assets(pages)

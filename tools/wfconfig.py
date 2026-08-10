@@ -34,10 +34,6 @@ COLLECTIONS = [
             {"cls": "breadcrumb-heading-3", "field": "Name", "kind": "text"},
             {"cls": "text-102", "field": "Short Details", "kind": "text",
              "on_empty": "remove"},
-            # 264 of 282 rows have no Main Image; fall back to the thumbnail
-            # rather than rendering a broken <img>.
-            {"cls": "blog-main-image", "field": ["Main Image", "Blog Thumbnail"],
-             "kind": "img", "alt": "Name"},
             {"cls": "blog-details", "field": "Main Details", "kind": "richtext"},
             # 'blog-meta-text' sits in the Date meta block, not the author one.
             {"cls": "blog-meta-text", "field": "@date", "kind": "text"},
