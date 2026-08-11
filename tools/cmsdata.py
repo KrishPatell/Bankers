@@ -48,6 +48,18 @@ DOCTOR_PROFILE_IMAGE_OVERRIDES = {
     "dr-janvi": "/images/doctor-card-janvi.png",
 }
 
+# Blog-card author avatars use the same approved portrait as their matching
+# doctor card.  The original author Picture remains available for the author
+# detail page and for authors without a published doctor-card counterpart.
+BLOG_AUTHOR_DOCTOR_IMAGE_OVERRIDES = {
+    "dr-disha-soni": "dr-disha-soni",
+    "dr-mohal": "dr-mohal-banker",
+    "www-bankersvascular-com-blog-author-dr-dimple-parmar": "dr-dimple",
+    "www-bankersvascular-com-our-doctors-dr-payal-vadlani": "dr-payal-vadlani",
+    "dr-pratiksha-patoliya": "dr-pratiksha-patoliya",
+    "dr-tensi-trivedi": "dr-tensi-trevedi",
+}
+
 # Card labels are intentionally separate from the profile designation, SEO
 # description, and CMS biography. This lets team cards keep a consistent,
 # concise two-line presentation without changing doctor profile content.
@@ -166,6 +178,10 @@ class Collections:
                     r["Card Designation"] = DOCTOR_CARD_DESIGNATION_OVERRIDES[slug]
                 if key == "our-doctors" and slug in DOCTOR_CARD_NAME_OVERRIDES:
                     r["Card Name"] = DOCTOR_CARD_NAME_OVERRIDES[slug]
+                if key == "blog-author":
+                    doctor_slug = BLOG_AUTHOR_DOCTOR_IMAGE_OVERRIDES.get(slug)
+                    r["Card Picture"] = DOCTOR_PROFILE_IMAGE_OVERRIDES.get(
+                        doctor_slug, r.get("Picture") or "")
                 if slug.lower() in seen:
                     dropped.append((slug, "duplicate slug"))
                     continue
