@@ -13291,6 +13291,41 @@ figure {
   transform: none !important;
 }
 
+/* Keep large desktop screens at the same visual density as the standard
+   desktop design. The exported 1280px/1440px rules enlarged the blog cards
+   (and, at 1920px, the main page canvas) enough to resemble browser zoom. */
+@media screen and (min-width: 1280px) {
+  .main-container {
+    width: calc(100% - 48px);
+    max-width: 1440px;
+    padding-top: 0;
+  }
+
+  .blog-archive {
+    grid-column-gap: 20px;
+    grid-row-gap: 36px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .blog-archive-thumbnail.animation-image {
+    aspect-ratio: 1;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .blog-content-wrapper {
+    padding-top: 14px;
+  }
+
+  .blog-archive-name {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+}
+
 /* SEO location and contextual-link modules injected by the site generator. */
 .seo-links-section {
   background: #f5fbfd;
