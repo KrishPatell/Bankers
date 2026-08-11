@@ -13133,9 +13133,14 @@ figure {
   flex: 0 0 16rem;
   width: 100%;
   height: 16rem;
+  position: relative;
+  /* Shared Rozil-reference studio background for all team-card photo areas. */
+  background: linear-gradient(135deg, #b7bdc9 0%, #8e97a9 48%, #626b82 100%);
 }
 
 .team-member-section .doctor-thumbnail.animation-image {
+  position: absolute;
+  inset: auto 0 -6.37%;
   object-fit: contain;
   object-position: 50% 100%;
   width: 100%;
@@ -13143,6 +13148,27 @@ figure {
   height: 100%;
   opacity: 1 !important;
   transform: none !important;
+}
+
+/* Doctor portraits are normalised transparent canvases.  Preserve their shared
+   head margin and bottom baseline in every card, including the narrow-screen
+   Webflow rule that previously stretched this image class. */
+.doctor-thumbnail.animation-image {
+  object-fit: contain !important;
+  object-position: 50% 100% !important;
+}
+
+/* Pratiksha's supplied cutout has slightly more visual headroom. Scale only
+   that transparent canvas while keeping its visible bottom on the shared line. */
+.team-member-section .doctor-thumbnail[alt="Dr. Pratiksha Patoliya"] {
+  height: 105%;
+  bottom: -6.7%;
+}
+
+/* Pratiksha has no designation line in the CMS. Reserve that line's height so
+   her card's image area starts on the same row as the other doctor cards. */
+.team-member-section .doctor-archive-card:has(.doctor-thumbnail[alt="Dr. Pratiksha Patoliya"]) .doctor-info-block {
+  min-height: 173px;
 }
 
 .team-member-section .image-animation-overlay {

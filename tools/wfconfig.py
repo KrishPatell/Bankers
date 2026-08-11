@@ -296,15 +296,26 @@ NAV_LISTS = [
 # Page-specific collection lists, keyed by the page they appear on. `items_cls`
 # identifies the <div role="list"> inside the w-dyn-list.
 
+# Card-only doctor portraits. These transparent 900 x 1100 uploads apply to
+# every reusable doctor-card list, without changing the larger profile images
+# used on individual doctor detail pages.
+DOCTOR_CARD_IMAGE_OVERRIDES = {
+    "dr-mohal-banker": {"Doctor Thumbnail": "/images/doctor-card-mohal-banker.png"},
+    "dr-rozil-gandhi": {"Doctor Thumbnail": "/images/doctor-card-rozil-gandhi.png"},
+    "dr-payal-vadlani": {"Doctor Thumbnail": "/images/doctor-card-payal-vadlani.png"},
+    "dr-dimple": {"Doctor Thumbnail": "/images/doctor-card-dimple-parmar.png"},
+    "dr-disha-soni": {"Doctor Thumbnail": "/images/doctor-card-disha-soni.png"},
+    "dr-janvi": {"Doctor Thumbnail": "/images/doctor-card-janvi.png"},
+    "dr-tensi-trevedi": {"Doctor Thumbnail": "/images/doctor-card-tensi-trivedi.png"},
+    "dr-pratiksha-patoliya": {"Doctor Thumbnail": "/images/doctor-card-pratiksha-patoliya.png"},
+    "dr-chandresh-bharada": {"Doctor Thumbnail": "/images/doctor-card-chandresh-bharada.png"},
+}
+
 PAGE_LISTS = {
     "index.html": [
         {"items_cls": "doctor-archive-list", "collection": "our-doctors",
          "order": ("Order", "numeric"), "bindings": "doctor-card",
-         "field_overrides": {
-             "dr-disha-soni": {"Doctor Thumbnail": "/images/doctor-card-disha-soni-scrub-sample.png"},
-             "dr-janvi": {"Doctor Thumbnail": "/images/doctor-card-janvi-scrub-sample.png"},
-             "dr-tensi-trevedi": {"Doctor Thumbnail": "/images/doctor-card-tensi-trivedi-scrub-sample.png"},
-         }},
+         "field_overrides": DOCTOR_CARD_IMAGE_OVERRIDES},
         {"items_cls": "fancy-columns", "collection": "testimonials",
          "order": ("Sort Order", "numeric"), "bindings": "testimonial-card"},
         {"items_cls": "blog-list-left", "collection": "blog",
@@ -326,15 +337,18 @@ PAGE_LISTS = {
     ],
     "contact-us.html": [
         {"items_cls": "doctor-archive-list", "collection": "our-doctors",
-         "order": ("Order", "numeric"), "bindings": "doctor-card"},
+         "order": ("Order", "numeric"), "bindings": "doctor-card",
+         "field_overrides": DOCTOR_CARD_IMAGE_OVERRIDES},
     ],
     "bng-conference-november-2024.html": [
         {"items_cls": "doctor-archive-list", "collection": "our-doctors",
-         "order": ("Order", "numeric"), "bindings": "doctor-card"},
+         "order": ("Order", "numeric"), "bindings": "doctor-card",
+         "field_overrides": DOCTOR_CARD_IMAGE_OVERRIDES},
     ],
     "bng-con-2025.html": [
         {"items_cls": "bng-conf", "collection": "our-doctors",
-         "order": ("Order", "numeric"), "bindings": "doctor-card"},
+         "order": ("Order", "numeric"), "bindings": "doctor-card",
+         "field_overrides": DOCTOR_CARD_IMAGE_OVERRIDES},
     ],
 }
 
