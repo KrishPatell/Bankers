@@ -36,6 +36,17 @@ SRC = os.path.join(ROOT, "src")
 
 STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
 
+STATIC_META = {
+    "bng-con-2025.html": {
+        "title": "BnG Con 2025 | Bankers Vascular Centre",
+        "desc": "Learn about BnG Con 2025, a Bankers Vascular Centre conference for vascular and interventional radiology professionals.",
+    },
+    "bng-conference-november-2024.html": {
+        "title": "BnG Conference November 2024 | Bankers Vascular Centre",
+        "desc": "Highlights from the November 2024 BnG Conference at Bankers Vascular Centre.",
+    },
+}
+
 
 # Shell pages copied through the shell-rewrite pass.
 def shell_pages():
@@ -65,6 +76,15 @@ def page_url(filename):
 
 
 PAGE_URLS = None  # filled in main()
+
+# Historic URLs still occur in exported CMS rich text and Webflow shells.
+# Resolve them while building so they cannot reintroduce internal 404s.
+LEGACY_INTERNAL_PATHS = {
+    "/departments/platelet-rich-plasma": "/treatment/platelet-rich-plasma",
+    "/departments/varicose-vein": "/departments/varicose-veins",
+    "/varicose-vein": "/varicose-veins/ahmedabad",
+    "/varicose-vein/": "/varicose-veins/ahmedabad",
+}
 
 
 def rewrite_links(html):
@@ -126,6 +146,8 @@ def rewrite_links(html):
         "", html,
     )
     html = html.replace('href=""', 'href="/"')
+    for old, new in LEGACY_INTERNAL_PATHS.items():
+        html = html.replace('href="%s"' % old, 'href="%s"' % new)
     return html
 
 
@@ -145,10 +167,15 @@ def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
         nonlocal html
         if value is None:
             return
-        rx = re.compile(r'<meta content="[^"]*"\s+%s>' % pattern)
-        repl = '<meta content="%s" %s>' % (_esc_attr(value), pattern.replace("\\", ""))
+        attr = pattern.replace("\\", "")
+        # Webflow exports meta attributes in both orders. Match the entire tag
+        # by its identifying attribute rather than assuming content comes first.
+        rx = re.compile(r'<meta(?=[^>]*\b%s)[^>]*>' % re.escape(attr))
+        repl = '<meta content="%s" %s>' % (_esc_attr(value), attr)
         if rx.search(html):
             html = rx.sub(lambda m: repl, html, count=1)
+        else:
+            html = html.replace("</head>", "  %s\n</head>" % repl, 1)
 
     meta('name="description"', desc)
     meta('property="og:title"', title)
@@ -165,6 +192,37 @@ def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
     if noindex and "<title>" in html:
         html = html.replace("</head>", '  <meta name="robots" content="noindex">\n</head>', 1)
     return html
+
+
+def ensure_meta_description(html):
+    """Give indexable pages a useful fallback when a CMS row has no excerpt."""
+    has_description = re.search(
+        r'<meta[^>]+name="description"[^>]+content="[^\"]+"|'
+        r'<meta[^>]+content="[^\"]+"[^>]+name="description"', html, re.I)
+    if has_description:
+        return html
+    title = re.search(r"<title>(.*?)</title>", html, re.S)
+    subject = re.sub(r"\s+", " ", htmllib.unescape(title.group(1) if title else ""))
+    subject = subject.replace(CFG.BRAND_TITLE, "").strip(" |-")
+    return set_head_meta(
+        html,
+        desc=("Learn about %s at Bankers Vascular Centre. "
+              "Contact our team to book a consultation." % subject)[:300],
+    )
+
+
+def enforce_single_h1(html):
+    """Keep the first page H1 and demote accidental additional H1s."""
+    matches = list(re.finditer(r"</?h1\b[^>]*>", html, re.I))
+    if len(matches) <= 2:
+        return html
+    first_close = next((i for i, m in enumerate(matches) if m.group(0).lower().startswith("</")), None)
+    if first_close is None:
+        return html
+    keep_until = matches[first_close].end()
+    head, tail = html[:keep_until], html[keep_until:]
+    tail = re.sub(r"<(/?)h1(?=[\s>])", r"<\1h2", tail, flags=re.I)
+    return head + tail
 
 
 # ------------------------------------------------------------------- rich text
@@ -192,6 +250,8 @@ def clean_richtext(rt, assets):
     rt = re.sub(r'\s+id=""', "", rt)
     # Keep internal links on-site; open external ones safely.
     rt = re.sub(r'https?://(?:www\.)?bankersvascular\.com(?=[/"\'])', "", rt)
+    for old, new in LEGACY_INTERNAL_PATHS.items():
+        rt = rt.replace('href="%s"' % old, 'href="%s"' % new)
 
     def anchor(m):
         tag = m.group(0)
@@ -205,6 +265,12 @@ def clean_richtext(rt, assets):
     rt = re.sub(r"<a\s[^>]*>", anchor, rt)
     # CMS images must not block first paint.
     rt = re.sub(r"<img\s(?![^>]*loading=)", '<img loading="lazy" ', rt)
+    # The page template supplies the document H1. Demote pasted rich-text H1s
+    # so each indexable page has one unambiguous primary heading.
+    rt = re.sub(r"<(/?)h1(?=[\s>])", r"<\1h2", rt, flags=re.I)
+    # Webflow's reserved placeholder is not meaningful alternative text.
+    rt = re.sub(r'\balt=("|\')__wf_reserved_inherit\1',
+                'alt="Medical treatment illustration"', rt)
     return rt
 
 
@@ -722,10 +788,63 @@ def fix_dead_links(html):
     return html
 
 
+def add_seo_internal_links(html, url):
+    """Create visible, contextual routes between conditions, procedures and cities."""
+    city_links = {
+        "varicose": [
+            ("Ahmedabad", "/varicose-veins/ahmedabad"), ("Vadodara", "/varicose-veins/vadodara"),
+            ("Rajkot", "/varicose-veins/rajkot"), ("Surat", "/varicose-veins/surat"),
+            ("Bhavnagar", "/varicose-veins/bhavnagar"), ("Rajasthan", "/varicose-veins/rajasthan")],
+        "knee": [
+            ("Ahmedabad", "/non-surgical-knee-pain/ahmedabad"), ("Vadodara", "/non-surgical-knee-pain/vadodara"),
+            ("Rajkot", "/non-surgical-knee-pain/rajkot"), ("Surat", "/non-surgical-knee-pain/surat"),
+            ("Bhavnagar", "/non-surgical-knee-pain/bhavnagar"), ("Rajasthan", "/non-surgical-knee-pain/rajasthan")],
+    }
+    links = []
+    heading = "Related treatment information"
+    if url == "/departments/varicose-veins":
+        heading = "Varicose veins treatment locations"
+        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation")]
+    elif url == "/departments/knee-pain" or url == "/treatment/genicular-artery-embolization":
+        heading = "Non-surgical knee pain treatment locations"
+        links = city_links["knee"] + [("Genicular Artery Embolization", "/treatment/genicular-artery-embolization")]
+    elif url.startswith("/varicose-veins/"):
+        links = [("Varicose veins treatment", "/departments/varicose-veins"), ("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation")]
+    elif url.startswith("/non-surgical-knee-pain/"):
+        links = [("Knee pain treatment", "/departments/knee-pain"), ("Genicular Artery Embolization", "/treatment/genicular-artery-embolization")]
+    elif url.startswith("/blog/"):
+        slug = url.lower()
+        if any(k in slug for k in ("varicose", "vein", "venaseal")):
+            links = [("Varicose veins treatment", "/departments/varicose-veins"), ("Varicose veins treatment in Ahmedabad", "/varicose-veins/ahmedabad")]
+        elif any(k in slug for k in ("knee", "gae", "genicular", "arthritis")):
+            links = [("Genicular Artery Embolization", "/treatment/genicular-artery-embolization"), ("Non-surgical knee pain treatment in Ahmedabad", "/non-surgical-knee-pain/ahmedabad")]
+        elif any(k in slug for k in ("prostate", "bph", "urination")):
+            links = [("Prostate artery embolization", "/treatment/prostate-artery-embolization"), ("Non-surgical prostate treatment", "/departments/prostate")]
+        elif any(k in slug for k in ("piles", "hemorrhoid", "stool")):
+            links = [("Hemorrhoids treatment", "/treatment/hemorrhoids"), ("Non-surgical piles treatment", "/departments/piles")]
+        elif "fibroadenoma" in slug:
+            links = [("Non-surgical breast fibroadenoma treatment", "/departments/breast-fibroadenoma")]
+    if not links or 'data-seo-links="true"' in html:
+        return html
+    items = "".join('<li><a href="%s">%s</a></li>' % (href, htmllib.escape(label)) for label, href in links)
+    module = ('<nav data-seo-links="true" aria-label="Related treatment links" '
+              'style="max-width:1200px;margin:32px auto;padding:0 24px">'
+              '<h2>%s</h2><ul>%s</ul></nav>' % (htmllib.escape(heading), items))
+    return html.replace("</footer>", module + "</footer>", 1)
+
+
 # ------------------------------------------------------------------- shell pass
 
 def prepare_shell(html, cms, binder, page_label):
     """Transforms every page gets, CMS shells and detail templates alike."""
+    # The exported blog template carries one generic FAQPage JSON-LD block on
+    # every article, irrespective of visible FAQ content. Remove it; FAQ schema
+    # should only be emitted for pages with matching visible questions/answers.
+    html = re.sub(r'<script type="application/ld\+json">\s*\{[^<]*"@type"\s*:\s*"FAQPage"[^<]*\}\s*</script>',
+                  '', html, flags=re.S)
+    # Video/maps below the fold should not compete with the hero for bandwidth.
+    html = re.sub(r'<iframe\b(?![^>]*\bloading=)', '<iframe loading="lazy"', html,
+                  flags=re.I)
     html = remove_template_junk(html)
     html = remove_dead_lists(html)
     html = rewrite_links(html)
@@ -749,8 +868,13 @@ def build_shells(pages, cms, binder, assets):
             html = populate(html, spec, order_items(cms, spec), binder)
 
         if not paginated:
-            html = set_head_meta(html, canonical=CFG.SITE_URL + url,
+            metadata = STATIC_META.get(page, {})
+            html = set_head_meta(html, title=metadata.get("title"),
+                                 desc=metadata.get("desc"), canonical=CFG.SITE_URL + url,
                                  noindex=page in CFG.NOINDEX_PAGES)
+            if page not in CFG.NOINDEX_PAGES:
+                html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(html)), url)
+                html = add_page_schema(html, url)
             write(out_rel, html)
             written.append((out_rel, url, page not in CFG.NOINDEX_PAGES))
             continue
@@ -775,6 +899,8 @@ def build_shells(pages, cms, binder, assets):
             page_html = set_head_meta(
                 page_html, canonical=CFG.SITE_URL + purl,
                 title=None if p == 1 else "Blog - Page %d %s" % (p, CFG.BRAND_TITLE))
+            page_html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(page_html)), purl)
+            page_html = add_page_schema(page_html, purl)
             write(rel, page_html)
             written.append((rel, purl, True))
     return written
@@ -830,7 +956,9 @@ def render_detail(base, spec, item, cms, binder, assets):
         image=assets.url(og) if og else None,
         canonical=CFG.SITE_URL + item.url,
     )
-    return add_article_schema(html, spec, item, assets)
+    html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(html)), item.url)
+    html = add_article_schema(html, spec, item, assets)
+    return add_page_schema(html, item.url, spec, item)
 
 
 def fill_repeated_richtext(html, spec, item, assets):
@@ -958,6 +1086,47 @@ def add_article_schema(html, spec, item, assets):
         data["description"] = desc
     tag = ('  <script type="application/ld+json">%s</script>\n</head>'
            % json.dumps(data, ensure_ascii=False))
+    return html.replace("</head>", tag, 1)
+
+
+def add_page_schema(html, url, spec=None, item=None):
+    """Add the clinic entity, breadcrumbs, and doctor entity where relevant."""
+    crumbs = [{"@type": "ListItem", "position": 1, "name": "Home",
+               "item": CFG.SITE_URL + "/"}]
+    path = url.strip("/")
+    if path:
+        current = ""
+        for position, part in enumerate(path.split("/"), start=2):
+            current += "/" + part
+            crumbs.append({"@type": "ListItem", "position": position,
+                           "name": part.replace("-", " ").title(),
+                           "item": CFG.SITE_URL + current})
+    graph = [{
+        "@context": "https://schema.org",
+        "@type": "MedicalClinic",
+        "@id": CFG.SITE_URL + "/#medical-clinic",
+        "name": "Bankers Vascular Centre",
+        "url": CFG.SITE_URL + "/",
+        "telephone": "+91-99099-03449",
+        "medicalSpecialty": "Interventional Radiology",
+        "address": [
+            {"@type": "PostalAddress", "streetAddress": "2nd & 3rd Floor, RJP House, 100 Ft Anand Nagar Road, Opp. Scarlet Heights, Near Gopi Restaurant", "addressLocality": "Ahmedabad", "addressRegion": "Gujarat", "postalCode": "380015", "addressCountry": "IN"},
+            {"@type": "PostalAddress", "streetAddress": "201, Ignite, Opp. Agrawal Motors, Above Meera Clinic and Eye Hospital, Dinesh Mill Road, Akota", "addressLocality": "Vadodara", "addressRegion": "Gujarat", "postalCode": "390020", "addressCountry": "IN"},
+        ],
+    }, {
+        "@context": "https://schema.org", "@type": "BreadcrumbList",
+        "itemListElement": crumbs,
+    }]
+    if url == "/":
+        graph.append({"@context": "https://schema.org", "@type": "WebSite",
+                      "name": "Bankers Vascular Centre", "url": CFG.SITE_URL + "/"})
+    if spec and spec.get("key") == "our-doctors" and item:
+        graph.append({"@context": "https://schema.org", "@type": "Physician",
+                      "name": item.name, "url": CFG.SITE_URL + url,
+                      "worksFor": {"@id": CFG.SITE_URL + "/#medical-clinic"},
+                      "jobTitle": item.get_text("Doctor Designation")})
+    tag = '  <script type="application/ld+json">%s</script>\n</head>' % json.dumps(
+        {"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)
     return html.replace("</head>", tag, 1)
 
 

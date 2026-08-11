@@ -4,6 +4,11 @@
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 5;
 const hits = new Map();
+const LEGACY_REDIRECTS = {
+  "/departments/platelet-rich-plasma": "/treatment/platelet-rich-plasma",
+  "/departments/varicose-vein": "/departments/varicose-veins",
+  "/varicose-vein": "/varicose-veins/ahmedabad",
+};
 
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => (
   { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]
@@ -96,7 +101,20 @@ async function contact(request, env) {
 
 export default {
   async fetch(request, env) {
-    if (new URL(request.url).pathname === "/api/contact") return contact(request, env);
+    const url = new URL(request.url);
+    // One canonical public origin prevents HTTP/www duplicate indexing. Keep
+    // the path and query exactly as requested so legacy deep links remain safe.
+    if (url.protocol !== "https:" || url.hostname !== "bankersvascular.com") {
+      url.protocol = "https:";
+      url.hostname = "bankersvascular.com";
+      return Response.redirect(url.toString(), 301);
+    }
+    const legacyDestination = LEGACY_REDIRECTS[url.pathname.replace(/\/$/, "")];
+    if (legacyDestination) {
+      url.pathname = legacyDestination;
+      return Response.redirect(url.toString(), 301);
+    }
+    if (url.pathname === "/api/contact") return contact(request, env);
     return env.ASSETS.fetch(request);
   },
 };
