@@ -13277,6 +13277,30 @@ figure {
   transform: none !important;
 }
 
+/* Reserve one consistent two-line designation area on every reusable doctor
+   card. Newline-separated CMS labels remain readable without changing card
+   size, typography, imagery, or button placement. */
+.team-member-section .doctor-designation {
+  white-space: pre-line;
+  min-height: 2.7em;
+  line-height: 1.35;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visiting OPD city names open the supplied Google Maps location without
+   altering the existing reach ribbon's typography or spacing. */
+.visiting-opd-location {
+  color: inherit;
+  text-decoration: none;
+}
+
+.visiting-opd-location:hover,
+.visiting-opd-location:focus-visible {
+  text-decoration: underline;
+}
+
 @media screen and (max-width: 991px) {
   .team-member-section .doctor-archive-list {
     grid-auto-columns: 260px;

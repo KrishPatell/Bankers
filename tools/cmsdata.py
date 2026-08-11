@@ -48,6 +48,19 @@ DOCTOR_PROFILE_IMAGE_OVERRIDES = {
     "dr-janvi": "/images/doctor-card-janvi.png",
 }
 
+# Card labels are intentionally separate from the profile designation, SEO
+# description, and CMS biography. This lets team cards keep a consistent,
+# concise two-line presentation without changing doctor profile content.
+DOCTOR_CARD_DESIGNATION_OVERRIDES = {
+    "dr-chandresh-bharada": "Interventional Radiologist\nBnG Vascular",
+    "dr-dimple": "Operational Head & Head Consultant\nBnG Vascular",
+    "dr-pratiksha-patoliya": "Consultant Doctor\nBnG Vascular",
+    "dr-disha-soni": "Consultant Doctor\nBnG Vascular",
+    "dr-tensi-trevedi": "Consultant Doctor\nBnG Vascular",
+    "dr-payal-vadlani": "Consultant Doctor\nBnG Vascular",
+    "dr-janvi": "Consultant Doctor\nBnG Vascular",
+}
+
 # Content explicitly withdrawn by the site owner.  Keep the source CSV intact
 # so its original record remains recoverable, while excluding it from every
 # generated surface (detail page, lists, related content and sitemap).
@@ -141,6 +154,8 @@ class Collections:
                     r["Order"] = str(DOCTOR_DISPLAY_ORDER[slug])
                 if key == "our-doctors" and slug in DOCTOR_PROFILE_IMAGE_OVERRIDES:
                     r["Doctor Details Image"] = DOCTOR_PROFILE_IMAGE_OVERRIDES[slug]
+                if key == "our-doctors" and slug in DOCTOR_CARD_DESIGNATION_OVERRIDES:
+                    r["Card Designation"] = DOCTOR_CARD_DESIGNATION_OVERRIDES[slug]
                 if slug.lower() in seen:
                     dropped.append((slug, "duplicate slug"))
                     continue
