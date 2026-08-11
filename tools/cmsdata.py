@@ -52,6 +52,8 @@ DOCTOR_PROFILE_IMAGE_OVERRIDES = {
 # description, and CMS biography. This lets team cards keep a consistent,
 # concise two-line presentation without changing doctor profile content.
 DOCTOR_CARD_DESIGNATION_OVERRIDES = {
+    "dr-mohal-banker": "Interventional Radiologist\nM.B.B.S., D.M.R.D.\nDirector - BnG Vascular",
+    "dr-rozil-gandhi": "Interventional Radiologist\nM.B.B.S., D.M.R.D.\nJoint Director - BnG Vascular",
     "dr-chandresh-bharada": "Interventional Radiologist\nBnG Vascular",
     "dr-dimple": "Operational Head & Head Consultant\nBnG Vascular",
     "dr-pratiksha-patoliya": "Consultant Doctor\nBnG Vascular",
@@ -59,6 +61,12 @@ DOCTOR_CARD_DESIGNATION_OVERRIDES = {
     "dr-tensi-trevedi": "Consultant Doctor\nBnG Vascular",
     "dr-payal-vadlani": "Consultant Doctor\nBnG Vascular",
     "dr-janvi": "Consultant Doctor\nBnG Vascular",
+}
+
+# Keep the longest doctor card name fully readable in its narrow card without
+# changing the name used on the profile, navigation, or structured data.
+DOCTOR_CARD_NAME_OVERRIDES = {
+    "dr-chandresh-bharada": "Dr. Chandresh\nBharada",
 }
 
 # Content explicitly withdrawn by the site owner.  Keep the source CSV intact
@@ -156,6 +164,8 @@ class Collections:
                     r["Doctor Details Image"] = DOCTOR_PROFILE_IMAGE_OVERRIDES[slug]
                 if key == "our-doctors" and slug in DOCTOR_CARD_DESIGNATION_OVERRIDES:
                     r["Card Designation"] = DOCTOR_CARD_DESIGNATION_OVERRIDES[slug]
+                if key == "our-doctors" and slug in DOCTOR_CARD_NAME_OVERRIDES:
+                    r["Card Name"] = DOCTOR_CARD_NAME_OVERRIDES[slug]
                 if slug.lower() in seen:
                     dropped.append((slug, "duplicate slug"))
                     continue

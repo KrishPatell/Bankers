@@ -13289,6 +13289,19 @@ figure {
   align-items: center;
 }
 
+/* Preserve room for the long two-line Chandresh Bharada card name instead of
+   clipping its second line inside the inherited Webflow link wrapper. */
+.team-member-section .doctor-name-link {
+  overflow: visible;
+}
+
+.team-member-section .div-block-6 {
+  height: auto;
+  min-height: 2.7em;
+  overflow: visible;
+}
+
+
 /* Visiting OPD city names open the supplied Google Maps location without
    altering the existing reach ribbon's typography or spacing. */
 .visiting-opd-location {

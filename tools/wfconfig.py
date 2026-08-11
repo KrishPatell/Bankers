@@ -201,7 +201,7 @@ ITEM_BINDINGS = {
     "doctor-card": [
         {"cls": "doctor-thumbnail", "field": ["Doctor Thumbnail", "Doctor Details Image"],
          "kind": "img", "alt": "Name"},
-        {"cls": "doctor-name", "field": "Name", "kind": "text"},
+        {"cls": "doctor-name", "field": ["Card Name", "Name"], "kind": "text"},
         {"cls": "doctor-designation", "field": ["Card Designation", "Doctor Designation"],
          "kind": "text", "on_empty": "remove"},
         {"kind": "link"},
