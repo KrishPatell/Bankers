@@ -18,6 +18,21 @@ FORCE_PUBLISH = {
     "our-doctors": {"dr-mohal-banker"},
 }
 
+# Approved display order for every published doctor card, profile list, event
+# roster, and navigation list. The exported CMS rows leave several Order
+# values blank, so keep the same numeric source of ordering in one place.
+DOCTOR_DISPLAY_ORDER = {
+    "dr-mohal-banker": 1,
+    "dr-rozil-gandhi": 2,
+    "dr-chandresh-bharada": 3,
+    "dr-dimple": 4,
+    "dr-pratiksha-patoliya": 5,
+    "dr-disha-soni": 6,
+    "dr-tensi-trevedi": 7,
+    "dr-payal-vadlani": 8,
+    "dr-janvi": 9,
+}
+
 
 def _truthy(v):
     return (v or "").strip().lower() == "true"
@@ -97,6 +112,8 @@ class Collections:
                 if not slug:
                     dropped.append((r.name or "(unnamed)", "empty slug"))
                     continue
+                if key == "our-doctors" and slug in DOCTOR_DISPLAY_ORDER:
+                    r["Order"] = str(DOCTOR_DISPLAY_ORDER[slug])
                 if slug.lower() in seen:
                     dropped.append((slug, "duplicate slug"))
                     continue
