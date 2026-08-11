@@ -5651,6 +5651,53 @@ figure {
   color: #5c4ebd;
 }
 
+/* Treatment detail sidebar: the CMS icons are repeated legacy artwork and
+   were stretched into tall cards. Keep this as a clear, compact set of links. */
+.featured-articles .w-dyn-items {
+  grid-row-gap: 10px;
+  display: grid;
+}
+
+.featured-articles .featured-block {
+  margin-top: 0;
+}
+
+.featured-articles .feature-image {
+  display: none;
+}
+
+.featured-articles .featured-item {
+  color: #153f54;
+  background: #f3f9fb;
+  border: 1px solid #dcebf0;
+  border-radius: 10px;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 50px;
+  margin-bottom: 0;
+  padding: 12px 14px;
+}
+
+.featured-articles .featured-item::after {
+  content: "→";
+  color: #286078;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.featured-articles .featured-item:hover {
+  color: #153f54;
+  background: #e8f4f7;
+}
+
+.featured-articles .title-small:not(.margin-top) {
+  color: inherit;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
 .container-22 {
   width: 100%;
   max-width: 1110px;
