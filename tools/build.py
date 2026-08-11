@@ -827,9 +827,20 @@ def add_seo_internal_links(html, url):
     if not links or 'data-seo-links="true"' in html:
         return html
     items = "".join('<li><a href="%s">%s</a></li>' % (href, htmllib.escape(label)) for label, href in links)
+    location = ""
+    if url in ("/varicose-veins/rajkot", "/non-surgical-knee-pain/rajkot"):
+        location = (
+            '<section aria-label="Rajkot consultation location" '
+            'style="margin-top:24px"><h2>Rajkot consultation location</h2>'
+            '<p>Consultation location: <strong>Akanksha IVF Hospital</strong>, '
+            'Akshar Square, near Raiya Circle, Tirupati Nagar, Rajkot, Gujarat 360001.</p>'
+            '<p><a href="https://www.google.com/maps/search/?api=1&amp;query=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001" '
+            'target="_blank" rel="noopener">Get directions to the Rajkot consultation location</a></p>'
+            '</section>'
+        )
     module = ('<nav data-seo-links="true" aria-label="Related treatment links" '
               'style="max-width:1200px;margin:32px auto;padding:0 24px">'
-              '<h2>%s</h2><ul>%s</ul></nav>' % (htmllib.escape(heading), items))
+              '<h2>%s</h2><ul>%s</ul>%s</nav>' % (htmllib.escape(heading), items, location))
     return html.replace("</footer>", module + "</footer>", 1)
 
 
@@ -1120,6 +1131,14 @@ def add_page_schema(html, url, spec=None, item=None):
     if url == "/":
         graph.append({"@context": "https://schema.org", "@type": "WebSite",
                       "name": "Bankers Vascular Centre", "url": CFG.SITE_URL + "/"})
+    if url in ("/varicose-veins/rajkot", "/non-surgical-knee-pain/rajkot"):
+        graph.append({
+            "@context": "https://schema.org", "@type": "Place",
+            "name": "Akanksha IVF Hospital",
+            "address": {"@type": "PostalAddress", "streetAddress": "Akshar Square, Near Raiya Circle, Tirupati Nagar", "addressLocality": "Rajkot", "addressRegion": "Gujarat", "postalCode": "360001", "addressCountry": "IN"},
+            "telephone": "+91-93282-94934",
+            "hasMap": "https://www.google.com/maps/search/?api=1&query=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001",
+        })
     if spec and spec.get("key") == "our-doctors" and item:
         graph.append({"@context": "https://schema.org", "@type": "Physician",
                       "name": item.name, "url": CFG.SITE_URL + url,
