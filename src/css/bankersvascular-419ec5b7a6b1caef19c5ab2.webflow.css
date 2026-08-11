@@ -13240,6 +13240,13 @@ figure {
   display: none !important;
 }
 
+/* The Contact page's Why Choose Us image can retain its Webflow reveal layer
+   after a cached or delayed interaction load. Keep that decorative layer
+   hidden so it never covers the doctor section below it. */
+.why-choose-us-section .image-animation-overlay {
+  display: none !important;
+}
+
 .team-member-section .doctor-name,
 .team-member-section .doctor-designation {
   opacity: 1 !important;
