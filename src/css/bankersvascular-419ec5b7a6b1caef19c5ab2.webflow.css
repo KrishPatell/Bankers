@@ -2155,15 +2155,11 @@ figure {
   background-position: 50% 87%;
 }
 
-.about-hero-section.about.satya {
-  background-image: url("https://cdn.prod.website-files.com/6a6df2581c0c561f07308c10/6a6df2581c0c561f0730901c_Ahmedabad's%20Only%20Non%20Surgical%20Knee%20Replacement");
-  background-position: 100% 135%;
-  background-size: 60%;
-}
-
 .about-hero-section.about {
-  background-image: url('../images/Non-surgical-treatment-for-bone-on-bone-knee-pain_3Non-surgical treatment for bone-on-bone knee pain');
-  background-size: 90%;
+  background-image: url('../images/doctors-group-photo-transparent-v2.png'), url('../images/hero-medical-pattern-v2.png');
+  background-position: 100% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat;
+  background-size: auto 88%, 90%;
 }
 
 .about-hero-wrapper {
@@ -7202,10 +7198,6 @@ figure {
     background-position: 50% 0;
   }
 
-  .about-hero-section.about.satya {
-    background-size: 55%;
-  }
-
   .our-story-grid {
     grid-column-gap: 80px;
     grid-row-gap: 80px;
@@ -7782,12 +7774,8 @@ figure {
     background-position: 50% 0;
   }
 
-  .about-hero-section.about.satya {
-    background-size: 45%;
-  }
-
   .about-hero-section.about {
-    background-size: 80%;
+    background-size: auto 88%, 80%;
   }
 
   .our-story-section {
@@ -8288,7 +8276,7 @@ figure {
   }
 
   .about-hero-section.about {
-    background-size: 75%;
+    background-size: auto 88%, 75%;
     padding-top: 225px;
   }
 
@@ -9024,6 +9012,7 @@ figure {
 
   .about-hero-section.about {
     background-position: 100% 100%;
+    background-size: auto 48%, 160%;
   }
 
   .our-story-text {
@@ -9828,7 +9817,8 @@ figure {
   }
 
   .about-hero-section.about {
-    background-position: 50% 100%;
+    background-position: 100% 100%;
+    background-size: auto 37%, 160%;
   }
 
   .our-story-grid {
@@ -10954,14 +10944,9 @@ figure {
     padding-top: 0;
   }
 
-  .about-hero-section.about.satya {
-    background-position: 50% 100%;
-    background-size: 100%;
-  }
-
   .about-hero-section.about {
     background-position: 100% 100%;
-    background-size: 160%;
+    background-size: auto 32%, 160%;
   }
 
   .about-hero-wrapper {
