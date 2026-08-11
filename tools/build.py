@@ -47,6 +47,55 @@ STATIC_META = {
     },
 }
 
+# Verified consultation/branch locations used only on their matching city pages.
+CITY_LOCATION_DATA = {
+    "rajkot": {
+        "eyebrow": "Rajkot consultation location",
+        "heading": "Visit us at Akanksha IVF Hospital",
+        "name": "Akanksha IVF Hospital",
+        "address": "Akshar Square, near Raiya Circle, Tirupati Nagar, Rajkot, Gujarat 360001",
+        "phone": "+91-93282-94934",
+        "city": "Rajkot",
+        "postal_code": "360001",
+    },
+    "bhavnagar": {
+        "eyebrow": "Bhavnagar consultation location",
+        "heading": "Visit us at Bajrangdas Arogyadham",
+        "name": "Shree Bajrangdasbapa Arogyadham",
+        "address": "Chowk, Panwadi, Bhavnagar, Gujarat 364001",
+        "phone": "+91-278-664-0664",
+        "city": "Bhavnagar",
+        "postal_code": "364001",
+    },
+    "surat": {
+        "eyebrow": "Surat consultation location",
+        "heading": "Visit us at Gastron Hospital",
+        "name": "Gastron Hospital - By Dr Vimal Dhaduk",
+        "address": "202, Ayush Doctor House Station to Lal Darwaja Station Road, Lal Darwaja, Surat, Gujarat 395003",
+        "phone": "+91-72111-40222",
+        "city": "Surat",
+        "postal_code": "395003",
+    },
+    "vadodara": {
+        "eyebrow": "Vadodara branch",
+        "heading": "Visit Bankers Vascular Centre in Vadodara",
+        "name": "Bankers Vascular Centre",
+        "address": "2nd Floor, Ignite, 201, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, Gujarat 390007",
+        "phone": "+91-99099-08428",
+        "city": "Vadodara",
+        "postal_code": "390007",
+    },
+    "rajasthan": {
+        "eyebrow": "Rajasthan consultation location",
+        "heading": "Visit us at Gyayak Hospital, Banswara",
+        "name": "GYAYAK HOSPITAL",
+        "address": "GCHF+3J5, 40, Banswara Road, Industrial Area, Banswara, Rajasthan 327001",
+        "phone": "+91-74140-32100",
+        "city": "Banswara",
+        "postal_code": "327001",
+    },
+}
+
 
 # Shell pages copied through the shell-rewrite pass.
 def shell_pages():
@@ -828,19 +877,24 @@ def add_seo_internal_links(html, url):
         return html
     items = "".join('<li><a href="%s">%s</a></li>' % (href, htmllib.escape(label)) for label, href in links)
     location = ""
-    if url in ("/varicose-veins/rajkot", "/non-surgical-knee-pain/rajkot"):
+    city = url.rsplit("/", 1)[-1]
+    location_data = CITY_LOCATION_DATA.get(city) if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) else None
+    if location_data:
+        query = urllib.parse.quote_plus("%s, %s" % (location_data["name"], location_data["address"]))
         location = (
-            '<section class="seo-location-section" aria-label="Rajkot consultation location">'
-            '<div class="seo-location-copy"><p class="seo-location-eyebrow">Rajkot consultation location</p>'
-            '<h2>Visit us at Akanksha IVF Hospital</h2>'
-            '<p>For Rajkot consultations, visit <strong>Akanksha IVF Hospital</strong> at Akshar Square, '
-            'near Raiya Circle, Tirupati Nagar, Rajkot, Gujarat 360001.</p>'
-            '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001" '
+            '<section class="seo-location-section" aria-label="%s">'
+            '<div class="seo-location-copy"><p class="seo-location-eyebrow">%s</p>'
+            '<h2>%s</h2><p>Visit <strong>%s</strong> at %s.</p>'
+            '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=%s" '
             'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a></div>'
-            '<div class="seo-location-map"><iframe loading="lazy" title="Akanksha IVF Hospital, Rajkot" '
-            'src="https://www.google.com/maps?q=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001&amp;output=embed" '
+            '<div class="seo-location-map"><iframe loading="lazy" title="%s" '
+            'src="https://www.google.com/maps?q=%s&amp;output=embed" '
             'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
-            '</section>'
+            '</section>' % tuple(htmllib.escape(value) for value in (
+                location_data["eyebrow"], location_data["eyebrow"], location_data["heading"],
+                location_data["name"], location_data["address"], query,
+                location_data["name"], query,
+            ))
         )
     module = ('<section class="seo-links-section" data-seo-links="true" aria-label="Related treatment links">'
               '<div class="seo-links-inner"><h2>%s</h2><ul>%s</ul>%s</div></section>'
@@ -1126,7 +1180,7 @@ def add_page_schema(html, url, spec=None, item=None):
         "medicalSpecialty": "Interventional Radiology",
         "address": [
             {"@type": "PostalAddress", "streetAddress": "2nd & 3rd Floor, RJP House, 100 Ft Anand Nagar Road, Opp. Scarlet Heights, Near Gopi Restaurant", "addressLocality": "Ahmedabad", "addressRegion": "Gujarat", "postalCode": "380015", "addressCountry": "IN"},
-            {"@type": "PostalAddress", "streetAddress": "201, Ignite, Opp. Agrawal Motors, Above Meera Clinic and Eye Hospital, Dinesh Mill Road, Akota", "addressLocality": "Vadodara", "addressRegion": "Gujarat", "postalCode": "390020", "addressCountry": "IN"},
+            {"@type": "PostalAddress", "streetAddress": "2nd Floor, Ignite, 201, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota", "addressLocality": "Vadodara", "addressRegion": "Gujarat", "postalCode": "390007", "addressCountry": "IN"},
         ],
     }, {
         "@context": "https://schema.org", "@type": "BreadcrumbList",
@@ -1135,13 +1189,16 @@ def add_page_schema(html, url, spec=None, item=None):
     if url == "/":
         graph.append({"@context": "https://schema.org", "@type": "WebSite",
                       "name": "Bankers Vascular Centre", "url": CFG.SITE_URL + "/"})
-    if url in ("/varicose-veins/rajkot", "/non-surgical-knee-pain/rajkot"):
+    city = url.rsplit("/", 1)[-1]
+    location_data = CITY_LOCATION_DATA.get(city) if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) else None
+    if location_data:
+        query = urllib.parse.quote_plus("%s, %s" % (location_data["name"], location_data["address"]))
         graph.append({
             "@context": "https://schema.org", "@type": "Place",
-            "name": "Akanksha IVF Hospital",
-            "address": {"@type": "PostalAddress", "streetAddress": "Akshar Square, Near Raiya Circle, Tirupati Nagar", "addressLocality": "Rajkot", "addressRegion": "Gujarat", "postalCode": "360001", "addressCountry": "IN"},
-            "telephone": "+91-93282-94934",
-            "hasMap": "https://www.google.com/maps/search/?api=1&query=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001",
+            "name": location_data["name"],
+            "address": {"@type": "PostalAddress", "streetAddress": location_data["address"], "addressLocality": location_data["city"], "addressRegion": "Rajasthan" if city == "rajasthan" else "Gujarat", "postalCode": location_data["postal_code"], "addressCountry": "IN"},
+            "telephone": location_data["phone"],
+            "hasMap": "https://www.google.com/maps/search/?api=1&query=" + query,
         })
     if spec and spec.get("key") == "our-doctors" and item:
         graph.append({"@context": "https://schema.org", "@type": "Physician",
