@@ -33,6 +33,21 @@ DOCTOR_DISPLAY_ORDER = {
     "dr-janvi": 9,
 }
 
+# The approved transparent portraits are shared by doctor cards and the main
+# image on each individual doctor profile. This deliberately leaves unrelated
+# doctor CMS fields and historic source-image URLs intact.
+DOCTOR_PROFILE_IMAGE_OVERRIDES = {
+    "dr-mohal-banker": "/images/doctor-card-mohal-banker.png",
+    "dr-rozil-gandhi": "/images/doctor-card-rozil-gandhi.png",
+    "dr-chandresh-bharada": "/images/doctor-card-chandresh-bharada.png",
+    "dr-dimple": "/images/doctor-card-dimple-parmar.png",
+    "dr-pratiksha-patoliya": "/images/doctor-card-pratiksha-patoliya.png",
+    "dr-disha-soni": "/images/doctor-card-disha-soni.png",
+    "dr-tensi-trevedi": "/images/doctor-card-tensi-trivedi.png",
+    "dr-payal-vadlani": "/images/doctor-card-payal-vadlani.png",
+    "dr-janvi": "/images/doctor-card-janvi.png",
+}
+
 # Content explicitly withdrawn by the site owner.  Keep the source CSV intact
 # so its original record remains recoverable, while excluding it from every
 # generated surface (detail page, lists, related content and sitemap).
@@ -124,6 +139,8 @@ class Collections:
                     continue
                 if key == "our-doctors" and slug in DOCTOR_DISPLAY_ORDER:
                     r["Order"] = str(DOCTOR_DISPLAY_ORDER[slug])
+                if key == "our-doctors" and slug in DOCTOR_PROFILE_IMAGE_OVERRIDES:
+                    r["Doctor Details Image"] = DOCTOR_PROFILE_IMAGE_OVERRIDES[slug]
                 if slug.lower() in seen:
                     dropped.append((slug, "duplicate slug"))
                     continue
