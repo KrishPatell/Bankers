@@ -33,6 +33,15 @@ DOCTOR_DISPLAY_ORDER = {
     "dr-janvi": 9,
 }
 
+# Content explicitly withdrawn by the site owner.  Keep the source CSV intact
+# so its original record remains recoverable, while excluding it from every
+# generated surface (detail page, lists, related content and sitemap).
+WITHDRAWN_CONTENT = {
+    "blog": {
+        "varicose-veins-in-young-adults-why-they-happen-and-when-to-seek-care",
+    },
+}
+
 
 def _truthy(v):
     return (v or "").strip().lower() == "true"
@@ -105,6 +114,7 @@ class Collections:
             with open(path, encoding="utf-8-sig", newline="") as fh:
                 rows = [Item(r) for r in csv.DictReader(fh)]
             forced = FORCE_PUBLISH.get(key, set())
+            withdrawn = WITHDRAWN_CONTENT.get(key, set())
             keep, dropped = [], []
             seen = {}
             for r in rows:
@@ -121,6 +131,9 @@ class Collections:
                 r["_collection"] = key
                 r["_url"] = self.item_url(key, slug)
                 r["_date"] = parse_wf_date(r.get("time") or r.get("Created On"))
+                if slug in withdrawn:
+                    dropped.append((slug, "withdrawn by site owner"))
+                    continue
                 if _truthy(r.get("Archived")):
                     dropped.append((slug, "archived"))
                     continue
