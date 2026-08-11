@@ -830,18 +830,22 @@ def add_seo_internal_links(html, url):
     location = ""
     if url in ("/varicose-veins/rajkot", "/non-surgical-knee-pain/rajkot"):
         location = (
-            '<section aria-label="Rajkot consultation location" '
-            'style="margin-top:24px"><h2>Rajkot consultation location</h2>'
-            '<p>Consultation location: <strong>Akanksha IVF Hospital</strong>, '
-            'Akshar Square, near Raiya Circle, Tirupati Nagar, Rajkot, Gujarat 360001.</p>'
-            '<p><a href="https://www.google.com/maps/search/?api=1&amp;query=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001" '
-            'target="_blank" rel="noopener">Get directions to the Rajkot consultation location</a></p>'
+            '<section class="seo-location-section" aria-label="Rajkot consultation location">'
+            '<div class="seo-location-copy"><p class="seo-location-eyebrow">Rajkot consultation location</p>'
+            '<h2>Visit us at Akanksha IVF Hospital</h2>'
+            '<p>For Rajkot consultations, visit <strong>Akanksha IVF Hospital</strong> at Akshar Square, '
+            'near Raiya Circle, Tirupati Nagar, Rajkot, Gujarat 360001.</p>'
+            '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001" '
+            'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a></div>'
+            '<div class="seo-location-map"><iframe loading="lazy" title="Akanksha IVF Hospital, Rajkot" '
+            'src="https://www.google.com/maps?q=Akanksha+IVF+Hospital%2C+Akshar+Square%2C+Near+Raiya+Circle%2C+Tirupati+Nagar%2C+Rajkot%2C+Gujarat+360001&amp;output=embed" '
+            'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
             '</section>'
         )
-    module = ('<nav data-seo-links="true" aria-label="Related treatment links" '
-              'style="max-width:1200px;margin:32px auto;padding:0 24px">'
-              '<h2>%s</h2><ul>%s</ul>%s</nav>' % (htmllib.escape(heading), items, location))
-    return html.replace("</footer>", module + "</footer>", 1)
+    module = ('<section class="seo-links-section" data-seo-links="true" aria-label="Related treatment links">'
+              '<div class="seo-links-inner"><h2>%s</h2><ul>%s</ul>%s</div></section>'
+              % (htmllib.escape(heading), items, location))
+    return html.replace("<footer", module + "<footer", 1)
 
 
 # ------------------------------------------------------------------- shell pass
