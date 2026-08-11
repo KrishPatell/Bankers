@@ -13165,10 +13165,21 @@ figure {
   bottom: -6.7%;
 }
 
-/* Pratiksha has no designation line in the CMS. Reserve that line's height so
-   her card's image area starts on the same row as the other doctor cards. */
-.team-member-section .doctor-archive-card:has(.doctor-thumbnail[alt="Dr. Pratiksha Patoliya"]) .doctor-info-block {
-  min-height: 173px;
+/* Keep every reusable card's photo area flush with the card top. The shared
+   information area reserves room for short or empty designations instead of
+   creating a blank strip above the image. */
+.team-member-section .doctor-archive-card {
+  justify-content: flex-start;
+}
+
+.team-member-section .doctor-info-block {
+  box-sizing: border-box;
+  flex: 0 0 207px;
+  min-height: 207px;
+}
+
+.team-member-section .doctor-info-block .link-block-6 {
+  margin-top: auto;
 }
 
 .team-member-section .image-animation-overlay {
