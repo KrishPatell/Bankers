@@ -4482,6 +4482,30 @@ figure {
   border-radius: 7.36715px;
 }
 
+/* About-page doctor biographies use the same approved cutouts as the reusable
+   cards. The transparent canvas has bottom padding, so the actual portrait is
+   anchored to the photo frame instead of appearing to float. */
+.doctor-bio-list-photo-frame {
+  background: #b9d5d8;
+  border-radius: 7.36715px;
+  flex: 0 0 auto;
+  width: 305px;
+  max-width: 100%;
+  aspect-ratio: 61 / 70;
+  position: relative;
+  overflow: hidden;
+}
+
+.doctor-bio-list-photo-frame .doctor-bio-list-photo {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  position: absolute;
+  bottom: -6.37%;
+  left: 0;
+  object-fit: contain;
+}
+
 .div-block-10 {
   grid-column-gap: 35px;
   grid-row-gap: 35px;
