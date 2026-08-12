@@ -13633,3 +13633,109 @@ figure {
     font-size: 34px;
   }
 }
+
+/* Shared mobile/tablet safeguards for Webflow's fixed-width embeds and CMS
+   collections. Keep page content readable at every breakpoint rather than
+   letting a single desktop-sized item be clipped outside the viewport. */
+@media screen and (max-width: 991px) {
+  .code-embed-3,
+  .big-video,
+  .big-video iframe,
+  .code-embed-3 iframe {
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .bng-conf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  main img,
+  main video,
+  main iframe,
+  .w-richtext figure,
+  .w-richtext img {
+    max-width: 100%;
+  }
+
+  .w-richtext img,
+  main video {
+    height: auto;
+  }
+
+  .w-richtext table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .fancy-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible;
+  }
+
+  .fancy-columns .column-item {
+    width: 100%;
+    min-width: 0;
+    height: 360px;
+  }
+
+  .fancy-columns .column_header-wrap {
+    inset: 24px auto auto 0;
+    margin-left: 24px;
+    transform: none;
+  }
+
+  .fancy-columns .column_details-wrap {
+    right: 0;
+    left: 0;
+  }
+
+  .doc,
+  .mohal,
+  .div-block-10 {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .div-block-10 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .doctor-bio-list-photo-frame {
+    width: 100%;
+  }
+
+  .subtitle-line {
+    margin-left: 0 !important;
+    left: auto !important;
+  }
+
+  .bng-conf {
+    grid-column-gap: 16px;
+    grid-row-gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: grid;
+    overflow: visible;
+  }
+
+  .bng-conf .doctor-archive-item,
+  .bng-conf .doctor-archive-card,
+  .bng-conf .doctor-thumbnail-wrapper {
+    width: 100%;
+    min-width: 0;
+  }
+}
