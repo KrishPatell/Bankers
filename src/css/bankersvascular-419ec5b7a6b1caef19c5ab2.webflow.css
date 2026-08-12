@@ -11455,7 +11455,9 @@ figure {
 
   .emergy {
     background-position: 3%;
-    background-size: cover;
+    /* Preserve the complete CMS hero image on phones instead of cropping it
+       to fill a fixed banner. */
+    background-size: contain;
     flex-flow: column;
     width: 75%;
     height: 36rem;
@@ -13592,7 +13594,9 @@ figure {
     min-height: 300px;
     height: auto;
     margin-top: 0;
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
   }
 
   .breadcrumb-heading-3--white {
