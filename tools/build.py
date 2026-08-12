@@ -1003,6 +1003,18 @@ def render_detail(base, spec, item, cms, binder, assets):
     for b in spec.get("bind", []):
         html = binder._one(html, item, b, item.url) if b["kind"] != "link" else html
 
+    # The exported VenaSeal banner is a 6:1 desktop canvas. On phones that
+    # pushes the illustration into a separate strip from its title. This
+    # purpose-made responsive illustration preserves the existing teal
+    # treatment-banner design at every viewport size.
+    if spec["key"] == "treatment" and item.slug == "venaseal-glue-embolization":
+        hero = W.find_by_class(html, "about-hero-section")
+        if hero >= 0:
+            html = W.edit_open_tag(
+                html, hero,
+                lambda t: W.add_class(t, "responsive-venaseal-hero"),
+            )
+
     html = fill_repeated_richtext(html, spec, item, assets)
     html = fill_author_block(html, spec, item, assets)
     html = fill_socials(html, spec, item)

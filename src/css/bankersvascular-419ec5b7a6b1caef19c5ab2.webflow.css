@@ -13599,9 +13599,57 @@ figure {
     background-position: center;
   }
 
+  /* Treatment-detail artwork is one composed banner.  Keeping its original
+     aspect ratio on a short, auto-height section split the title from the
+     illustration on phones.  Crop only the outer edges and centre the copy
+     vertically, so every detail page remains one readable hero. */
+  .about-hero-section.frozen.sizedown:not(.training) {
+    height: 300px;
+    min-height: 300px;
+    max-height: none;
+    display: flex;
+    align-items: center;
+    /* CMS treatment banners are intentionally very wide (6:1). Scale by
+       height and shift the visible window so both the teal copy panel and
+       illustration stay together on a phone. */
+    background-color: #38697b;
+    background-position: -9999px center;
+    background-size: auto 300px;
+    position: relative;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training)::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 47%;
+    background-image: inherit;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: auto 300px;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training) .main-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-venaseal-hero {
+    background-image: url('../images/venaseal-responsive-hero.png') !important;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-venaseal-hero::after {
+    display: none;
+  }
+
   .breadcrumb-heading-3--white {
     width: min(58%, 300px);
-    font-size: clamp(26px, 8vw, 34px);
+    font-size: clamp(25px, 7vw, 30px);
     line-height: 1.14;
     overflow-wrap: anywhere;
   }
