@@ -13543,6 +13543,10 @@ figure {
     overflow-x: hidden;
   }
 
+  .main-wrapper {
+    padding-top: 80px;
+  }
+
   .main-container,
   .main-container.grid {
     box-sizing: border-box;
