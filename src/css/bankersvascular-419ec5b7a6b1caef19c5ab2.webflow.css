@@ -13787,3 +13787,40 @@ figure {
     min-width: 0;
   }
 }
+/* Bankers Notes is Dr. Mohal Banker's personal article archive. */
+.bankers-notes-hero {
+  overflow: hidden;
+  /* Remove the exported group-doctor background at every breakpoint. */
+  background-image: none !important;
+}
+
+.bankers-notes-doctor-portrait {
+  position: absolute;
+  right: max(5vw, 48px);
+  bottom: 0;
+  z-index: 1;
+  width: min(300px, 25vw);
+  pointer-events: none;
+}
+
+.bankers-notes-doctor-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bankers-notes-hero .about-hero-wrapper-2 {
+  position: relative;
+  z-index: 2;
+}
+
+@media screen and (max-width: 767px) {
+  .bankers-notes-doctor-portrait {
+    right: 16px;
+    width: 118px;
+  }
+
+  .bankers-notes-hero .about-hero-wrapper-2 {
+    padding-right: 92px;
+  }
+}

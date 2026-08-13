@@ -352,6 +352,21 @@ PAGE_LISTS = {
     ],
 }
 
+# Bankers Notes reuses the blog archive but is intentionally limited to the
+# lead doctor's authored articles.
+EXTRA_SHELL_PAGES = {
+    "bankers-notes.html": {
+        "source": "blog.html",
+        "output": "bankers-notes/index.html",
+        "url": "/bankers-notes",
+    },
+}
+
+PAGE_LISTS["bankers-notes.html"] = [
+    {"items_cls": "blog-archive", "collection": "blog", "order": "newest",
+     "author_slug": "dr-mohal", "paginate": 100, "bindings": "blog-card"},
+]
+
 # Lists inside detail templates, resolved per rendered item.
 DETAIL_LISTS = {
     "detail_blog.html": [

@@ -372,7 +372,10 @@ def main():
     parser = argparse.ArgumentParser(description="Prepare one Bankers Vascular blog from DOCX + thumbnail.")
     parser.add_argument("docx", type=Path)
     parser.add_argument("thumbnail", type=Path)
-    parser.add_argument("--author", required=True, help="Existing doctor or Blog Author name")
+    author_group = parser.add_mutually_exclusive_group(required=True)
+    author_group.add_argument("--author", help="Existing doctor or Blog Author name")
+    author_group.add_argument("--bankers-notes", action="store_true",
+                              help="Publish as a Dr. Mohal Banker Bankers Note")
     parser.add_argument("--dry-run", action="store_true", help="Validate and preview without writing files")
     args = parser.parse_args()
     if not args.docx.is_file() or args.docx.suffix.lower() != ".docx":
@@ -394,7 +397,8 @@ def main():
     if existing_same_slug and not existing_same_slug.get("Slug"):
         raise SystemExit("duplicate blog title: %s" % existing_same_slug.get("Name"))
 
-    author_slug, author_name, author_kind = select_author(args.author)
+    requested_author = "Dr. Mohal Banker" if args.bankers_notes else args.author
+    author_slug, author_name, author_kind = select_author(requested_author)
     rich = add_internal_links(rich)
     extension = args.thumbnail.suffix.lower()
     if extension not in {".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"}:

@@ -12,6 +12,18 @@ The requested action is: `Publish this blog.` The publish operator must use the
 repository tool below, inspect its output, build locally, and obtain the usual
 deployment approval separately. This workflow does **not** deploy by itself.
 
+## Bankers Notes (Dr. Mohal Banker only)
+
+`/bankers-notes` is Dr. Mohal Banker's personal article archive. It uses the
+same Blog CMS collection and article layout as `/blog`, but displays only posts
+authored by Dr. Mohal Banker. Publish a note using `--bankers-notes`; this
+fixes the author automatically so another doctor's article cannot enter this
+archive by mistake.
+
+```powershell
+& $BV_PYTHON tools/publish_blog.py <article.docx> <thumbnail-image> --bankers-notes
+```
+
 ## Guardrails
 
 - Read the complete DOCX. Its first meaningful paragraph is the post title;

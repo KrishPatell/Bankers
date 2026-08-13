@@ -37,6 +37,10 @@ SRC = os.path.join(ROOT, "src")
 STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
 
 STATIC_META = {
+    "bankers-notes.html": {
+        "title": "Bankers Notes | Dr. Mohal Banker | Bankers Vascular Centre",
+        "desc": "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.",
+    },
     "bng-con-2025.html": {
         "title": "BnG Con 2025 | Bankers Vascular Centre",
         "desc": "Learn about BnG Con 2025, a Bankers Vascular Centre conference for vascular and interventional radiology professionals.",
@@ -99,10 +103,11 @@ CITY_LOCATION_DATA = {
 
 # Shell pages copied through the shell-rewrite pass.
 def shell_pages():
-    return sorted(
+    pages = sorted(
         f for f in os.listdir(SRC)
         if f.endswith(".html") and f not in CFG.EXCLUDE_PAGES
     )
+    return pages + sorted(CFG.EXTRA_SHELL_PAGES)
 
 
 warnings = []
@@ -117,6 +122,9 @@ def warn(msg):
 # index.html -> /, everything else -> /<name>, with the three directory pages
 # mapped to their folder form.
 def page_url(filename):
+    extra = CFG.EXTRA_SHELL_PAGES.get(filename)
+    if extra:
+        return extra["url"]
     if filename == "index.html":
         return "/"
     if filename in CFG.DIRECTORY_PAGES:
@@ -591,6 +599,9 @@ def order_items(cms, spec):
         items = cms.sorted_by(key, field, numeric=(mode == "numeric"))
     else:
         items = list(cms.published[key])
+    if spec.get("author_slug"):
+        items = [item for item in items if item.get("_author") is not None
+                 and item["_author"].slug == spec["author_slug"]]
     items = items[spec.get("offset", 0):]
     if spec.get("limit"):
         items = items[:spec["limit"]]
@@ -923,11 +934,52 @@ def prepare_shell(html, cms, binder, page_label):
     return html
 
 
+def add_bankers_notes_nav(html, current=False):
+    """Add the personal-notes link beside Blog on every site header."""
+    if 'href="/bankers-notes"' in html:
+        return html
+    if current:
+        html = html.replace(
+            'href="/blog" aria-current="page" class="nav-link text-block-8 w--current"',
+            'href="/blog" class="nav-link text-block-8"', 1)
+    link = ('<li class="nav-list-item position-relative">\n'
+            '                  <div class="nav-line"></div>\n'
+            '                  <a href="/bankers-notes"%s class="nav-link text-block-8%s">Bankers Notes</a>\n'
+            '                </li>') % (
+                ' aria-current="page"' if current else '',
+                ' w--current' if current else '')
+    pattern = (r'(<li class="nav-list-item position-relative">\s*'
+               r'<div class="nav-line"></div>\s*'
+               r'<a href="/blog"[^>]*>Blog</a>\s*</li>)')
+    return re.sub(pattern, r'\1\n                ' + link, html, count=1)
+
+
+def customise_bankers_notes(html):
+    """Turn the cloned blog archive into Dr. Mohal Banker's personal page."""
+    html = html.replace("Our Blog", "Bankers Notes")
+    html = html.replace("Latest blog articles<br>", "Notes from Dr. Mohal Banker<br>")
+    html = html.replace(
+        "Are you willing to not going for any operative procedure in your body? Than interventional radiologist is a right choice for your treatment. Interventional radiologist treat different disease with small needle puncture, without any kind of cut or suture.",
+        "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.")
+    html = html.replace('class="about-hero-section about">',
+                        'class="about-hero-section about bankers-notes-hero">', 1)
+    portrait = ('<div class="bankers-notes-doctor-portrait">'
+                '<img src="/images/doctor-card-mohal-banker.png" '
+                'alt="Dr. Mohal Banker" loading="eager"></div>')
+    return html.replace('<div class="highlighter-shape-wrapper">',
+                        portrait + '<div class="highlighter-shape-wrapper">', 1)
+
+
 def build_shells(pages, cms, binder, assets):
     written = []
     for page in pages:
-        html = prepare_shell(read(os.path.join(SRC, page)), cms, binder, page)
-        out_rel = CFG.DIRECTORY_PAGES.get(page, page)
+        extra = CFG.EXTRA_SHELL_PAGES.get(page, {})
+        source = extra.get("source", page)
+        html = prepare_shell(read(os.path.join(SRC, source)), cms, binder, page)
+        if page == "bankers-notes.html":
+            html = customise_bankers_notes(html)
+        html = add_bankers_notes_nav(html, current=(page == "bankers-notes.html"))
+        out_rel = extra.get("output", CFG.DIRECTORY_PAGES.get(page, page))
         url = page_url(page)
         specs = CFG.PAGE_LISTS.get(page, [])
 
@@ -965,9 +1017,13 @@ def build_shells(pages, cms, binder, assets):
             rel = out_rel if p == 1 else "%s/page/%d.html" % (
                 out_rel.rsplit("/", 1)[0] if "/" in out_rel else out_rel[:-5], p)
             purl = url if p == 1 else "%s/page/%d" % (url.rstrip("/"), p)
+            metadata = STATIC_META.get(page, {})
             page_html = set_head_meta(
                 page_html, canonical=CFG.SITE_URL + purl,
-                title=None if p == 1 else "Blog - Page %d %s" % (p, CFG.BRAND_TITLE))
+                title=metadata.get("title") if p == 1 else "%s - Page %d %s" % (
+                    "Bankers Notes" if page == "bankers-notes.html" else "Blog", p,
+                    CFG.BRAND_TITLE),
+                desc=metadata.get("desc") if p == 1 else None)
             page_html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(page_html)), purl)
             page_html = add_page_schema(page_html, purl)
             write(rel, page_html)
@@ -986,7 +1042,8 @@ def build_details(cms, binder, assets):
         key = spec["key"]
         # The nav/junk/link/form work is identical for every item, so do it
         # once per template rather than 282 times.
-        base = prepare_shell(read(os.path.join(SRC, tpl)), cms, binder, tpl)
+        base = add_bankers_notes_nav(
+            prepare_shell(read(os.path.join(SRC, tpl)), cms, binder, tpl))
         items = cms.published[key]
         for item in items:
             html = render_detail(base, spec, item, cms, binder, assets)
