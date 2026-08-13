@@ -14096,85 +14096,92 @@ figure {
   .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="venaseal-glue-embolization"] { background-image: url('../images/treatment-mobile-venaseal-glue-embolization.webp') !important; }
 }
 
-/* Homepage recognition: keep the supplied award artwork prominent and the
-   accompanying clinical credentials easy to scan at every screen size. */
+/* Homepage recognition: a compact image-led award banner. */
 .recognition-section {
-  background: #f5fbfc;
-  padding: 96px 0;
+  width: 100%;
+  margin: 40px auto 30px;
 }
 
-.recognition-grid {
+.recognition-banner {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  grid-template-columns: 230px minmax(0, 1fr);
   align-items: center;
-  gap: 64px;
+  max-width: 940px;
+  margin: 0 auto;
+  gap: 44px;
+  padding: 24px 30px;
+  border: 1px solid #38697b;
+  border-radius: 16px;
 }
 
-.recognition-image-wrap {
-  overflow: hidden;
-  border-radius: 20px;
-  box-shadow: 0 18px 45px rgba(30, 74, 89, .16);
+.recognition-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .recognition-image {
   display: block;
   width: 100%;
+  max-width: 230px;
   height: auto;
+  border-radius: 12px;
 }
 
 .recognition-copy {
-  color: #183f50;
+  padding: 4px 0;
 }
 
-.recognition-copy .subtitle-block {
-  justify-content: flex-start;
-  margin-bottom: 16px;
-}
-
-.recognition-copy .large-subtitle-text {
-  color: #38697b;
-}
-
-.recognition-heading {
-  margin: 0 0 16px;
-  color: #173e50;
-  font-size: clamp(32px, 3.2vw, 52px);
-  line-height: 1.08;
-}
-
-.recognition-copy p {
-  margin: 0 0 16px;
-  color: #405765;
-  font-size: 17px;
-  line-height: 1.65;
-}
-
-.recognition-copy .recognition-lead {
-  color: #173e50;
-  font-size: 19px;
-}
-
-.recognition-copy h3 {
-  margin: 28px 0 10px;
-  color: #1b6278;
-  font-size: 25px;
+.recognition-kicker {
+  margin-bottom: 14px;
+  padding-left: 18px;
+  border-left: 3px solid #0aa5e5;
+  color: #0a9ee0;
+  font-size: clamp(18px, 1.65vw, 27px);
+  font-weight: 700;
   line-height: 1.2;
 }
 
+.recognition-heading {
+  margin: 0 0 10px;
+  color: #102e3a;
+  font-size: clamp(23px, 2vw, 32px);
+  line-height: 1.18;
+}
+
+.recognition-copy p {
+  max-width: 800px;
+  margin: 0 0 22px;
+  color: #183642;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.recognition-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 17px;
+  border-radius: 6px;
+  background: #0a9ee0;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 @media screen and (max-width: 991px) {
-  .recognition-section { padding: 72px 0; }
-  .recognition-grid { grid-template-columns: 1fr; gap: 42px; }
-  .recognition-image-wrap { max-width: 760px; margin: 0 auto; }
+  .recognition-section { margin: 36px auto 28px; }
+  .recognition-banner { grid-template-columns: 210px minmax(0, 1fr); gap: 32px; padding: 22px; }
+  .recognition-image { max-width: 210px; }
 }
 
 @media screen and (max-width: 767px) {
-  .recognition-section { padding: 52px 0; }
-  .recognition-grid { gap: 30px; }
-  .recognition-image-wrap { border-radius: 13px; }
-  .recognition-copy .subtitle-block { margin-bottom: 13px; }
-  .recognition-copy .large-subtitle-text { font-size: 13px; }
-  .recognition-heading { font-size: 31px; }
-  .recognition-copy p { font-size: 16px; line-height: 1.58; }
-  .recognition-copy .recognition-lead { font-size: 17px; }
-  .recognition-copy h3 { margin-top: 24px; font-size: 22px; }
+  .recognition-section { margin: 30px auto 24px; }
+  .recognition-banner { grid-template-columns: 1fr; gap: 26px; padding: 18px; border-radius: 12px; }
+  .recognition-art { justify-content: flex-start; }
+  .recognition-image { max-width: 100%; }
+  .recognition-kicker { margin-bottom: 11px; padding-left: 13px; font-size: 19px; }
+  .recognition-heading { font-size: 25px; }
+  .recognition-copy p { margin-bottom: 18px; font-size: 15px; }
 }
