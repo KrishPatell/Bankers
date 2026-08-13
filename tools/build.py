@@ -964,7 +964,7 @@ def customise_bankers_notes(html):
     html = html.replace('class="about-hero-section about">',
                         'class="about-hero-section about bankers-notes-hero">', 1)
     portrait = ('<div class="bankers-notes-doctor-portrait">'
-                '<img src="/images/cms/d6609d46_66c6a63c340ea4cad3466596_mohal.webp" '
+                '<img src="/images/bankers-notes-mohal-hd.png" '
                 'alt="Dr. Mohal Banker" loading="eager"></div>')
     return html.replace('<div class="highlighter-shape-wrapper">',
                         portrait + '<div class="highlighter-shape-wrapper">', 1)
