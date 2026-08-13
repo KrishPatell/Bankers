@@ -14104,11 +14104,11 @@ figure {
 
 .recognition-banner {
   display: grid;
-  grid-template-columns: 230px minmax(0, 1fr);
+  grid-template-columns: 360px minmax(0, 1fr);
   align-items: center;
-  max-width: 940px;
+  max-width: 1080px;
   margin: 0 auto;
-  gap: 44px;
+  gap: 50px;
   padding: 24px 30px;
   border: 1px solid #38697b;
   border-radius: 16px;
@@ -14123,7 +14123,7 @@ figure {
 .recognition-image {
   display: block;
   width: 100%;
-  max-width: 230px;
+  max-width: 360px;
   height: auto;
   border-radius: 12px;
 }
@@ -14172,8 +14172,8 @@ figure {
 
 @media screen and (max-width: 991px) {
   .recognition-section { margin: 36px auto 28px; }
-  .recognition-banner { grid-template-columns: 210px minmax(0, 1fr); gap: 32px; padding: 22px; }
-  .recognition-image { max-width: 210px; }
+  .recognition-banner { grid-template-columns: 280px minmax(0, 1fr); gap: 36px; padding: 22px; }
+  .recognition-image { max-width: 280px; }
 }
 
 @media screen and (max-width: 767px) {
