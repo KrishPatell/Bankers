@@ -13955,7 +13955,7 @@ figure {
   }
 }
 
-/* One complete, purpose-made 3:2 medical banner for every treatment page on
+/* One complete, purpose-made 3:2 medical banner for every detail page on
    phone and tablet. The original wide CMS banners continue to be used on PC. */
 @media screen and (max-width: 991px) {
   .about-hero-section.frozen.sizedown.responsive-treatment-hero {
@@ -13969,7 +13969,7 @@ figure {
     padding: 0;
     overflow: hidden;
     background-color: #38697b;
-    background-image: url('../images/responsive-treatment-hero.webp') !important;
+    background-image: var(--responsive-hero-image, url('../images/responsive-treatment-hero.webp')) !important;
     background-position: center !important;
     background-repeat: no-repeat;
     background-size: 100% 100% !important;
@@ -14028,7 +14028,7 @@ figure {
     padding: 0;
     overflow: hidden;
     background-color: #38697b;
-    background-image: url('../images/responsive-treatment-hero.webp') !important;
+    background-image: var(--responsive-hero-image, url('../images/responsive-treatment-hero.webp')) !important;
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -14080,4 +14080,18 @@ figure {
   .main-wrapper {
     padding-top: 78px;
   }
+}
+
+/* Each treatment retains its own clinical illustration at phone and tablet
+   widths while using the common automatic responsive layout. */
+@media screen and (max-width: 991px) {
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="absolute-ethanol-embolization-for-vascular-malformations"] { background-image: url('../images/treatment-mobile-absolute-ethanol-embolization-for-vascular-malformations.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="foam-sclerotherap"] { background-image: url('../images/treatment-mobile-foam-sclerotherap.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="genicular-artery-embolization"] { background-image: url('../images/treatment-mobile-genicular-artery-embolization.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="hemorrhoids"] { background-image: url('../images/treatment-mobile-hemorrhoids.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="msk-embolization"] { background-image: url('../images/treatment-mobile-msk-embolization.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="platelet-rich-plasma"] { background-image: url('../images/treatment-mobile-platelet-rich-plasma.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="prostate-artery-embolization"] { background-image: url('../images/treatment-mobile-prostate-artery-embolization.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="radiofrequency-ablation"] { background-image: url('../images/treatment-mobile-radiofrequency-ablation.webp') !important; }
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="venaseal-glue-embolization"] { background-image: url('../images/treatment-mobile-venaseal-glue-embolization.webp') !important; }
 }

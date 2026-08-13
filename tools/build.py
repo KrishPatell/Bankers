@@ -1060,16 +1060,28 @@ def render_detail(base, spec, item, cms, binder, assets):
     for b in spec.get("bind", []):
         html = binder._one(html, item, b, item.url) if b["kind"] != "link" else html
 
-    # The exported treatment banners are 6:1 desktop canvases. They cannot
-    # show both their title area and clinical illustration at phone/tablet
-    # widths. Keep desktop imagery untouched, but mark every treatment hero
-    # for the purpose-made responsive illustration used at smaller breakpoints.
-    if spec["key"] == "treatment":
-        hero = W.find_by_class(html, "about-hero-section")
+    # The exported detail banners are desktop-wide canvases.  At phone and
+    # tablet widths use a purpose-made version of *that item's* artwork so
+    # every page keeps its own clinical image instead of sharing one banner.
+    responsive_families = {
+        "treatment": "about-hero-section",
+        "departments": "new-combo",
+        "varicose-veins": "new-combo",
+        "non-surgical-knee-pain": "new-combo",
+    }
+    hero_class = responsive_families.get(spec["key"])
+    if hero_class:
+        hero = W.find_by_class(html, hero_class)
         if hero >= 0:
+            mobile_asset = "../images/mobile-%s-%s.webp" % (spec["key"], item.slug)
             html = W.edit_open_tag(
                 html, hero,
-                lambda t: W.add_class(t, "responsive-treatment-hero"),
+                lambda t: W.set_attr(
+                    W.set_attr(
+                        W.add_class(t, "responsive-treatment-hero"),
+                        "data-mobile-hero", item.slug),
+                    "style", (W.get_attr(t, "style") or "") +
+                    ";--responsive-hero-image:url('%s')" % mobile_asset),
             )
 
     html = fill_repeated_richtext(html, spec, item, assets)
