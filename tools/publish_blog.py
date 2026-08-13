@@ -89,6 +89,11 @@ def run_html(paragraph):
     return "".join(out)
 
 
+def paragraph_image_rel_ids(paragraph):
+    """Return inline-image relationship IDs in their authored paragraph order."""
+    return re.findall(r'r:embed="(rId\d+)"', paragraph._p.xml)
+
+
 def paragraph_kind(paragraph):
     style = (paragraph.style.name if paragraph.style else "").lower()
     if "heading 1" in style or style == "title":
@@ -174,13 +179,20 @@ def docx_to_html(path):
                 blocks.append("<table><tbody>%s</tbody></table>" % "".join(rows))
             continue
         paragraph = item
-        if not paragraph.text.strip():
+        image_ids = paragraph_image_rel_ids(paragraph)
+        if not paragraph.text.strip() and not image_ids:
             continue
         # The CMS detail template renders the title as the page's one H1. Do
         # not repeat it in rich text; it remains the visible page title.
         if paragraph is title_paragraph:
             continue
         kind, body = paragraph_kind(paragraph), run_html(paragraph)
+        # Word may place an image in a paragraph with no text. Keep it at the
+        # exact authored point instead of dropping it during text conversion.
+        if image_ids:
+            flush_list()
+            blocks.extend('<figure class="blog-inline-image" data-docx-image="%s"></figure>' % image_id
+                          for image_id in image_ids)
         if item_index in plain_list_indexes:
             kind = "ul"
         if not body:
@@ -200,6 +212,40 @@ def docx_to_html(path):
 
     flush_list()
     return title, "\n".join(blocks)
+
+
+def extract_docx_images(path, slug):
+    """Copy original inline DOCX images and return their local public URLs.
+
+    The blog workflow retains clinician-supplied inline visuals rather than
+    silently publishing a text-only article. Names are deterministic and are
+    never allowed to overwrite an existing blog asset.
+    """
+    document = Document(path)
+    urls, written = {}, []
+    try:
+        for paragraph in document.paragraphs:
+            for image_id in paragraph_image_rel_ids(paragraph):
+                if image_id in urls:
+                    continue
+                part = document.part.related_parts.get(image_id)
+                if not part or not getattr(part, "blob", None):
+                    continue
+                ext = {
+                    "image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif",
+                    "image/webp": ".webp", "image/tiff": ".tiff",
+                }.get(getattr(part, "content_type", ""), ".png")
+                dest = IMAGE_DIR / ("%s-inline-%d%s" % (slug, len(urls) + 1, ext))
+                if dest.exists():
+                    raise ValueError("refusing to overwrite existing inline image: %s" % dest)
+                dest.write_bytes(part.blob)
+                written.append(dest)
+                urls[image_id] = "/images/blog/%s" % dest.name
+        return urls, written
+    except Exception:
+        for image in written:
+            image.unlink(missing_ok=True)
+        raise
 
 
 TOPIC_TARGETS = (
@@ -316,7 +362,10 @@ def write_row(fields, rows, row):
     with open(BLOGS, "w", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
-        writer.writerows(rows + [row])
+        # A retry after a transient build/publish interruption must update the
+        # prepared row, not create a duplicate public URL.
+        writer.writerows([existing for existing in rows
+                          if (existing.get("Slug") or "").strip().lower() != row["Slug"].lower()] + [row])
 
 
 def main():
@@ -336,11 +385,14 @@ def main():
     slug = slugify(title)
     if not slug:
         raise SystemExit("could not derive a URL slug from the DOCX title")
+    existing_same_slug = None
     for existing in rows:
         if normalise(existing.get("Name")) == normalise(title):
-            raise SystemExit("duplicate blog title: %s" % existing.get("Name"))
+            existing_same_slug = existing
         if (existing.get("Slug") or "").strip().lower() == slug.lower():
-            raise SystemExit("duplicate blog slug: %s" % slug)
+            existing_same_slug = existing
+    if existing_same_slug and not existing_same_slug.get("Slug"):
+        raise SystemExit("duplicate blog title: %s" % existing_same_slug.get("Name"))
 
     author_slug, author_name, author_kind = select_author(args.author)
     rich = add_internal_links(rich)
@@ -365,13 +417,22 @@ def main():
         return
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
     image_dest = IMAGE_DIR / (slug + extension)
-    if image_dest.exists():
-        raise SystemExit("refusing to overwrite existing image: %s" % image_dest)
-    shutil.copy2(args.thumbnail, image_dest)
+    if not image_dest.exists():
+        shutil.copy2(args.thumbnail, image_dest)
     try:
+        inline_urls, inline_images = extract_docx_images(args.docx, slug)
+        for image_id, image_url in inline_urls.items():
+            rich = rich.replace(
+                '<figure class="blog-inline-image" data-docx-image="%s"></figure>' % image_id,
+                '<figure class="blog-inline-image"><img src="%s" alt="%s"></figure>'
+                % (image_url, html.escape(title)),
+            )
+        row["Main Details"] = rich
         write_row(fields, rows, row)
     except Exception:
         image_dest.unlink(missing_ok=True)
+        for inline_image in locals().get("inline_images", []):
+            inline_image.unlink(missing_ok=True)
         raise
     print("Prepared CMS row and copied thumbnail. Run the build and verification before publishing.")
 
