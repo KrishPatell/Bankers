@@ -13857,6 +13857,87 @@ figure {
   z-index: 2;
 }
 
+/* Responsive treatment-detail headers
+   -----------------------------------
+   The CMS export stores these as extremely wide desktop artwork. A background
+   set to `cover` necessarily cuts the clinical illustration on phones. Keep
+   a consistent teal copy panel and use the artwork only inside the right-hand
+   illustration panel at small widths. This applies to every treatment page,
+   not just the VenaSeal page. */
+@media screen and (max-width: 991px) {
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    min-height: 300px;
+    height: 300px;
+    margin-top: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #38697b;
+    background-position: -9999px center;
+    background-size: auto 300px;
+    position: relative;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero)::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0 0 0 auto;
+    width: 52%;
+    background-image: inherit;
+    background-repeat: no-repeat;
+    background-position: 76% center;
+    background-size: auto 300px;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) .main-container {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 40px);
+    margin: 0 auto;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) .about-hero-wrapper-2 {
+    width: 46%;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) .breadcrumb-heading-3--white {
+    width: 100%;
+    max-width: none;
+    font-size: clamp(30px, 5.2vw, 42px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) {
+    min-height: 260px;
+    height: 260px;
+    background-size: auto 260px;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero)::after {
+    width: 50%;
+    background-size: auto 260px;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) .main-container {
+    width: calc(100% - 32px);
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) .about-hero-wrapper-2 {
+    width: 50%;
+  }
+
+  .about-hero-section.frozen.sizedown:not(.training):not(.responsive-venaseal-hero) .breadcrumb-heading-3--white {
+    font-size: clamp(23px, 6.6vw, 28px);
+    line-height: 1.14;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .bankers-notes-hero {
     height: 480px;
@@ -13871,5 +13952,64 @@ figure {
 
   .bankers-notes-hero .about-hero-wrapper-2 {
     padding-right: 150px;
+  }
+}
+
+/* One complete, purpose-made 3:2 medical banner for every treatment page on
+   phone and tablet. The original wide CMS banners continue to be used on PC. */
+@media screen and (max-width: 991px) {
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 3 / 2 !important;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #38697b;
+    background-image: url('../images/responsive-treatment-hero.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat;
+    background-size: 100% 100% !important;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero::after {
+    display: none;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero .main-container {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 40px);
+    margin: 0 auto;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero .about-hero-wrapper-2 {
+    width: 46%;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero .breadcrumb-heading-3--white {
+    width: 100%;
+    max-width: none;
+    font-size: clamp(30px, 5.2vw, 42px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero .main-container {
+    width: calc(100% - 32px);
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero .about-hero-wrapper-2 {
+    width: 50%;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero .breadcrumb-heading-3--white {
+    font-size: clamp(21px, 5.8vw, 25px);
+    line-height: 1.14;
   }
 }
