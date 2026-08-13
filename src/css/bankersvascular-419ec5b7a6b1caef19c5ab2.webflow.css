@@ -13546,7 +13546,7 @@ figure {
   }
 
   .main-wrapper {
-    padding-top: 80px;
+    padding-top: 0;
   }
 
   .main-container,
@@ -13639,8 +13639,11 @@ figure {
 
   .about-hero-section.frozen.sizedown.responsive-venaseal-hero {
     background-image: url('../images/venaseal-responsive-hero.png') !important;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
     background-position: center;
-    background-size: cover;
+    background-size: 100% 100%;
   }
 
   .about-hero-section.frozen.sizedown.responsive-venaseal-hero::after {
@@ -13700,6 +13703,39 @@ figure {
   .bng-conf {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
+  }
+
+  /* Purpose-made VenaSeal artwork has a 3:2 canvas.  Match the banner to
+     that canvas on tablets instead of using `cover`, which cropped the leg
+     and applicator out of the image. */
+  .about-hero-section.frozen.sizedown.responsive-venaseal-hero {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+    padding-top: 0;
+    padding-bottom: 0;
+    background-image: url('../images/venaseal-responsive-hero.png') !important;
+    background-position: center;
+    background-size: 100% 100%;
+  }
+
+  @media screen and (min-width: 768px) {
+    .main-wrapper {
+      /* The tablet navigation is fixed, unlike the mobile navigation. Keep
+         the banner below it so the first line of the title is not hidden. */
+      padding-top: 94px;
+    }
+
+    .about-hero-section.frozen.sizedown.responsive-venaseal-hero {
+      display: flex;
+      align-items: center;
+    }
+
+    .responsive-venaseal-hero .breadcrumb-heading-3--white {
+      width: 44%;
+      font-size: clamp(34px, 5.5vw, 44px);
+      line-height: 1.12;
+    }
   }
 }
 
