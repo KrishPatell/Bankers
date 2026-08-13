@@ -14013,3 +14013,71 @@ figure {
     line-height: 1.14;
   }
 }
+
+/* The detail templates for departments, varicose veins, and knee pain use
+   `.new-combo`. Apply the same automatic small-screen composition there. */
+@media screen and (max-width: 991px) {
+  .new-combo {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #38697b;
+    background-image: url('../images/responsive-treatment-hero.png') !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+
+  .new-combo .container-departmen {
+    box-sizing: border-box;
+    width: calc(100% - 40px);
+    margin: 0 auto;
+  }
+
+  .new-combo .about-hero-wrapper-2 {
+    width: 46%;
+  }
+
+  .new-combo .breadcrumb-heading-3--white {
+    width: 100%;
+    max-width: none;
+    font-size: clamp(30px, 5.2vw, 42px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .new-combo .container-departmen {
+    width: calc(100% - 32px);
+  }
+
+  .new-combo .about-hero-wrapper-2 {
+    width: 50%;
+  }
+
+  .new-combo .breadcrumb-heading-3--white {
+    font-size: clamp(21px, 5.8vw, 25px);
+    line-height: 1.14;
+  }
+}
+
+/* The small-screen navigation is fixed. Reserve its height so hero copy does
+   not start behind the logo and language bar on any template. */
+@media screen and (max-width: 991px) {
+  .main-wrapper {
+    padding-top: 94px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .main-wrapper {
+    padding-top: 78px;
+  }
+}
