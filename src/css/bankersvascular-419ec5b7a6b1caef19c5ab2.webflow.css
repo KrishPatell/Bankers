@@ -13833,7 +13833,9 @@ figure {
 .bankers-notes-doctor-portrait {
   position: absolute;
   right: max(5vw, 48px);
-  bottom: 0;
+  /* Sink the transparent portrait slightly below the crop so it sits on the
+     hero edge instead of looking as though it is floating. */
+  bottom: -28px;
   z-index: 1;
   width: min(300px, 25vw);
   pointer-events: none;
@@ -13854,6 +13856,7 @@ figure {
   .bankers-notes-doctor-portrait {
     right: 16px;
     width: 118px;
+    bottom: -10px;
   }
 
   .bankers-notes-hero .about-hero-wrapper-2 {
