@@ -14185,3 +14185,18 @@ figure {
   .recognition-heading { font-size: 25px; }
   .recognition-copy p { margin-bottom: 18px; font-size: 15px; }
 }
+
+/* Treatment selector: every label must remain readable when a tab is active. */
+.tabs-menu .tab-button > div:not(.load-bar-base) {
+  color: #264c5a !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.tabs-menu .tab-button.w--current {
+  background-color: #38697b !important;
+}
+
+.tabs-menu .tab-button.w--current > div:not(.load-bar-base) {
+  color: #fff !important;
+}
