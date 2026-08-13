@@ -13828,16 +13828,21 @@ figure {
   overflow: hidden;
   /* Remove the exported group-doctor background at every breakpoint. */
   background-image: none !important;
+  /* A true split hero: article title on the left, a full-height portrait on
+     the right.  The larger frame compensates for transparent space around the
+     original studio image. */
+  height: min(78vh, 700px);
+  min-height: 620px;
 }
 
 .bankers-notes-doctor-portrait {
   position: absolute;
-  right: max(5vw, 48px);
+  right: 3vw;
   /* Sink the transparent portrait slightly below the crop so it sits on the
      hero edge instead of looking as though it is floating. */
   bottom: -28px;
   z-index: 1;
-  width: min(300px, 25vw);
+  width: min(500px, 40vw);
   pointer-events: none;
 }
 
@@ -13853,13 +13858,18 @@ figure {
 }
 
 @media screen and (max-width: 767px) {
+  .bankers-notes-hero {
+    height: 480px;
+    min-height: 480px;
+  }
+
   .bankers-notes-doctor-portrait {
     right: 16px;
-    width: 118px;
+    width: 250px;
     bottom: -10px;
   }
 
   .bankers-notes-hero .about-hero-wrapper-2 {
-    padding-right: 92px;
+    padding-right: 150px;
   }
 }
