@@ -13826,40 +13826,23 @@ figure {
 /* Bankers Notes is Dr. Mohal Banker's personal article archive. */
 .bankers-notes-hero {
   overflow: hidden;
-  /* Remove the exported group-doctor background at every breakpoint. */
-  background-image: url('/images/bankers-notes-travel-collage.png') !important;
-  background-position: center;
-  background-size: cover;
-  /* A true split hero: article title on the left, a full-height portrait on
-     the right.  The larger frame compensates for transparent space around the
-     original studio image. */
+  /* One composed banner keeps the doctor, landscape, and travel stories in
+     the same visual scene instead of making the collage appear pasted on. */
+  background-image: url('/images/bankers-notes-travel-banner.png') !important;
+  /* The exported page's generic hero rule runs later in the stylesheet, so
+     keep this full banner's crop explicit at every desktop size. */
+  background-position: center !important;
+  background-size: cover !important;
   height: min(78vh, 700px);
   min-height: 620px;
 }
 
-.bankers-notes-doctor-portrait {
-  position: absolute;
-  left: 3vw;
-  right: auto;
-  /* Sink the transparent portrait slightly below the crop so it sits on the
-     hero edge instead of looking as though it is floating. */
-  bottom: -28px;
-  z-index: 1;
-  width: min(400px, 32vw);
-  pointer-events: none;
-}
-
-.bankers-notes-doctor-portrait img {
-  display: block;
-  width: 100%;
-  height: auto;
-  transform: scaleX(-1);
-}
-
-
 .bankers-notes-hero .about-hero-wrapper-2 {
   position: relative;
   z-index: 2;
+  /* The middle of the artwork is intentionally kept empty for readable copy. */
+  margin-left: clamp(400px, 38vw, 640px);
+  max-width: 470px;
 }
 
 /* Responsive treatment-detail headers
@@ -13947,18 +13930,37 @@ figure {
   .bankers-notes-hero {
     height: 480px;
     min-height: 480px;
-  }
-
-  .bankers-notes-doctor-portrait {
-    left: 10px;
-    right: auto;
-    width: 150px;
-    bottom: -10px;
+    /* Keep the doctor in the lower part of the phone crop and reserve the
+       upper-left for the page title. */
+    background-position: left center !important;
   }
 
   .bankers-notes-hero .about-hero-wrapper-2 {
-    padding-left: 150px;
+    margin-left: 0;
+    max-width: 72%;
+    padding-left: 20px;
     padding-right: 16px;
+    transform: translateY(-115px);
+  }
+
+  .bankers-notes-hero .container-21 {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  .bankers-notes-hero {
+    background-position: left center !important;
+  }
+
+  .bankers-notes-hero .about-hero-wrapper-2 {
+    margin-left: clamp(240px, 35vw, 300px);
+    max-width: 300px;
+  }
+
+  .bankers-notes-hero .container-21 {
+    max-width: 210px;
+    flex-wrap: wrap;
   }
 }
 
