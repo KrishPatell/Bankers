@@ -13950,13 +13950,15 @@ figure {
   }
 
   .bankers-notes-doctor-portrait {
-    right: 16px;
-    width: 250px;
+    left: 10px;
+    right: auto;
+    width: 150px;
     bottom: -10px;
   }
 
   .bankers-notes-hero .about-hero-wrapper-2 {
-    padding-right: 150px;
+    padding-left: 150px;
+    padding-right: 16px;
   }
 }
 
