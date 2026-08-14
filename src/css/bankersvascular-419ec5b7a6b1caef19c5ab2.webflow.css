@@ -13832,7 +13832,9 @@ figure {
   /* The exported page's generic hero rule runs later in the stylesheet, so
      keep this full banner's crop explicit at every desktop size. */
   background-position: center !important;
-  background-size: cover !important;
+  /* The artwork has its own safe margins. Fit the entire composition instead
+     of cropping the travel cards or Dr. Mohal at narrower desktop widths. */
+  background-size: 100% 100% !important;
   height: min(78vh, 700px);
   min-height: 620px;
 }
