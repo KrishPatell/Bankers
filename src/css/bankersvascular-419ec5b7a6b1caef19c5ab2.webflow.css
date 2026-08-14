@@ -13852,6 +13852,12 @@ figure {
   height: auto;
 }
 
+.bankers-notes-travel-collage {
+  right: 0;
+  bottom: 0;
+  width: min(980px, 61vw);
+}
+
 .bankers-notes-hero .about-hero-wrapper-2 {
   position: relative;
   z-index: 2;
