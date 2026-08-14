@@ -963,9 +963,9 @@ def customise_bankers_notes(html):
         "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.")
     html = html.replace('class="about-hero-section about">',
                         'class="about-hero-section about bankers-notes-hero">', 1)
-    portrait = ('<div class="bankers-notes-doctor-portrait bankers-notes-travel-collage">'
-                '<img src="/images/bankers-notes-travel-hero.png" '
-                'alt="Travel stories from Bankers Notes" loading="eager"></div>')
+    portrait = ('<div class="bankers-notes-doctor-portrait">'
+                '<img src="/images/bankers-notes-mohal-hd.png" '
+                'alt="Dr. Mohal Banker" loading="eager"></div>')
     return html.replace('<div class="highlighter-shape-wrapper">',
                         portrait + '<div class="highlighter-shape-wrapper">', 1)
 

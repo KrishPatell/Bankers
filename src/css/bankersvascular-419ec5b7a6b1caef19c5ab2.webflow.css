@@ -13827,7 +13827,9 @@ figure {
 .bankers-notes-hero {
   overflow: hidden;
   /* Remove the exported group-doctor background at every breakpoint. */
-  background-image: none !important;
+  background-image: url('/images/bankers-notes-travel-collage.png') !important;
+  background-position: center;
+  background-size: cover;
   /* A true split hero: article title on the left, a full-height portrait on
      the right.  The larger frame compensates for transparent space around the
      original studio image. */
@@ -13852,11 +13854,6 @@ figure {
   height: auto;
 }
 
-.bankers-notes-travel-collage {
-  right: 0;
-  bottom: 0;
-  width: min(980px, 61vw);
-}
 
 .bankers-notes-hero .about-hero-wrapper-2 {
   position: relative;
