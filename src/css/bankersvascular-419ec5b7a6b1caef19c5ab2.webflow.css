@@ -14110,24 +14110,30 @@ figure {
 .blog-detail-hero {
   display: flex;
   align-items: center;
-  min-height: 470px;
+  min-height: 0;
+  padding: 58px 0 54px;
   background: #e3f1f1 !important;
   background-image: none !important;
 }
 
 .blog-detail-hero .main-container {
-  display: grid !important;
-  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.85fr);
+  display: flex !important;
+  flex-direction: column;
   align-items: center;
-  gap: clamp(34px, 6vw, 100px);
-  width: min(1180px, calc(100% - 64px));
+  justify-content: center;
+  gap: 30px;
+  width: min(900px, calc(100% - 64px));
   margin: 0 auto;
 }
 
 .blog-detail-hero .about-hero-wrapper-2 {
   width: auto;
-  max-width: 620px;
+  max-width: 850px;
   margin: 0;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  text-align: center;
 }
 
 .blog-detail-hero .blog-breadcrumb-trail {
@@ -14141,12 +14147,13 @@ figure {
   font-weight: 600;
   letter-spacing: -0.05em;
   line-height: 1.02;
+  text-align: center;
 }
 
 .blog-detail-hero-thumbnail {
   display: block;
-  width: 100%;
-  max-height: 370px;
+  width: min(620px, 100%);
+  max-height: 390px;
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 18px 40px rgba(12, 37, 54, 0.18);
@@ -14155,12 +14162,11 @@ figure {
 @media screen and (max-width: 767px) {
   .blog-detail-hero {
     min-height: 0;
-    padding: 54px 0 38px;
+    padding: 42px 0 34px;
   }
 
   .blog-detail-hero .main-container {
-    grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 22px;
     width: calc(100% - 40px);
   }
 
