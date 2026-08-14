@@ -936,7 +936,9 @@ def prepare_shell(html, cms, binder, page_label):
 
 def add_bankers_notes_nav(html, current=False):
     """Add the personal-notes link beside Blog on every site header."""
-    if 'href="/bankers-notes"' in html:
+    # A few body sections link to this archive too; only skip injection when
+    # the header navigation link itself is already present.
+    if re.search(r'<a href="/bankers-notes"[^>]*>Bankers Notes</a>', html):
         return html
     if current:
         html = html.replace(
@@ -948,9 +950,12 @@ def add_bankers_notes_nav(html, current=False):
             '                </li>') % (
                 ' aria-current="page"' if current else '',
                 ' w--current' if current else '')
+    # Some exported static pages retain the relative `blog.html` nav URL,
+    # while the blog archive itself has the clean `/blog` URL.  Recognise
+    # both so Bankers Notes appears in every page's shared header.
     pattern = (r'(<li class="nav-list-item position-relative">\s*'
                r'<div class="nav-line"></div>\s*'
-               r'<a href="/blog"[^>]*>Blog</a>\s*</li>)')
+               r'<a href="(?:/blog|blog\.html)"[^>]*>Blog</a>\s*</li>)')
     return re.sub(pattern, r'\1\n                ' + link, html, count=1)
 
 
