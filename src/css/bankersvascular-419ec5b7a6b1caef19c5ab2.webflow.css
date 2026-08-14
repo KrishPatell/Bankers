@@ -13845,7 +13845,7 @@ figure {
      hero edge instead of looking as though it is floating. */
   bottom: -28px;
   z-index: 1;
-  width: min(500px, 40vw);
+  width: min(400px, 32vw);
   pointer-events: none;
 }
 
