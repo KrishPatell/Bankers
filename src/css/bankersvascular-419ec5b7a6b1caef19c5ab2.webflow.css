@@ -14104,6 +14104,75 @@ figure {
   }
 }
 
+/* Blog details use the post's own thumbnail in the hero. This replaces the
+   exported clinic group photo, so each article opens with only its heading
+   and its own cover visual. */
+.blog-detail-hero {
+  display: flex;
+  align-items: center;
+  min-height: 470px;
+  background: #e3f1f1 !important;
+  background-image: none !important;
+}
+
+.blog-detail-hero .main-container {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.85fr);
+  align-items: center;
+  gap: clamp(34px, 6vw, 100px);
+  width: min(1180px, calc(100% - 64px));
+  margin: 0 auto;
+}
+
+.blog-detail-hero .about-hero-wrapper-2 {
+  width: auto;
+  max-width: 620px;
+  margin: 0;
+}
+
+.blog-detail-hero .blog-breadcrumb-trail {
+  display: none;
+}
+
+.blog-detail-hero .breadcrumb-heading-3 {
+  color: #0c2536;
+  font-family: Generalsans, Satoshi, sans-serif;
+  font-size: clamp(38px, 4vw, 62px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+}
+
+.blog-detail-hero-thumbnail {
+  display: block;
+  width: 100%;
+  max-height: 370px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 18px 40px rgba(12, 37, 54, 0.18);
+}
+
+@media screen and (max-width: 767px) {
+  .blog-detail-hero {
+    min-height: 0;
+    padding: 54px 0 38px;
+  }
+
+  .blog-detail-hero .main-container {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    width: calc(100% - 40px);
+  }
+
+  .blog-detail-hero .breadcrumb-heading-3 {
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  .blog-detail-hero-thumbnail {
+    max-height: none;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .main-wrapper {
     padding-top: 78px;

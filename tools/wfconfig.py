@@ -32,6 +32,8 @@ COLLECTIONS = [
         "og_image": ["Main Image", "Blog Thumbnail"],
         "bind": [
             {"cls": "breadcrumb-heading-3", "field": "Name", "kind": "text"},
+            {"cls": "blog-detail-hero-thumbnail", "field": ["Blog Thumbnail", "Main Image"],
+             "kind": "img", "alt": "Name", "on_empty": "remove"},
             {"cls": "text-102", "field": "Short Details", "kind": "text",
              "on_empty": "remove"},
             {"cls": "blog-details", "field": "Main Details", "kind": "richtext"},
