@@ -87,6 +87,7 @@ DOCTOR_CARD_NAME_OVERRIDES = {
 WITHDRAWN_CONTENT = {
     "blog": {
         "varicose-veins-in-young-adults-why-they-happen-and-when-to-seek-care",
+        "simhasth-kumbh-a-spiritual-journey",
     },
 }
 
