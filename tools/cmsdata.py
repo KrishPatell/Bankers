@@ -199,6 +199,13 @@ class Collections:
                 if _truthy(r.get("Draft")) and slug not in forced:
                     dropped.append((slug, "draft"))
                     continue
+                # Scheduled blogs stay hidden until their calendar date.  This
+                # keeps future monthly entries in the source CSV while
+                # preventing early publication on listings, detail routes,
+                # related cards, and the sitemap.
+                if key == "blog" and r.get("_date") and r["_date"].date() > datetime.now().date():
+                    dropped.append((slug, "scheduled for a future date"))
+                    continue
                 if spec.get("require_active") and not _truthy(r.get("Active")):
                     dropped.append((slug, "inactive"))
                     continue
