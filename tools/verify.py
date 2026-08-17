@@ -15,6 +15,7 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import cmsdata
+import schema as ENTITY_SCHEMA
 import wfconfig as CFG
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -230,6 +231,47 @@ def check_blog_featured_image_policy(pages, cms):
         note("blog pages flow directly into content; thumbnails and author/date blocks stay off-page")
 
 
+def check_entity_schema(pages):
+    """Keep the organisation and lead-doctor entity graph unambiguous."""
+    person_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]
+    profile_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["profile_page"]
+    organization_id = ENTITY_SCHEMA.ENTITY_IDS["organization"]
+    website_id = ENTITY_SCHEMA.ENTITY_IDS["website"]
+    person_nodes = profile_nodes = organization_nodes = website_nodes = 0
+
+    for path, html in pages.items():
+        for raw in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+            try:
+                document = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                fail("%s: invalid JSON-LD: %s" % (rel(path), exc))
+                continue
+            for node in document.get("@graph", [document]):
+                node_id = node.get("@id")
+                if node_id == person_id:
+                    person_nodes += 1
+                elif node_id == profile_id:
+                    profile_nodes += 1
+                elif node_id == organization_id:
+                    organization_nodes += 1
+                elif node_id == website_id:
+                    website_nodes += 1
+                if node_id and "#medical-clinic" in node_id:
+                    fail("%s: obsolete #medical-clinic entity ID" % rel(path))
+                if (node.get("@type") == "BlogPosting"
+                        and node.get("publisher", {}).get("@id") != organization_id):
+                    fail("%s: BlogPosting publisher does not reference the primary organization" % rel(path))
+
+    if person_nodes != 1 or profile_nodes != 1:
+        fail("expected one Dr. Mohal Banker Person and ProfilePage node; found %d and %d"
+             % (person_nodes, profile_nodes))
+    if organization_nodes != 1 or website_nodes != 1:
+        fail("expected one homepage Organization and WebSite node; found %d and %d"
+             % (organization_nodes, website_nodes))
+    if not failures:
+        note("entity schema uses one primary organization, website, and Dr. Mohal Banker profile")
+
+
 def check_forms(pages):
     """Every lead form must POST to the endpoint and have a real submit control."""
     total = 0
@@ -434,6 +476,7 @@ def main():
     cms = check_publish_rules(pages)
     check_nav(pages, cms)
     check_meta(pages)
+    check_entity_schema(pages)
     check_blog_featured_image_policy(pages, cms)
     check_forms(pages)
     check_submit_controls(pages)

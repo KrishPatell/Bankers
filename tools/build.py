@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import cmsdata
+import schema as ENTITY_SCHEMA
 import wfconfig as CFG
 import wfhtml as W
 
@@ -51,6 +52,9 @@ STATIC_META = {
         "desc": "Highlights from the November 2024 BnG Conference at Bankers Vascular Centre.",
     },
 }
+
+MOHAL_DOCTOR_SLUG = "dr-mohal-banker"
+MOHAL_PROFILE_URL = "/our-doctors/" + MOHAL_DOCTOR_SLUG
 
 # Verified consultation/branch locations used only on their matching city pages.
 CITY_LOCATION_DATA = {
@@ -1273,6 +1277,14 @@ def render_detail(base, spec, item, cms, binder, assets):
         image=assets.url(og) if og else None,
         canonical=CFG.SITE_URL + item.url,
     )
+    if spec["key"] == "our-doctors" and item.slug == MOHAL_DOCTOR_SLUG:
+        html = set_head_meta(
+            html,
+            title="Dr. Mohal Banker | Interventional Radiologist | Bankers Vascular Centre",
+            desc="Dr. Mohal Banker is an Interventional Radiologist at Bankers Vascular Centre.",
+        )
+        html = re.sub(r'<meta(?=[^>]*\bproperty="og:type")[^>]*>',
+                      '<meta property="og:type" content="profile">', html, count=1)
     html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(html)), item.url)
     html = add_article_schema(html, spec, item, assets)
     return add_page_schema(html, item.url, spec, item)
@@ -1330,8 +1342,10 @@ def fill_author_block(html, spec, item, assets):
                        "alt", _esc_attr(author.name)), "w-dyn-bind-empty"))
     j = W.find_by_class(seg, conf["link"])
     if j >= 0:
+        author_url = (MOHAL_PROFILE_URL if author.name.strip().casefold() == "dr. mohal banker"
+                      else author.url)
         seg = W.edit_open_tag(seg, j, lambda t: W.drop_class(
-            W.set_attr(t, "href", author.url), "w-dyn-bind-empty"))
+            W.set_attr(t, "href", author_url), "w-dyn-bind-empty"))
         seg = W.set_inner(seg, W.find_block(seg, j), htmllib.escape(author.name))
     return html[:block[0]] + seg + html[block[1]:]
 
@@ -1381,21 +1395,25 @@ def add_article_schema(html, spec, item, assets):
         return html
     author = item.get("_author")
     img = item.get_text("Main Image", "Blog Thumbnail")
+    canonical_url = CFG.SITE_URL + item.url
     data = {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
+        "@id": canonical_url + "#article",
         "headline": item.name,
-        "url": CFG.SITE_URL + item.url,
-        "mainEntityOfPage": CFG.SITE_URL + item.url,
-        "publisher": {"@type": "Organization", "name": "Bankers Vascular Centre",
-                      "url": CFG.SITE_URL},
+        "url": canonical_url,
+        "mainEntityOfPage": {"@type": "WebPage", "@id": canonical_url},
+        "publisher": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
     }
     if img:
         data["image"] = CFG.SITE_URL + assets.url(img) if assets.url(img).startswith("/") \
             else assets.url(img)
     if item.get("_date"):
         data["datePublished"] = item["_date"].strftime("%Y-%m-%d")
-    if author:
+    if author and author.name.strip().casefold() == "dr. mohal banker":
+        data["author"] = {"@id": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]}
+    elif author:
+        # Do not attribute another author's post to Dr. Mohal Banker.
         data["author"] = {"@type": "Person", "name": author.name,
                           "url": CFG.SITE_URL + author.url}
     desc = re.sub(r"\s+", " ", item.get_text("Short Details"))[:300]
@@ -1407,7 +1425,7 @@ def add_article_schema(html, spec, item, assets):
 
 
 def add_page_schema(html, url, spec=None, item=None):
-    """Add the clinic entity, breadcrumbs, and doctor entity where relevant."""
+    """Emit one page-appropriate graph using stable shared entity IDs."""
     crumbs = [{"@type": "ListItem", "position": 1, "name": "Home",
                "item": CFG.SITE_URL + "/"}]
     path = url.strip("/")
@@ -1418,41 +1436,46 @@ def add_page_schema(html, url, spec=None, item=None):
             crumbs.append({"@type": "ListItem", "position": position,
                            "name": part.replace("-", " ").title(),
                            "item": CFG.SITE_URL + current})
+    if spec and spec.get("key") == "our-doctors" and item:
+        # There is no published /our-doctors archive; do not manufacture one.
+        crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
+                              "name": item.name, "item": CFG.SITE_URL + url}]
     graph = [{
-        "@context": "https://schema.org",
-        "@type": "MedicalClinic",
-        "@id": CFG.SITE_URL + "/#medical-clinic",
-        "name": "Bankers Vascular Centre",
-        "url": CFG.SITE_URL + "/",
-        "telephone": "+91-99099-03449",
-        "medicalSpecialty": "Interventional Radiology",
-        "address": [
-            {"@type": "PostalAddress", "streetAddress": "2nd & 3rd Floor, RJP House, 100 Ft Anand Nagar Road, Opp. Scarlet Heights, Near Gopi Restaurant", "addressLocality": "Ahmedabad", "addressRegion": "Gujarat", "postalCode": "380015", "addressCountry": "IN"},
-            {"@type": "PostalAddress", "streetAddress": "2nd Floor, Ignite, 201, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota", "addressLocality": "Vadodara", "addressRegion": "Gujarat", "postalCode": "390007", "addressCountry": "IN"},
-        ],
-    }, {
-        "@context": "https://schema.org", "@type": "BreadcrumbList",
+        "@type": "BreadcrumbList", "@id": CFG.SITE_URL + url + "#breadcrumb",
         "itemListElement": crumbs,
     }]
     if url == "/":
-        graph.append({"@context": "https://schema.org", "@type": "WebSite",
-                      "name": "Bankers Vascular Centre", "url": CFG.SITE_URL + "/"})
-    city = url.rsplit("/", 1)[-1]
-    location_data = CITY_LOCATION_DATA.get(city) if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) else None
-    if location_data:
-        query = urllib.parse.quote_plus("%s, %s" % (location_data["name"], location_data["address"]))
-        graph.append({
-            "@context": "https://schema.org", "@type": "Place",
-            "name": location_data["name"],
-            "address": {"@type": "PostalAddress", "streetAddress": location_data["address"], "addressLocality": location_data["city"], "addressRegion": "Rajasthan" if city == "rajasthan" else "Gujarat", "postalCode": location_data["postal_code"], "addressCountry": "IN"},
-            "telephone": location_data["phone"],
-            "hasMap": "https://www.google.com/maps/search/?api=1&query=" + query,
-        })
-    if spec and spec.get("key") == "our-doctors" and item:
-        graph.append({"@context": "https://schema.org", "@type": "Physician",
-                      "name": item.name, "url": CFG.SITE_URL + url,
-                      "worksFor": {"@id": CFG.SITE_URL + "/#medical-clinic"},
-                      "jobTitle": item.get_text("Doctor Designation")})
+        graph.extend((
+            {"@type": "WebSite", "@id": ENTITY_SCHEMA.ENTITY_IDS["website"],
+             "url": CFG.SITE_URL + "/", "name": "Bankers Vascular Centre",
+             "publisher": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]}},
+            {"@type": "MedicalOrganization", "@id": ENTITY_SCHEMA.ENTITY_IDS["organization"],
+             "name": "Bankers Vascular Centre", "url": CFG.SITE_URL + "/",
+             "sameAs": list(ENTITY_SCHEMA.ORGANIZATION_SAME_AS)},
+        ))
+    if spec and spec.get("key") == "our-doctors" and item and item.slug == MOHAL_DOCTOR_SLUG:
+        person_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]
+        image = item.get_text("Doctor Details Image", "Doctor Thumbnail")
+        person = {
+            "@type": "Person", "@id": person_id, "name": "Dr. Mohal Banker",
+            "honorificPrefix": "Dr.", "url": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["url"],
+            "jobTitle": "Interventional Radiologist",
+            "worksFor": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+            "affiliation": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+            "knowsAbout": ["Interventional Radiology", "Varicose Vein Treatment",
+                           "Genicular Artery Embolization", "Vascular Malformations"],
+        }
+        if image:
+            image_url = image if image.startswith(("http://", "https://")) else CFG.SITE_URL + image
+            person["image"] = {"@type": "ImageObject", "url": image_url}
+        graph.extend((
+            {"@type": "ProfilePage", "@id": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["profile_page"],
+             "url": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["url"],
+             "name": "Dr. Mohal Banker | Bankers Vascular Centre",
+             "isPartOf": {"@id": ENTITY_SCHEMA.ENTITY_IDS["website"]},
+             "mainEntity": {"@id": person_id}, "about": {"@id": person_id}},
+            person,
+        ))
     tag = '  <script type="application/ld+json">%s</script>\n</head>' % json.dumps(
         {"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False)
     return html.replace("</head>", tag, 1)
