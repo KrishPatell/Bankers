@@ -7,6 +7,7 @@
 import json
 import os
 import re
+import xml.etree.ElementTree as ET
 import sys
 import urllib.parse
 from collections import Counter
@@ -338,12 +339,25 @@ def check_sitemap(pages):
     if not os.path.exists(p):
         return fail("sitemap.xml missing")
     xml = open(p, encoding="utf-8").read()
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as exc:
+        return fail("sitemap.xml is not valid XML: %s" % exc)
+    if root.tag != "{http://www.sitemaps.org/schemas/sitemap/0.9}urlset":
+        fail("sitemap.xml has an invalid urlset namespace")
     locs = re.findall(r"<loc>([^<]+)</loc>", xml)
     if len(locs) < 300:
         fail("sitemap has only %d URLs" % len(locs))
     for bad in ("detail_", "/401", "/404", "insurance-departments"):
         if bad in xml:
             fail("sitemap contains %s" % bad)
+    if len(locs) != len(set(locs)):
+        fail("sitemap contains duplicate URLs")
+    for loc in locs:
+        if not loc.startswith("https://bankersvascular.com/"):
+            fail("sitemap contains a non-canonical URL: %s" % loc)
+        if any(bad in loc for bad in ("localhost", "staging", ".html", "?")):
+            fail("sitemap contains an invalid URL: %s" % loc)
     note("sitemap.xml lists %d URLs" % len(locs))
 
 

@@ -1,5 +1,6 @@
 // Cloudflare Worker for the static site and its single lead-capture endpoint.
-// Static files bypass this script; only /api/* is routed here (wrangler.jsonc).
+// It runs before static assets so the canonical-origin redirect applies to every
+// public URL, including sitemap.xml and robots.txt.
 
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 5;
