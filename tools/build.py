@@ -15,6 +15,7 @@ import os
 import re
 import shutil
 import sys
+import unicodedata
 import urllib.parse
 from datetime import datetime, timezone
 
@@ -602,6 +603,15 @@ def order_items(cms, spec):
     if spec.get("author_slug"):
         items = [item for item in items if item.get("_author") is not None
                  and item["_author"].slug == spec["author_slug"]]
+    # Personal Bankers Notes must stay separate from the clinic-wide Blog
+    # archive and the standard home-page blog cards.
+    if spec.get("notes_only"):
+        items = [item for item in items if str(item.get("Bankers Notes", "")).lower() == "true"]
+    elif spec.get("exclude_notes"):
+        items = [item for item in items if str(item.get("Bankers Notes", "")).lower() != "true"]
+    if spec.get("include_slugs"):
+        wanted = set(spec["include_slugs"])
+        items = [item for item in items if item.slug in wanted]
     items = items[spec.get("offset", 0):]
     if spec.get("limit"):
         items = items[:spec["limit"]]
@@ -959,7 +969,150 @@ def add_bankers_notes_nav(html, current=False):
     return re.sub(pattern, r'\1\n                ' + link, html, count=1)
 
 
-def customise_bankers_notes(html):
+LOVE_U_ZINDAGI_GUJARAT = [
+    ("Patan Ni Vav — Reversal of Taj Mahal", "https://loveuzindagiorg.wordpress.com/2015/11/20/%e0%aa%aa%e0%aa%be%e0%aa%9f%e0%aa%a3-%e0%aa%a8%e0%ab%80-%e0%aa%b5%e0%aa%be%e0%aa%b5-reversal-of-tajmahal/", "https://mohalbankerdotcom.files.wordpress.com/2015/11/img_20241.jpg"),
+    ("Kutchh Rann Utsav — Mhaaro Kutchhdo", "https://loveuzindagiorg.wordpress.com/2016/02/21/kutchh-rann-utsav-%e0%aa%ae%e0%ab%8d%e0%aa%b9%e0%aa%be%e0%aa%b0%e0%ab%8b-%e0%aa%95%e0%aa%9a%e0%ab%8d%e0%aa%9b%e0%aa%a1%e0%ab%8b-%e0%aa%ac%e0%aa%be%e0%aa%b0%e0%ab%87-%e0%aa%ae%e0%aa%be%e0%aa%b8/", "https://mohalbankerdotcom.files.wordpress.com/2016/02/img_4413.jpg"),
+    ("Jurassic Jungle — Gir Forest", "https://loveuzindagiorg.wordpress.com/2014/08/19/jurasic-jungle-gir-forest/", "https://mohalbankerdotcom.files.wordpress.com/2016/06/61.jpg"),
+    ("Hidden Waterfall Trail — Dediapada Forest", "https://loveuzindagiorg.wordpress.com/2016/08/16/waterfall-trail-of-dediapada-forest/", "https://mohalbankerdotcom.files.wordpress.com/2016/08/trip-042.jpg"),
+    ("Don Hill at Dang", "https://loveuzindagiorg.wordpress.com/2015/02/26/don-hill-dang/", "https://mohalbankerdotcom.files.wordpress.com/2015/02/img_6666-e1425444621165.jpg"),
+    ("Vadla Bird Sanctuary", "https://loveuzindagiorg.wordpress.com/2015/03/08/vadla-bird-century/", "https://mohalbankerdotcom.files.wordpress.com/2015/03/3.jpg"),
+    ("Ahmedabad Mirror Travel Article", "https://loveuzindagiorg.wordpress.com/2015/06/03/ahmedabad-mirror-article-on-my-arunachal-pradesh-trip-this-is-my-attempt-to-popularise-incredible-india/", "https://mohalbankerdotcom.files.wordpress.com/2015/06/page-1-for-media.jpg"),
+    ("Ratanmahal Sloth Bear Sanctuary", "https://loveuzindagiorg.wordpress.com/2017/07/17/ratanmahal-sloth-bear-sanctuarygujarat-a-game-of-pleasure-chemical/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/07/1.jpg"),
+    ("Border — Who Can Be Winner?", "https://loveuzindagiorg.wordpress.com/2017/08/27/border-who-can-be-winner/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/08/img_3257.jpg"),
+    ("Being Parents — Jambughoda", "https://loveuzindagiorg.wordpress.com/2018/09/24/being-a-parents-jambughoda/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/09/img_10801.jpg"),
+    ("Rupal Ni Palli", "https://loveuzindagiorg.wordpress.com/2018/10/24/rupal-ni-palli-is-it-culture-or-religion/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/10/img_7557.jpg"),
+    ("Dwarka — Happiness Is a Mindset", "https://loveuzindagiorg.wordpress.com/2018/11/14/happiness-is-a-mindset/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/11/img_20181109_194438.jpg"),
+    ("Aravalli Waterfall", "https://loveuzindagiorg.wordpress.com/2019/08/25/aravalli-waterfall-is-travelling-losers-game/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2019/08/3.jpg"),
+    ("Discover Dediapada", "https://loveuzindagiorg.wordpress.com/2021/10/04/is-the-glass-half-empty-or-half-full-discover-dediapada/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2021/10/img_20211003_145635.jpg"),
+    ("Tail Event — Waterfall Hunter", "https://loveuzindagiorg.wordpress.com/2022/08/11/tail-event-make-me-waterfall-hunter/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2022/08/img_9368.jpg"),
+]
+
+# Original Love U Zindagi stories, organised from the supplied WordPress
+# export.  Each destination opens independently so visitors can browse places
+# without losing their position in the directory.
+LOVE_U_ZINDAGI_DESTINATIONS = [
+    ("Gujarat", "https://mohalbankerdotcom.files.wordpress.com/2016/02/img_4413.jpg", LOVE_U_ZINDAGI_GUJARAT + [
+        ("Ghar Kone Kahevay — Mandvi, Nakhatrana & Chharichand", "https://loveuzindagiorg.wordpress.com/2017/03/27/ghar-kone-kahevay/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/03/5.jpg"),
+        ("Pol Ni Uttarayan", "https://loveuzindagiorg.wordpress.com/2016/01/15/%e0%aa%aa%e0%ab%8b%e0%aa%b3-%e0%aa%a8%e0%ab%80-%e0%aa%89%e0%aa%a4%e0%ab%8d%e0%aa%a4%e0%aa%b0%e0%aa%be%e0%aa%af%e0%aa%a3-a-feast-of-indian-festival/", "https://mohalbankerdotcom.files.wordpress.com/2016/01/img_37181.jpg"),
+        ("Mysterious Island — Bankers Island", "https://loveuzindagiorg.wordpress.com/2013/12/22/mysterious-island-bankers-island/", "https://mohalbankerdotcom.files.wordpress.com/2016/03/1.jpg"),
+    ]),
+    ("Andaman & Nicobar", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/01/20161225_172647.jpg", [
+        ("Havelock Island — Love U Zindagi", "https://loveuzindagiorg.wordpress.com/2017/01/01/havelock-island-love-u-zindagi/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/01/20161225_172647.jpg"),
+    ]),
+    ("Madhya Pradesh", "https://mohalbankerdotcom.files.wordpress.com/2015/08/11856361_10207591362401194_5764355214743304467_o.jpg", [
+        ("Mandu — Monsoon Magic", "https://loveuzindagiorg.wordpress.com/2015/08/19/mandu-monsoon-magic/", "https://mohalbankerdotcom.files.wordpress.com/2015/08/11856361_10207591362401194_5764355214743304467_o.jpg"),
+        ("Simhasth Kumbh — A Spiritual Journey", "https://loveuzindagiorg.wordpress.com/2016/04/24/simhasth-kumbh-a-spiritual-journey/", "https://mohalbankerdotcom.files.wordpress.com/2016/04/23.jpg"),
+    ]),
+    ("Rajasthan", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/10/img_2322.jpg", [
+        ("Deogarh Mahal — Padharo Mhare Des", "https://loveuzindagiorg.wordpress.com/2015/11/18/deogarh-mahal-%e0%a4%aa%e0%a4%a7%e0%a4%be%e0%a4%b0%e0%a5%8b-%e0%a4%ae%e0%a5%8d%e0%a4%b9%e0%a4%be%e0%a4%b0%e0%a5%87-%e0%a4%a6%e0%a5%87%e0%a4%b6-padharo-mahare-desh/", "https://mohalbankerdotcom.files.wordpress.com/2015/11/img_1333.jpg"),
+        ("Jaipur — A Royal City", "https://loveuzindagiorg.wordpress.com/2017/10/30/jaipur-a-royal-city/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/10/img_2322.jpg"),
+        ("Jaisalmer — Small Things Matter", "https://loveuzindagiorg.wordpress.com/2019/11/07/jaisalmer-small-things-matter-a-lot/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2019/11/img_20191030_181709_original.jpg"),
+    ]),
+    ("Goa & Konkan", "https://mohalbankerdotcom.files.wordpress.com/2015/12/2.jpg", [
+        ("Stay Hungry Stay Foolish — Goa & Konkan", "https://loveuzindagiorg.wordpress.com/2014/10/31/stay-hungry-stay-foolish-goa-konkan/", "https://mohalbankerdotcom.files.wordpress.com/2015/12/2.jpg"),
+    ]),
+    ("Lakshadweep", "https://mohalbankerdotcom.files.wordpress.com/2016/01/img_2416.jpg", [
+        ("Amazing Lakshadweep", "https://loveuzindagiorg.wordpress.com/2016/01/03/amazing-lakshadweep/", "https://mohalbankerdotcom.files.wordpress.com/2016/01/img_2416.jpg"),
+    ]),
+    ("Tamil Nadu", "https://mohalbankerdotcom.files.wordpress.com/2016/01/img_3032.jpg", [
+        ("Valparai — Tea & Coffee Gardens", "https://loveuzindagiorg.wordpress.com/2016/01/05/valparai-land-of-tea-coffee-gardens/", "https://mohalbankerdotcom.files.wordpress.com/2016/01/img_3032.jpg"),
+    ]),
+    ("Maharashtra", "https://mohalbankerdotcom.files.wordpress.com/2016/03/0-7.jpg", [
+        ("Vineyard Trail — Nashik", "https://loveuzindagiorg.wordpress.com/2016/03/17/vineyard-trail-nashik/", "https://mohalbankerdotcom.files.wordpress.com/2016/03/0-7.jpg"),
+        ("Fireflies Trail — Purushwadi", "https://loveuzindagiorg.wordpress.com/2016/06/09/fireflies-trail-purushwadi/", "https://mohalbankerdotcom.files.wordpress.com/2016/06/3-2.jpg"),
+        ("Velas Turtle Festival", "https://loveuzindagiorg.wordpress.com/2018/03/21/velas-turtle-festival-a-concept-of-inner-score-card/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/03/71.jpg"),
+    ]),
+    ("Arunachal Pradesh", "https://mohalbankerdotcom.files.wordpress.com/2015/06/10995572_10206792086259790_8424106195667674787_n.jpg", [
+        ("Ahmedabad Mirror — Arunachal Pradesh Trip", "https://loveuzindagiorg.wordpress.com/2015/06/03/ahmedabad-mirror-article-on-my-arunachal-pradesh-trip-this-is-my-attempt-to-popularise-incredible-india/", "https://mohalbankerdotcom.files.wordpress.com/2015/06/page-1-for-media.jpg"),
+        ("The Land of Rising Sun — Arunachal Pradesh", "https://loveuzindagiorg.wordpress.com/2015/06/03/the-land-of-rising-sun-arunachal-pradesh/", "https://mohalbankerdotcom.files.wordpress.com/2015/06/10995572_10206792086259790_8424106195667674787_n.jpg"),
+        ("Hanging Bridge in Arunachal Pradesh", "https://loveuzindagiorg.wordpress.com/2015/06/03/hanging-bridge-in-arunachal-pradesh-hanging-bridge-are-lifeline-for-arunachal-pradesh-in-my-trip-i-encounter-minimum-8-different-hanging-bridge-of-different-variety/", "https://mohalbankerdotcom.files.wordpress.com/2015/06/img_3549.jpg"),
+        ("Mechuka Valley — Any Body Can Travel", "https://loveuzindagiorg.wordpress.com/2015/06/22/a-b-c-td-any-body-can-travel-mechuka-valley/", "https://mohalbankerdotcom.files.wordpress.com/2015/06/10986652_10207117341230961_3666773959899489769_n.jpg"),
+    ]),
+    ("Sikkim", "https://mohalbankerdotcom.files.wordpress.com/2016/05/1.jpg", [
+        ("Sikkim — A Land of Flowers", "https://loveuzindagiorg.wordpress.com/2016/05/15/sikkim-a-land-of-flower/", "https://mohalbankerdotcom.files.wordpress.com/2016/05/1.jpg"),
+    ]),
+    ("Himachal Pradesh", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2023/05/photo-2023-05-28-11-52-39_1.jpg", [
+        ("Bir Billing & Palampur", "https://loveuzindagiorg.wordpress.com/2016/11/09/bir-billing-palampur/", "https://mohalbankerdotcom.files.wordpress.com/2016/11/img_9211.jpg"),
+        ("Jibhi — Happiness Fluctuates Like Stock Market", "https://loveuzindagiorg.wordpress.com/2023/05/28/jibhi-happiness-fluctuate-like-a-stock-market/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2023/05/photo-2023-05-28-11-52-39_1.jpg"),
+        ("Spiti Valley Bike Tour", "https://loveuzindagiorg.wordpress.com/2023/07/09/spiti-valley-bike-tour-the-greatest-pleasure-in-life-is-doing-what-people-say-you-cannot-do-it/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2023/07/image.png"),
+    ]),
+    ("Ladakh", "https://mohalbankerdotcom.files.wordpress.com/2015/12/110.jpg", [
+        ("Rendezvous in Ladakh", "https://loveuzindagiorg.wordpress.com/2014/06/11/rendezvous-in-ladakh/", "https://mohalbankerdotcom.files.wordpress.com/2015/12/110.jpg"),
+    ]),
+    ("Kerala", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/08/img_1914.jpg", [
+        ("Snake Boat Race — Alleppey", "https://loveuzindagiorg.wordpress.com/2017/08/19/snake-boat-race-alleppy/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2017/08/img_1914.jpg"),
+    ]),
+    ("Karnataka", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/01/img_0912.jpg", [
+        ("Chikmagalur & Gokarna", "https://loveuzindagiorg.wordpress.com/2018/01/02/chikmagalur-gokarna/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/01/img_0912.jpg"),
+    ]),
+    ("Meghalaya & Manipur", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/05/xwfr0650.jpg", [
+        ("Don't Be a Chicken — Meghalaya & Manipur", "https://loveuzindagiorg.wordpress.com/2018/05/13/dont-be-a-chicken-meghalaya-manipur/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2018/05/xwfr0650.jpg"),
+    ]),
+    ("Odisha", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2019/05/1.jpg", [
+        ("Desia — Rich Tribal Culture of Odisha", "https://loveuzindagiorg.wordpress.com/2019/06/02/desia/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2019/05/1.jpg"),
+    ]),
+    ("Uttarakhand", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2021/11/5.5.jpg", [
+        ("Rishikesh — Does It Have a Magical Formula?", "https://loveuzindagiorg.wordpress.com/2021/11/11/rishikesh-does-it-have-a-magical-formula/", "https://loveuzindagiorg.wordpress.com/wp-content/uploads/2021/11/5.5.jpg"),
+    ]),
+    ("Incredible India", "https://mohalbankerdotcom.files.wordpress.com/2015/10/img_0377.jpg", [
+        ("Tribal Tourism — Kauncha Village", "https://loveuzindagiorg.wordpress.com/2015/10/06/tribal-tourism-kauncha-villagedudhani/", "https://mohalbankerdotcom.files.wordpress.com/2015/10/img_0377.jpg"),
+    ]),
+]
+
+
+def travel_local_slug(source_url):
+    """Match the stable local slug created from a WordPress post URL."""
+    source_slug = urllib.parse.unquote(urllib.parse.urlparse(source_url).path.rstrip("/").rsplit("/", 1)[-1])
+    source_slug = unicodedata.normalize("NFKD", source_slug).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", source_slug.lower()).strip("-")[:110]
+
+
+def bankers_notes_destination_directory(cms):
+    """Return the first place-wise travel collection for the Bankers Notes page.
+
+    These verified WordPress export links keep the original travel journal
+    intact while the Bankers Notes landing page becomes its branded directory.
+    Further destinations use the same card system as their media is curated.
+    """
+    imported_names = {item.slug: item.name for item in cms.all.get("blog", [])}
+
+    def cards_for(destination, stories):
+        return "".join(
+            '<a class="travel-story-card" href="%s">'
+            '<img src="%s" alt="%s" loading="lazy">'
+            '<span class="travel-story-overlay"></span><span class="travel-story-copy">'
+            '<span class="travel-story-location">%s journey</span><strong>%s</strong>'
+            '<span class="travel-story-read">Read story <b aria-hidden="true">↗</b></span>'
+            '</span></a>' % (htmllib.escape(url, quote=True), htmllib.escape(image, quote=True),
+                              htmllib.escape(display_title, quote=True), htmllib.escape(destination),
+                              htmllib.escape(display_title))
+            for title, url, image in stories
+            for slug, display_title in [(
+                travel_local_slug(url),
+                imported_names.get(travel_local_slug(url)) or title,
+            )]
+        )
+
+    destinations = "".join(
+        '<details class="travel-destination"><summary>'
+        '<img src="%s" alt="%s travel destination" loading="lazy">'
+        '<span class="travel-destination-cover"></span>'
+        '<span class="travel-destination-title"><em>Travel through</em>%s'
+        '<small>%d %s explored</small></span><i aria-hidden="true">+</i></summary>'
+        '<div class="travel-story-grid">%s</div></details>' % (
+            htmllib.escape(cover, quote=True), htmllib.escape(destination, quote=True),
+            htmllib.escape(destination), len(stories), "place" if len(stories) == 1 else "places",
+            cards_for(destination, stories))
+        for destination, cover, stories in LOVE_U_ZINDAGI_DESTINATIONS
+    )
+    return ('<section class="travel-directory" aria-labelledby="travel-directory-heading">'
+            '<div class="travel-directory-heading"><p>Travel journals by Dr. Mohal Banker</p>'
+            '<h2 id="travel-directory-heading">Explore journeys by destination</h2>'
+            '<span>Choose a state to see every place and story.</span></div>'
+            '<div class="travel-destination-grid">%s</div></section>') % destinations
+
+
+def customise_bankers_notes(html, cms):
     """Turn the cloned blog archive into Dr. Mohal Banker's personal page."""
     html = html.replace("Our Blog", "Bankers Notes")
     html = html.replace("Latest blog articles<br>", "Notes from Dr. Mohal Banker<br>")
@@ -968,6 +1121,12 @@ def customise_bankers_notes(html):
         "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.")
     html = html.replace('class="about-hero-section about">',
                         'class="about-hero-section about bankers-notes-hero">', 1)
+    directory = bankers_notes_destination_directory(cms)
+    # The page is now a dedicated travel directory; keep the clinic's Mirchi
+    # recognition post out of this layout.
+    archive = W.block_by_class(html, "blog-archive-wrapper")
+    if archive:
+        html = html[:archive[0]] + directory + html[archive[1]:]
     return html
 
 
@@ -978,7 +1137,7 @@ def build_shells(pages, cms, binder, assets):
         source = extra.get("source", page)
         html = prepare_shell(read(os.path.join(SRC, source)), cms, binder, page)
         if page == "bankers-notes.html":
-            html = customise_bankers_notes(html)
+            html = customise_bankers_notes(html, cms)
         html = add_bankers_notes_nav(html, current=(page == "bankers-notes.html"))
         out_rel = extra.get("output", CFG.DIRECTORY_PAGES.get(page, page))
         url = page_url(page)
@@ -1057,6 +1216,13 @@ def build_details(cms, binder, assets):
 
 def render_detail(base, spec, item, cms, binder, assets):
     html = base
+
+    if (spec["key"] == "blog"
+            and str(item.get("Bankers Notes", "")).lower() == "true"):
+        back_link = ('<a class="back-to-bankers-notes" href="/bankers-notes" '
+                     'aria-label="Back to Bankers Notes">'
+                     '<span aria-hidden="true">←</span> Back to Bankers Notes</a>')
+        html = html.replace("<main", back_link + "<main", 1)
 
     for b in spec.get("bind", []):
         html = binder._one(html, item, b, item.url) if b["kind"] != "link" else html

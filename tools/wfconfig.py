@@ -364,10 +364,7 @@ EXTRA_SHELL_PAGES = {
     },
 }
 
-PAGE_LISTS["bankers-notes.html"] = [
-    {"items_cls": "blog-archive", "collection": "blog", "order": "newest",
-     "author_slug": "dr-mohal", "paginate": 100, "bindings": "blog-card"},
-]
+PAGE_LISTS["bankers-notes.html"] = []
 
 # Lists inside detail templates, resolved per rendered item.
 DETAIL_LISTS = {

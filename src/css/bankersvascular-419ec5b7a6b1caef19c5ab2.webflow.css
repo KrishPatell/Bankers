@@ -14303,3 +14303,81 @@ figure {
 .tabs-menu .tab-button.w--current > div:not(.load-bar-base) {
   color: #fff !important;
 }
+
+/* Bankers Notes: destination-led travel journal directory. */
+.travel-directory {
+  width: min(1240px, calc(100% - 48px));
+  margin: 24px auto 72px;
+  padding: 42px;
+  border: 1px solid rgba(38, 76, 90, .14);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #f6fbfb 0%, #e2f1f0 100%);
+}
+
+.travel-directory-heading { max-width: 650px; margin-bottom: 28px; }
+.travel-directory-heading p { margin: 0 0 9px; color: #e78343; font-size: 13px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.travel-directory-heading h2 { margin: 0 0 9px; color: #0b3545; font-size: clamp(28px, 3vw, 42px); line-height: 1.08; }
+.travel-directory-heading span { color: #49626b; font-size: 17px; }
+.travel-destination-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.travel-destination { overflow: hidden; border: 1px solid rgba(11, 53, 69, .14); border-radius: 16px; background: #fff; }
+.travel-destination[open] { grid-column: 1 / -1; }
+.travel-destination summary { position: relative; display: flex; min-height: 260px; overflow: hidden; align-items: flex-end; gap: 16px; padding: 25px; color: #fff; background: #0b4f63; cursor: pointer; list-style: none; isolation: isolate; }
+.travel-destination summary::-webkit-details-marker { display: none; }
+.travel-destination summary > img { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #0b4f63; transition: transform .35s ease; }
+.travel-destination summary:hover > img { transform: scale(1.015); }
+.travel-destination-cover { position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, rgba(6, 42, 57, .94), rgba(6, 42, 57, .29)); }
+.travel-destination-title { display: flex; flex-direction: column; font-size: clamp(38px, 5vw, 58px); font-weight: 700; line-height: .96; }
+.travel-destination-title em { margin-bottom: 8px; color: #ffc17c; font-size: 12px; font-style: normal; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.travel-destination-title small { margin-top: 14px; color: #fff; font-size: 15px; font-weight: 600; letter-spacing: normal; }
+.travel-destination summary i { display: grid; width: 34px; height: 34px; margin: 0 0 2px auto; place-items: center; border: 1px solid rgba(255,255,255,.72); border-radius: 50%; font-style: normal; font-size: 25px; line-height: 1; }
+.travel-destination[open] summary i { transform: rotate(45deg); }
+.travel-story-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; padding: 22px; }
+.travel-story-card { position: relative; display: flex; aspect-ratio: 1 / 1; overflow: hidden; align-items: flex-end; border: 2px solid #e89b4d; border-radius: 14px; background: #0b3545; box-shadow: 0 9px 22px rgba(11, 53, 69, .18); color: #fff; text-decoration: none; isolation: isolate; }
+.travel-story-card img { position: absolute; z-index: -2; width: 100%; height: 100%; object-fit: contain; background: #0b3545; transition: transform .35s ease; }
+.travel-story-overlay { position: absolute; z-index: -1; inset: 0; background: linear-gradient(180deg, rgba(4, 35, 50, .02) 28%, rgba(4, 35, 50, .94) 100%); }
+.travel-story-card:hover img { transform: scale(1.015); }
+.travel-story-copy { display: flex; width: 100%; min-height: 125px; flex-direction: column; justify-content: flex-end; padding: 19px; }
+.travel-story-location { margin-bottom: 7px; color: #ffc17c; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.travel-story-copy strong { color: #fff; font-size: 21px; line-height: 1.14; }
+.travel-story-read { margin-top: 12px; color: #d9f4f3; font-size: 14px; font-weight: 700; }
+.travel-story-read b { margin-left: 3px; color: #ffb96c; font-size: 17px; }
+
+@media screen and (max-width: 991px) {
+  .travel-destination-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .travel-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 767px) {
+  .travel-directory { width: calc(100% - 30px); margin: 12px auto 46px; padding: 22px 14px; border-radius: 17px; }
+  .travel-directory-heading { padding: 0 7px; }
+  .travel-directory-heading span { font-size: 15px; }
+  .travel-destination summary { min-height: 225px; padding: 20px; }
+  .travel-destination-title { font-size: 39px; }
+  .travel-destination-title small { display: block; font-size: 14px; }
+  .travel-destination-grid { grid-template-columns: 1fr; gap: 14px; }
+  .travel-story-grid { grid-template-columns: 1fr; padding: 14px; }
+  .travel-story-card { min-height: 0; }
+}
+
+/* The Mirchi recognition is a distinct editorial feature, not a travel card. */
+.bankers-notes-featured-award { width: min(1040px, calc(100% - 48px)); margin: 24px auto 56px; }
+.bankers-notes-featured-award .blog-archive { display: block; }
+.bankers-notes-featured-award .blog-archive-item { width: 100%; }
+.bankers-notes-featured-award .blog-archive-card { position: relative; min-height: 0; aspect-ratio: 16 / 7; overflow: hidden; border: 3px solid #d99745; border-radius: 20px; background: #062c3b; box-shadow: 0 18px 44px rgba(4, 45, 62, .22); }
+.bankers-notes-featured-award .blog-image-link,
+.bankers-notes-featured-award .wbs-blog-author,
+.bankers-notes-featured-award .wbs-button-link-icon { display: none !important; }
+.bankers-notes-featured-award .blog-content-wrapper { position: absolute; inset: 0; display: block; padding: 0; }
+.bankers-notes-featured-award .blog-archive-name-link { position: absolute; inset: 0; display: block; overflow: hidden; }
+.bankers-notes-featured-award .blog-archive-thumbnail { width: 100% !important; height: 100% !important; max-width: none; margin: 0; object-fit: cover; transition: transform .4s ease; }
+.bankers-notes-featured-award .blog-archive-name { position: absolute; inset: 0; display: flex !important; align-items: flex-end; margin: 0; padding: clamp(22px, 4vw, 52px); color: #fff; background: linear-gradient(180deg, rgba(4, 35, 50, 0) 35%, rgba(4, 35, 50, .94)); font-size: clamp(28px, 4.1vw, 56px); line-height: 1.05; opacity: 0 !important; transform: none !important; transition: opacity .3s ease; }
+.bankers-notes-featured-award .blog-archive-card:hover .blog-archive-thumbnail { transform: scale(1.035); }
+.bankers-notes-featured-award .blog-archive-card:hover .blog-archive-name,
+.bankers-notes-featured-award .blog-archive-name-link:focus .blog-archive-name { opacity: 1 !important; }
+.back-to-bankers-notes { position: absolute; z-index: 8; top: 128px; left: max(24px, calc((100% - 1280px) / 2)); display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; border: 1px solid rgba(11, 79, 99, .22); border-radius: 999px; background: rgba(255,255,255,.9); box-shadow: 0 6px 18px rgba(4, 45, 62, .12); color: #0b4f63; font-size: 14px; font-weight: 700; text-decoration: none; }
+.back-to-bankers-notes:hover { background: #0b4f63; color: #fff; }
+.back-to-bankers-notes span { font-size: 20px; line-height: .7; }
+@media screen and (max-width: 767px) {
+  .bankers-notes-featured-award { width: calc(100% - 30px); margin: 18px auto 42px; }
+  .bankers-notes-featured-award .blog-archive-card { aspect-ratio: 16 / 9; border-radius: 14px; }
+  .back-to-bankers-notes { top: 96px; left: 16px; padding: 9px 12px; font-size: 13px; }
+}
