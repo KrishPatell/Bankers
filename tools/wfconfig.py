@@ -362,9 +362,17 @@ EXTRA_SHELL_PAGES = {
         "output": "bankers-notes/index.html",
         "url": "/bankers-notes",
     },
+    "services-gujarat.html": {
+        "source": "products.html",
+        "output": "services-gujarat/index.html",
+        "url": "/services-gujarat",
+        "title": "Banker's Vascular Hospital Services Across Gujarat | Ahmedabad, Vadodara, Rajkot & Surat",
+        "desc": "Explore Banker's Vascular Hospital services and consultation options across Gujarat.",
+    },
 }
 
 PAGE_LISTS["bankers-notes.html"] = []
+PAGE_LISTS["services-gujarat.html"] = PAGE_LISTS["products.html"]
 
 # Lists inside detail templates, resolved per rendered item.
 DETAIL_LISTS = {
