@@ -14499,3 +14499,39 @@ figure {
   .services-video-grid { grid-template-columns: 1fr; gap: 15px; }
   .services-video-card h3 { font-size: 15px; }
 }
+
+/* Large insurance support cards with expandable document guidance. */
+.services-insurance-showcase { margin: 28px 0 54px; padding: 38px 28px 34px; border: 1px solid #d6e9eb; border-radius: 22px; background: #f7fcfc; text-align: center; }
+.services-insurance-showcase h2 { margin: 0; color: #112a3f; }
+.services-insurance-intro { max-width: 720px; margin: 8px auto 25px; color: #5b6d77; }
+.services-insurance-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; text-align: left; }
+.services-insurance-card { min-height: 260px; padding: 16px; border: 1px solid #d1e5e7; border-radius: 17px; background: #fff; box-shadow: 0 8px 22px rgba(0, 104, 123, .09); }
+.services-insurance-logo { display: grid; place-items: center; min-height: 82px; margin-bottom: 13px; border-radius: 12px; color: #fff; font-size: 22px; font-weight: 900; letter-spacing: .02em; line-height: 1.05; text-align: center; }
+.services-insurance-logo small { display: block; font-size: 10px; letter-spacing: .09em; }
+.services-insurance-logo.tata { background: linear-gradient(135deg, #0c4c9c, #1685ce); }
+.services-insurance-logo.reliance { background: linear-gradient(135deg, #e37b16, #f1aa29); }
+.services-insurance-logo.birla { background: linear-gradient(135deg, #3a217c, #6f47ae); }
+.services-insurance-logo.hdfc { background: linear-gradient(135deg, #ec1b2f, #96203a); }
+.services-insurance-logo.icici { background: linear-gradient(135deg, #e76720, #c3291c); }
+.services-insurance-logo.bajaj { background: linear-gradient(135deg, #123a86, #2175c6); }
+.services-insurance-logo.star { background: linear-gradient(135deg, #007f9b, #11b8ad); }
+.services-insurance-logo.niva { background: linear-gradient(135deg, #008e97, #00b7b6); }
+.services-insurance-logo.care { background: linear-gradient(135deg, #0c7194, #1bb5bd); }
+.services-insurance-logo.sbi { background: linear-gradient(135deg, #0d4d97, #168ac8); }
+.services-insurance-card h3 { margin: 0 0 11px; color: #12354b; font-size: 16px; }
+.services-insurance-card details { color: #5b6d77; font-size: 12px; line-height: 1.45; }
+.services-insurance-card summary { width: max-content; cursor: pointer; color: #007d85; font-size: 12px; font-weight: 800; }
+.services-insurance-card details p { margin: 10px 0 5px; }
+.services-insurance-card details ul { margin: 0; padding-left: 17px; }
+.services-insurance-note { margin: 24px auto 0; color: #5b6d77; font-size: 12px; }
+@media screen and (max-width: 1199px) {
+  .services-insurance-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 991px) {
+  .services-insurance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 479px) {
+  .services-insurance-showcase { margin: 20px 0 38px; padding: 26px 14px 30px; border-radius: 16px; }
+  .services-insurance-grid { grid-template-columns: 1fr; gap: 15px; }
+  .services-insurance-card { min-height: 0; }
+}
