@@ -564,11 +564,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script>
     (function () {
       var doctors = {
-        'Dr. Tensi': { name: 'Dr. Tensi Trivedi', role: 'Interventional Radiologist', detail: 'Vascular &amp; Endovascular Specialist', image: 'images/doctor-card-tensi-trivedi.png' },
-        'Dr. Dimple': { name: 'Dr. Dimple Parmar', role: 'Operational Head &amp; Head Consultant', detail: 'BnG Vascular', image: 'images/doctor-card-dimple-parmar.png' },
-        'Dr. Pratiksha': { name: 'Dr. Pratiksha Patoliya', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-pratiksha-patoliya.png' },
-        'Dr. Payal': { name: 'Dr. Payal Vadlani', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-payal-vadlani.png' },
-        'Dr. Disha': { name: 'Dr. Disha Soni', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-disha-soni.png' }
+        'Dr. Tensi': { name: 'Dr. Tensi Trivedi', role: 'Interventional Radiologist', detail: 'Vascular &amp; Endovascular Specialist', image: 'images/doctor-card-tensi-trivedi.png', link: '/our-doctors/dr-tensi-trevedi.html' },
+        'Dr. Dimple': { name: 'Dr. Dimple Parmar', role: 'Operational Head &amp; Head Consultant', detail: 'BnG Vascular', image: 'images/doctor-card-dimple-parmar.png', link: '/our-doctors/dr-dimple.html' },
+        'Dr. Pratiksha': { name: 'Dr. Pratiksha Patoliya', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-pratiksha-patoliya.png', link: '/our-doctors/dr-pratiksha-patoliya.html' },
+        'Dr. Payal': { name: 'Dr. Payal Vadlani', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-payal-vadlani.png', link: '/our-doctors/dr-payal-vadlani.html' },
+        'Dr. Disha': { name: 'Dr. Disha Soni', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-disha-soni.png', link: '/our-doctors/dr-disha-soni.html' }
       };
       var popup = document.createElement('div');
       popup.className = 'services-doctor-popover';
@@ -591,7 +591,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         cell.appendChild(trigger);
         function show() {
           clearTimeout(hideTimer);
-          popup.innerHTML = '<img src="' + doctor.image + '" alt="' + doctor.name + '"><div class="services-doctor-popover-body"><strong>' + doctor.name + '</strong><span>' + doctor.role + '</span><small>' + doctor.detail + '</small><em>Know more&nbsp; →</em></div>';
+          popup.innerHTML = '<img src="' + doctor.image + '" alt="' + doctor.name + '"><div class="services-doctor-popover-body"><strong>' + doctor.name + '</strong><span>' + doctor.role + '</span><small>' + doctor.detail + '</small><a href="' + doctor.link + '">Know more&nbsp; →</a></div>';
           var rect = trigger.getBoundingClientRect();
           var width = 260;
           var left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));

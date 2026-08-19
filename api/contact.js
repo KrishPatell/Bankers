@@ -74,7 +74,8 @@ export default async function handler(req, res) {
   }
 
   const name = String(body.Name || body.name || "").trim();
-  const phone = String(body["Phone-Number"] || body.phone || "").trim();
+  const phone = String(body["Phone-Number"] || body.phone || body.mobile || "").trim();
+  const city = String(body.City || body.city || "").trim();
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
   const preferredDate = String(body.Date || "").trim();
@@ -116,6 +117,7 @@ export default async function handler(req, res) {
     ["Name", name],
     ...(phone ? [["Phone", phone]] : []),
     ...(email ? [["Email", email]] : []),
+    ...(city ? [["City", city]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),
     ...(message ? [["Message", message]] : []),
     ["Form", formName],
