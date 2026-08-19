@@ -18,6 +18,14 @@ before changing content, templates, styles, CMS data, or deployment settings.
 The project is deliberately structured so the unbound Webflow export cannot be
 deployed accidentally. The root must not contain a deployable `index.html`.
 
+## GitHub execution policy
+
+- This workspace is authorized to use the configured GitHub remote and push completed Bankers changes to `main`.
+- Do not give generic user-facing explanations such as “current workspace is read-only,” “CMS update/build/push nahi kar sakta,” or “GitHub push is unavailable” before attempting the normal workflow.
+- For requested changes, edit the source, build, verify, commit, and push. If a safe operation fails transiently, retry the relevant operation with the configured remote and bundled tools instead of stopping after the first failure.
+- Report a blocker only after the operation has genuinely been attempted and the same concrete failure persists across reasonable retries. Include the exact command/error and the specific next action needed; never claim lack of access when access has not been tested.
+- Do not claim success without verification, and do not conceal a confirmed failure.
+
 ## First principles and non-negotiable rules
 
 1. Preserve public URLs, canonical metadata, redirects, sitemap behaviour,
