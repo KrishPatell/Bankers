@@ -14493,15 +14493,15 @@ figure {
 }
 .gbp-hero-floating-logo {
   position: absolute;
-  top: 18px;
+  top: 112px;
   right: max(24px, calc(50% - 600px));
-  z-index: 2;
-  width: 150px;
-  padding: 10px 14px;
-  border: 1px solid rgba(255,255,255,.72);
-  border-radius: 16px;
-  background: rgba(255,255,255,.86);
-  box-shadow: 0 10px 26px rgba(6,43,67,.16);
+  z-index: 3;
+  width: 178px;
+  padding: 12px 16px;
+  border: 2px solid rgba(255,255,255,.9);
+  border-radius: 18px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 12px 30px rgba(6,43,67,.24);
   transform-origin: center;
   animation: gbp-brand-logo-float 5s ease-in-out infinite;
 }
@@ -14526,11 +14526,11 @@ figure {
 }
 @media screen and (max-width: 991px) {
   .gbp-hero-visual { width: 100%; background-position: center, center; background-size: cover, cover; }
-  .gbp-hero-floating-logo { right: 24px; width: 135px; }
+  .gbp-hero-floating-logo { top: 104px; right: 24px; width: 150px; }
 }
 @media screen and (max-width: 479px) {
   .gbp-hero-visual { width: 100%; background-position: center, center; background-size: cover, cover; }
-  .gbp-hero-floating-logo { top: 14px; right: 16px; width: 118px; padding: 8px 10px; border-radius: 12px; }
+  .gbp-hero-floating-logo { top: 92px; right: 16px; width: 128px; padding: 8px 10px; border-radius: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gbp-hero-floating-logo { animation: none; }
