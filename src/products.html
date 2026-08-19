@@ -239,13 +239,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <main class="gbp-service-main">
     <section class="gbp-service-hero" aria-labelledby="gbp-hero-title" data-hero-slider>
       <div class="gbp-hero-visual" aria-hidden="true"></div>
+      <div class="gbp-hero-floating-logo" aria-hidden="true"><img src="images/Link.svg" alt=""></div>
       <div class="w-layout-blockcontainer main-container w-container gbp-hero-container">
         <div class="gbp-hero-copy">
-          <p class="gbp-hero-badge">●&nbsp; ALL OVER GUJARAT OPD VISITING</p>
-          <h1 id="gbp-hero-title" data-hero-title>Best Hospital for Varicose Veins<br><span>in Gujarat</span></h1>
-          <p class="gbp-hero-subtitle" data-hero-subtitle>Advanced non-surgical &amp; minimally invasive care<br>now available across Gujarat</p>
-          <p class="gbp-hero-cities">Ahmedabad &nbsp;•&nbsp; Vadodara &nbsp;•&nbsp; Rajkot &nbsp;•&nbsp; Surat &nbsp;•&nbsp; Visiting OPDs Across Gujarat</p>
-          <div class="gbp-hero-actions"><a class="gbp-call" href="tel:+919909908428">☎&nbsp; Call Now</a><a class="gbp-whatsapp" href="https://api.whatsapp.com/send/?phone=%2B919909908428&amp;text=Hello%20Bankers%20Vascular&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener">◉&nbsp; WhatsApp</a><a class="gbp-explore" href="#services-list">Explore Treatments&nbsp; ↓</a></div>
+          <h1 id="gbp-hero-title" data-hero-title>Best Hospital for Knee Pain<br><span>in Gujarat</span></h1>
         </div>
       </div>
     </section>
@@ -581,13 +578,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       if (!hero) return;
       var visual = hero.querySelector('.gbp-hero-visual');
       var title = hero.querySelector('[data-hero-title]');
-      var subtitle = hero.querySelector('[data-hero-subtitle]');
+      var fixedTitle = 'Best Hospital for Knee Pain<br><span>in Gujarat</span>';
       var slides = [
-        { title: 'Best Hospital for Varicose Veins<br><span>in Gujarat</span>', subtitle: 'Advanced non-surgical varicose vein care<br>with faster recovery and no major cuts', image: '/images/mobile-varicose-veins-ahmedabad.webp' },
-        { title: 'Best Hospital for Knee Pain<br><span>in Gujarat</span>', subtitle: 'Image-guided, non-surgical knee pain treatment<br>to help you move comfortably again', image: '/images/mobile-departments-knee-pain.webp' },
-        { title: 'Best Hospital for Piles<br><span>Treatment in Gujarat</span>', subtitle: 'Precise, minimally invasive piles treatment<br>with day-care recovery', image: '/images/mobile-departments-piles.webp' },
-        { title: 'Best Hospital for Prostate / BPH<br><span>in Gujarat</span>', subtitle: 'Advanced prostate artery embolization<br>without open surgery', image: '/images/mobile-departments-prostate.webp' },
-        { title: 'Best Hospital for Obesity<br><span>Management in Gujarat</span>', subtitle: 'Personalized, non-surgical weight management<br>with expert vascular care', image: '/images/mobile-departments-bariatric-artery-embolization-for-obesity.webp' }
+        { title: 'Best Hospital for Varicose Veins<br><span>in Gujarat</span>', subtitle: 'Advanced non-surgical varicose vein care<br>with faster recovery and no major cuts', image: '/images/hero-varicose-veins.png' },
+        { title: 'Best Hospital for Knee Pain<br><span>in Gujarat</span>', subtitle: 'Image-guided, non-surgical knee pain treatment<br>to help you move comfortably again', image: '/images/hero-knee-pain.png' },
+        { title: 'Best Hospital for Piles<br><span>Treatment in Gujarat</span>', subtitle: 'Precise, minimally invasive piles treatment<br>with day-care recovery', image: '/images/hero-piles.png' },
+        { title: 'Best Hospital for Prostate / BPH<br><span>in Gujarat</span>', subtitle: 'Advanced prostate artery embolization<br>without open surgery', image: '/images/hero-prostate-bph.png' },
+        { title: 'Best Hospital for Frozen Shoulder<br><span>in Gujarat</span>', subtitle: 'Image-guided care to restore movement<br>with minimally invasive treatment', image: '/images/hero-frozen-shoulder.png' },
+        { title: 'Best Hospital for Heel Pain<br><span>in Gujarat</span>', subtitle: 'Targeted treatment for lasting heel pain relief<br>and a quicker return to daily life', image: '/images/hero-heel-pain.png' },
+        { title: 'Best Hospital for Obesity<br><span>Management in Gujarat</span>', subtitle: 'Personalized, non-surgical weight management<br>with expert vascular care', image: '/images/hero-obesity.png' },
+        { title: 'Best Hospital for Breast Fibroadenoma<br><span>in Gujarat</span>', subtitle: 'Accurate diagnosis and minimally invasive care<br>with a focus on safe recovery', image: '/images/hero-breast-fibroadenoma.png' },
+        { title: 'Best Hospital for Hair Fall<br><span>Treatment in Gujarat</span>', subtitle: 'Evidence-based hair fall treatment<br>with personalised specialist guidance', image: '/images/hero-hair-fall.png' },
+        { title: 'Best Hospital for Fibroids<br><span>Treatment in Gujarat</span>', subtitle: 'Uterine fibroid care without major surgery<br>and with a faster recovery', image: '/images/hero-fibroids.png' },
+        { title: 'Best Hospital for Lymphedema<br><span>in Gujarat</span>', subtitle: 'Specialist care to reduce swelling<br>and improve everyday mobility', image: '/images/hero-lymphedema.png' },
+        { title: 'Best Hospital for Tennis Elbow<br><span>in Gujarat</span>', subtitle: 'Non-surgical elbow pain treatment<br>to help you get back to an active life', image: '/images/hero-tennis-elbow.png' }
       ];
       var index = 0;
       var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -595,14 +599,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         var slide = slides[next];
         visual.classList.add('is-changing');
         title.classList.add('is-changing');
-        subtitle.classList.add('is-changing');
         window.setTimeout(function () {
           visual.style.setProperty('--hero-slide-image', "url('" + slide.image + "')");
-          title.innerHTML = slide.title;
-          subtitle.innerHTML = slide.subtitle;
+          visual.style.setProperty('--hero-slide-position', 'center center');
+          visual.style.backgroundImage = "linear-gradient(90deg, rgba(185,213,216,.96) 0%, rgba(185,213,216,.32) 48%, rgba(185,213,216,0) 74%), url('" + slide.image + "')";
+          visual.style.backgroundPosition = 'center, center';
+          visual.style.backgroundSize = 'cover, cover';
+          title.innerHTML = fixedTitle;
           visual.classList.remove('is-changing');
           title.classList.remove('is-changing');
-          subtitle.classList.remove('is-changing');
         }, 180);
       }
       renderSlide(index);
