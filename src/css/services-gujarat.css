@@ -19,11 +19,11 @@
   transform: scale(1.035);
 }
 
-/* Keep the supplied 546 × 362 poster artwork at its intended display size. */
+/* Keep every supplied poster in the same compact landscape card format. */
 @media screen and (min-width: 992px) {
   .services-condition-grid {
-    grid-template-columns: repeat(2, minmax(0, 546px));
+    grid-template-columns: repeat(3, minmax(0, 360px));
     justify-content: center;
-    gap: 26px;
+    gap: 20px;
   }
 }
