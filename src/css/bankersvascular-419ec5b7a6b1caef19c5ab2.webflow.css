@@ -14497,15 +14497,16 @@ figure {
   right: max(24px, calc(50% - 600px));
   z-index: 3;
   width: 178px;
-  padding: 12px 16px;
-  border: 2px solid rgba(255,255,255,.9);
-  border-radius: 18px;
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 12px 30px rgba(6,43,67,.24);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   transform-origin: center;
   animation: gbp-brand-logo-float 5s ease-in-out infinite;
 }
 .gbp-hero-floating-logo img { display: block; width: 100%; height: auto; }
+.gbp-hero-floating-logo img, .gbp-hero-logo-cloud img { mix-blend-mode: multiply; }
 @keyframes gbp-brand-logo-float {
   0%, 100% {
     transform: translateY(0) scale(1) rotate(-6deg);
@@ -14534,6 +14535,27 @@ figure {
 }
 @media (prefers-reduced-motion: reduce) {
   .gbp-hero-floating-logo { animation: none; }
+}
+
+/* Transparent logo echoes add the requested branded jumping motion across
+   the hero without placing opaque white boxes over the disease artwork. */
+.gbp-hero-logo-cloud { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.gbp-hero-logo-cloud img { position: absolute; width: 142px; height: auto; opacity: .15; filter: drop-shadow(0 8px 14px rgba(0,73,94,.2)); animation: gbp-logo-jump 5.8s ease-in-out infinite; }
+.gbp-hero-logo-cloud img:nth-child(1) { top: 17%; left: 7%; animation-delay: -.6s; }
+.gbp-hero-logo-cloud img:nth-child(2) { top: 34%; left: 31%; animation-delay: -2.2s; }
+.gbp-hero-logo-cloud img:nth-child(3) { top: 68%; left: 11%; animation-delay: -3.8s; }
+.gbp-hero-logo-cloud img:nth-child(4) { top: 24%; right: 31%; animation-delay: -1.4s; }
+.gbp-hero-logo-cloud img:nth-child(5) { top: 65%; right: 25%; animation-delay: -4.6s; }
+.gbp-hero-logo-cloud img:nth-child(6) { top: 78%; right: 6%; animation-delay: -2.9s; }
+@keyframes gbp-logo-jump {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-5deg) scale(.96); }
+  50% { transform: translate3d(0, -18px, 0) rotate(5deg) scale(1.04); }
+}
+@media screen and (max-width: 479px) {
+  .gbp-hero-logo-cloud img { width: 106px; opacity: .12; }
+  .gbp-hero-logo-cloud img:nth-child(2) { left: 43%; }
+  .gbp-hero-logo-cloud img:nth-child(4) { right: 4%; }
+  .gbp-hero-logo-cloud img:nth-child(5) { right: 6%; }
 }
 
 /* The hero now has one focused headline; start it safely below the nav. */
