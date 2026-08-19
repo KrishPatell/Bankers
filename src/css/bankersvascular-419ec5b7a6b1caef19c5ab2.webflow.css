@@ -14540,11 +14540,11 @@ figure {
 
 
 /* The hero now has one focused headline; start it safely below the nav. */
-.gbp-hero-container { align-items: flex-start; padding-top: 142px; padding-bottom: 0; }
+.gbp-hero-container { align-items: flex-start; padding-top: 190px; padding-bottom: 0; }
 .gbp-hero-copy { transform: none; }
 .gbp-hero-copy h1 { margin-top: 0; margin-bottom: 0; }
 @media screen and (max-width: 479px) {
-  .gbp-hero-container { align-items: flex-start; padding-top: 132px; padding-bottom: 0; }
+  .gbp-hero-container { align-items: flex-start; padding-top: 170px; padding-bottom: 0; }
   .gbp-hero-copy { transform: none; }
 }
 
