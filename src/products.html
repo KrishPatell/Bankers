@@ -237,13 +237,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <div class="nav-box-shadow"></div>
   </header>
   <main class="gbp-service-main">
-    <section class="gbp-service-hero" aria-labelledby="gbp-hero-title">
+    <section class="gbp-service-hero" aria-labelledby="gbp-hero-title" data-hero-slider>
       <div class="gbp-hero-visual" aria-hidden="true"></div>
       <div class="w-layout-blockcontainer main-container w-container gbp-hero-container">
         <div class="gbp-hero-copy">
-          <p class="gbp-hero-badge">●&nbsp; ALL GUJARAT VISITED</p>
-          <h1 id="gbp-hero-title">All Over Gujarat<br>OPD Visits</h1>
-          <p class="gbp-hero-subtitle">Advanced non-surgical &amp; minimally invasive care<br>now available across Gujarat</p>
+          <p class="gbp-hero-badge">●&nbsp; ALL OVER GUJARAT OPD VISITING</p>
+          <h1 id="gbp-hero-title" data-hero-title>Best Hospital for Varicose Veins<br><span>in Gujarat</span></h1>
+          <p class="gbp-hero-subtitle" data-hero-subtitle>Advanced non-surgical &amp; minimally invasive care<br>now available across Gujarat</p>
           <p class="gbp-hero-cities">Ahmedabad &nbsp;•&nbsp; Vadodara &nbsp;•&nbsp; Rajkot &nbsp;•&nbsp; Surat &nbsp;•&nbsp; Visiting OPDs Across Gujarat</p>
           <div class="gbp-hero-actions"><a class="gbp-call" href="tel:+919909908428">☎&nbsp; Call Now</a><a class="gbp-whatsapp" href="https://api.whatsapp.com/send/?phone=%2B919909908428&amp;text=Hello%20Bankers%20Vascular&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener">◉&nbsp; WhatsApp</a><a class="gbp-explore" href="#services-list">Explore Treatments&nbsp; ↓</a></div>
         </div>
@@ -542,6 +542,45 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script src="js/webflow.js" type="text/javascript"></script>
   <script src="js/forms.js" type="text/javascript"></script>
   <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8182382315648187" crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      var hero = document.querySelector('[data-hero-slider]');
+      if (!hero) return;
+      var visual = hero.querySelector('.gbp-hero-visual');
+      var title = hero.querySelector('[data-hero-title]');
+      var subtitle = hero.querySelector('[data-hero-subtitle]');
+      var slides = [
+        { title: 'Best Hospital for Varicose Veins<br><span>in Gujarat</span>', subtitle: 'Advanced non-surgical varicose vein care<br>with faster recovery and no major cuts', image: '/images/services/varicose-veins.jpg' },
+        { title: 'Best Hospital for Knee Pain<br><span>in Gujarat</span>', subtitle: 'Image-guided, non-surgical knee pain treatment<br>to help you move comfortably again', image: '/images/services/knee-pain.webp' },
+        { title: 'Best Hospital for Piles<br><span>Treatment in Gujarat</span>', subtitle: 'Precise, minimally invasive piles treatment<br>with day-care recovery', image: '/images/services/piles.jpg' },
+        { title: 'Best Hospital for Prostate / BPH<br><span>in Gujarat</span>', subtitle: 'Advanced prostate artery embolization<br>without open surgery', image: '/images/services/prostate-enlargement.png' },
+        { title: 'Best Hospital for Obesity<br><span>Management in Gujarat</span>', subtitle: 'Personalized, non-surgical weight management<br>with expert vascular care', image: '/images/services/obesity-management.png' }
+      ];
+      var index = 0;
+      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function renderSlide(next) {
+        var slide = slides[next];
+        visual.classList.add('is-changing');
+        title.classList.add('is-changing');
+        subtitle.classList.add('is-changing');
+        window.setTimeout(function () {
+          visual.style.setProperty('--hero-slide-image', "url('" + slide.image + "')");
+          title.innerHTML = slide.title;
+          subtitle.innerHTML = slide.subtitle;
+          visual.classList.remove('is-changing');
+          title.classList.remove('is-changing');
+          subtitle.classList.remove('is-changing');
+        }, 180);
+      }
+      renderSlide(index);
+      if (!reducedMotion) {
+        window.setInterval(function () {
+          index = (index + 1) % slides.length;
+          renderSlide(index);
+        }, 2000);
+      }
+    }());
+  </script>
   <!--  Google Tag Manager (noscript)  -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W87P4FV5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!--  End Google Tag Manager (noscript)  -->

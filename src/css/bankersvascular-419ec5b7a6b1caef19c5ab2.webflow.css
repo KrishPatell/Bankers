@@ -14430,3 +14430,16 @@ figure {
   .gbp-hero-copy h1 { font-size: 45px; }
   .gbp-hero-visual { inset: auto 0 0; width: 100%; height: 330px; background-size: contain; background-position: center bottom; }
 }
+
+/* Two-second hero slider for the core Gujarat OPD services. */
+.gbp-hero-visual { background-image: linear-gradient(90deg, rgba(185,213,216,.96) 0%, rgba(185,213,216,.32) 48%, rgba(185,213,216,0) 74%), var(--hero-slide-image); background-position: center, right center; background-size: cover, cover; transition: opacity .18s ease, transform .18s ease; }
+.gbp-hero-visual.is-changing { opacity: 0; transform: scale(1.015); }
+.gbp-hero-copy h1, .gbp-hero-subtitle { transition: opacity .18s ease, transform .18s ease; }
+.gbp-hero-copy h1.is-changing, .gbp-hero-subtitle.is-changing { opacity: 0; transform: translateY(8px); }
+.gbp-hero-copy h1 span { color: #007d85; }
+@media screen and (max-width: 991px) {
+  .gbp-hero-visual { background-position: center, right center; background-size: cover, cover; }
+}
+@media screen and (max-width: 479px) {
+  .gbp-hero-visual { background-position: center, center bottom; background-size: cover, cover; }
+}
