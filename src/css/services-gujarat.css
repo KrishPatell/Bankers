@@ -37,31 +37,27 @@
   margin-top: 23px;
 }
 
-.services-branch-grid a {
+.services-branch-card {
   position: relative;
-  display: grid;
-  grid-template-columns: 42px 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 11px;
-  align-items: center;
-  min-height: 94px;
+  min-height: 126px;
   padding: 16px;
   border: 1.5px solid #a9d9dc;
   border-radius: 14px;
   background: #fff;
   color: #07364b;
   box-shadow: 0 5px 14px rgba(0, 95, 114, .06);
-  text-decoration: none;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.services-branch-grid a:nth-child(2) { border-color: #a9c8e8; background: #f9fcff; }
-.services-branch-grid a:nth-child(3) { border-color: #d4b9e9; background: #fdfaff; }
-.services-branch-grid a:nth-child(4) { border-color: #efc3ae; background: #fffaf7; }
-.services-branch-grid a:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 95, 114, .12); }
-.services-branch-grid span { grid-row: 1 / span 2; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #0a8890; font-size: 18px; }
-.services-branch-grid a:nth-child(2) span { background: #397bb4; }.services-branch-grid a:nth-child(3) span { background: #885db3; }.services-branch-grid a:nth-child(4) span { background: #d46a44; }
-.services-branch-grid strong { font-size: 16px; }.services-branch-grid small { color: #647886; font-size: 11px; }
+.services-branch-card:nth-child(2) { border-color: #a9c8e8; background: #f9fcff; }
+.services-branch-card:nth-child(3) { border-color: #d4b9e9; background: #fdfaff; }
+.services-branch-card:nth-child(4) { border-color: #efc3ae; background: #fffaf7; }
+.services-branch-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 95, 114, .12); }
+.services-branch-city { display: grid; grid-template-columns: 42px 1fr; column-gap: 11px; align-items: center; }
+.services-branch-city p { margin: 0; }.services-branch-city span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #0a8890; font-size: 18px; }
+.services-branch-card:nth-child(2) span { background: #397bb4; }.services-branch-card:nth-child(3) span { background: #885db3; }.services-branch-card:nth-child(4) span { background: #d46a44; }
+.services-branch-grid strong,.services-branch-grid small { display: block; }.services-branch-grid strong { font-size: 16px; }.services-branch-grid small { color: #647886; font-size: 11px; }
+.services-branch-links { display: flex; gap: 7px; margin-top: 13px; }.services-branch-links a { flex: 1; padding: 7px 5px; border: 1px solid currentColor; border-radius: 7px; color: #08747c; font-size: 10px; font-weight: 800; text-align: center; text-decoration: none; }.services-branch-links a:hover { background: #08747c; color: #fff; }
 
 /* Keep every supplied poster in the same compact landscape card format. */
 @media screen and (min-width: 992px) {
