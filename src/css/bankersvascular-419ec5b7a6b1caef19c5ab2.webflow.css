@@ -14494,7 +14494,8 @@ figure {
 .gbp-hero-floating-logo {
   position: absolute;
   top: 112px;
-  right: max(24px, calc(50% - 600px));
+  left: max(24px, calc(50% - 600px));
+  right: auto;
   z-index: 3;
   width: 178px;
   padding: 0;
@@ -14527,11 +14528,11 @@ figure {
 }
 @media screen and (max-width: 991px) {
   .gbp-hero-visual { width: 100%; background-position: center, center; background-size: cover, cover; }
-  .gbp-hero-floating-logo { top: 104px; right: 24px; width: 150px; }
+  .gbp-hero-floating-logo { top: 104px; left: 24px; right: auto; width: 150px; }
 }
 @media screen and (max-width: 479px) {
   .gbp-hero-visual { width: 100%; background-position: center, center; background-size: cover, cover; }
-  .gbp-hero-floating-logo { top: 92px; right: 16px; width: 128px; padding: 8px 10px; border-radius: 12px; }
+  .gbp-hero-floating-logo { top: 92px; left: 16px; right: auto; width: 128px; padding: 8px 10px; border-radius: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gbp-hero-floating-logo { animation: none; }
