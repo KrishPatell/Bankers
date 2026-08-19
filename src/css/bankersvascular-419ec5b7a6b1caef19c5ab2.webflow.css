@@ -14387,3 +14387,22 @@ figure {
 .gbp-social-trust{position:relative;z-index:3;margin-top:-48px;padding:0 0 45px}.gbp-social-panel{display:grid;grid-template-columns:minmax(205px,1.6fr) repeat(6,minmax(86px,1fr));align-items:center;overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 10px 35px rgba(4,45,65,.1)}.gbp-social-panel>p{margin:0;padding:22px 26px;color:#062b43;font-size:15px;font-weight:800;line-height:1.2}.gbp-social-panel>p small{display:block;margin-top:5px;color:#647886;font-size:11px;font-weight:500}.gbp-social-panel>a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:108px;border-left:1px solid #e2ebed;color:#183d51;font-size:11px;font-weight:800;text-decoration:none}.gbp-social-panel>a:hover{background:#effafa;color:#007d85}.gbp-social-panel>a img,.gbp-social-panel>a b{width:26px;height:26px;object-fit:contain}.gbp-social-panel>a b{display:grid;place-items:center;border-radius:50%;color:#4285f4;font-size:22px;line-height:1}
 .services-condition-section{padding:35px 0 80px;background:#fff}.services-condition-section>.main-container>.services-eyebrow,.services-condition-section>.main-container>h2,.services-condition-section>.main-container>.services-condition-intro{text-align:center}.services-condition-section h2{margin:0;color:#112a3f}.services-condition-intro{color:#5b6d77}.services-condition-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-top:26px}.services-condition-grid a{overflow:hidden;border:1px solid #cfe6e8;border-top:4px solid #008a94;border-radius:16px;background:#fff;color:#062b43;text-decoration:none;box-shadow:0 10px 24px rgba(0,104,123,.1)}.services-condition-grid a img{display:block;width:100%;height:168px;object-fit:cover}.services-condition-grid a div{padding:14px 12px 17px;text-align:center}.services-condition-grid strong,.services-condition-grid span{display:block}.services-condition-grid strong{font-size:16px}.services-condition-grid span{margin-top:7px;color:#e02424;font-size:12px;font-weight:800}.services-view-all{display:block;width:max-content;margin:28px auto 0;padding:12px 31px;border-radius:8px;background:#007d85;color:#fff;font-weight:800;text-decoration:none}
 @media screen and (max-width:991px){.gbp-service-hero,.gbp-hero-container{min-height:520px}.gbp-hero-copy h1{font-size:52px}.gbp-hero-visual{width:55%;opacity:.65}.gbp-social-panel{grid-template-columns:repeat(3,1fr)}.gbp-social-panel>p{grid-column:1/-1;text-align:center}.gbp-social-panel>a:nth-of-type(4){border-left:0}.services-condition-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media screen and (max-width:479px){.gbp-service-hero{min-height:650px}.gbp-hero-container{min-height:470px;align-items:flex-start;padding-top:42px}.gbp-hero-visual{top:auto;width:100%;height:260px;opacity:.52}.gbp-hero-copy h1{font-size:42px}.gbp-hero-subtitle{font-size:16px}.gbp-hero-actions a{width:100%;justify-content:center}.gbp-social-trust{margin-top:0}.gbp-social-panel{grid-template-columns:repeat(2,1fr)}.gbp-social-panel>a{min-height:92px}.gbp-social-panel>a:nth-of-type(even){border-left:0}.services-condition-grid{grid-template-columns:1fr}.services-condition-grid a img{height:190px}}
+
+/* Gujarati OPD banner supplied for the services-page hero. Keep the original
+   copy available to assistive technology while letting the designed banner
+   carry the visual headline and calls to action. */
+.gbp-service-hero { min-height: 0; height: min(56.4vw, 820px); background: #effcff; }
+.gbp-hero-visual { inset: 0; width: 100%; height: 100%; opacity: 1; background: url('../images/gujarat-opd-banner.png') center center / cover no-repeat; }
+.gbp-service-hero:after { display: none; }
+.gbp-hero-container { min-height: 100%; height: 100%; }
+.gbp-hero-copy { opacity: 0; pointer-events: none; }
+@media screen and (max-width: 991px) {
+  .gbp-service-hero { height: min(56.4vw, 620px); }
+  .gbp-hero-container { min-height: 100%; height: 100%; }
+  .gbp-hero-visual { width: 100%; opacity: 1; }
+}
+@media screen and (max-width: 479px) {
+  .gbp-service-hero { height: 300px; min-height: 0; }
+  .gbp-hero-container { min-height: 100%; height: 100%; padding-top: 0; }
+  .gbp-hero-visual { height: 100%; background-size: cover; }
+}
