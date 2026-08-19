@@ -19,10 +19,11 @@
   transform: scale(1.035);
 }
 
-/* Landscape medical artwork needs more room than a four-column thumbnail grid. */
+/* Keep the supplied 546 × 362 poster artwork at its intended display size. */
 @media screen and (min-width: 992px) {
   .services-condition-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(2, minmax(0, 546px));
+    justify-content: center;
+    gap: 26px;
   }
 }
