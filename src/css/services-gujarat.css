@@ -75,6 +75,3 @@
   .services-branch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .services-main-maps { margin-top: 50px; }.services-map-grid { grid-template-columns: 1fr; }
 }
-
-/* Keep the Google-style details as a static visual preview; no profile widget/API is embedded. */
-.services-google-profile-card .services-profile-rating a { pointer-events: none; cursor: default; }

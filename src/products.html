@@ -494,5 +494,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <!--  Google Tag Manager (noscript)  -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W87P4FV5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!--  End Google Tag Manager (noscript)  -->
+  <script>
+    (function () {
+      var googleProfileLinks = [
+        'https://share.google/NXJcYyNL9mD0SmUKJ',
+        'https://share.google/OV3EfD0qEnKRgkZmj'
+      ];
+      document.querySelectorAll('.services-google-profile-card .services-profile-rating a').forEach(function (link, index) {
+        if (googleProfileLinks[index]) link.href = googleProfileLinks[index];
+      });
+    }());
+  </script>
 </body>
 </html>
