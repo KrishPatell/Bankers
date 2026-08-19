@@ -242,7 +242,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <div class="gbp-hero-floating-logo" aria-hidden="true"><img src="images/Link.svg" alt=""></div>
       <div class="w-layout-blockcontainer main-container w-container gbp-hero-container">
         <div class="gbp-hero-copy">
-          <h1 id="gbp-hero-title" data-hero-title>Best Hospital for Knee Pain<br><span>in Gujarat</span></h1>
+          <h1 id="gbp-hero-title" data-hero-title>Best Hospital for Varicose Veins<br><span>in Gujarat</span></h1>
         </div>
       </div>
     </section>
@@ -578,7 +578,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       if (!hero) return;
       var visual = hero.querySelector('.gbp-hero-visual');
       var title = hero.querySelector('[data-hero-title]');
-      var fixedTitle = 'Best Hospital for Knee Pain<br><span>in Gujarat</span>';
       var slides = [
         { title: 'Best Hospital for Varicose Veins<br><span>in Gujarat</span>', subtitle: 'Advanced non-surgical varicose vein care<br>with faster recovery and no major cuts', image: '/images/hero-varicose-veins.png' },
         { title: 'Best Hospital for Knee Pain<br><span>in Gujarat</span>', subtitle: 'Image-guided, non-surgical knee pain treatment<br>to help you move comfortably again', image: '/images/hero-knee-pain.png' },
@@ -605,7 +604,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           visual.style.backgroundImage = "linear-gradient(90deg, rgba(185,213,216,.96) 0%, rgba(185,213,216,.32) 48%, rgba(185,213,216,0) 74%), url('" + slide.image + "')";
           visual.style.backgroundPosition = 'center, center';
           visual.style.backgroundSize = 'cover, cover';
-          title.innerHTML = fixedTitle;
+          title.innerHTML = slide.title;
           visual.classList.remove('is-changing');
           title.classList.remove('is-changing');
         }, 180);
