@@ -1,7 +1,7 @@
 /* Full-image promotion cards: the artwork itself contains the CTA. */
 .services-condition-grid a.services-promo-card {
   display: block;
-  aspect-ratio: 546 / 362;
+  aspect-ratio: 16 / 9;
   border: 0;
   border-radius: 15px;
   background: #063e52;
@@ -11,7 +11,7 @@
 .services-condition-grid a.services-promo-card img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   transition: transform .22s ease;
 }
 
@@ -22,7 +22,7 @@
 /* Keep every supplied poster in the same compact landscape card format. */
 @media screen and (min-width: 992px) {
   .services-condition-grid {
-    grid-template-columns: repeat(3, minmax(0, 360px));
+    grid-template-columns: repeat(4, minmax(0, 265px));
     justify-content: center;
     gap: 20px;
   }
