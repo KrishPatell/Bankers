@@ -18,3 +18,11 @@
 .services-condition-grid a.services-promo-card:hover img {
   transform: scale(1.035);
 }
+
+/* Landscape medical artwork needs more room than a four-column thumbnail grid. */
+@media screen and (min-width: 992px) {
+  .services-condition-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+}
