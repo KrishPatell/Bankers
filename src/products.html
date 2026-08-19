@@ -503,6 +503,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       document.querySelectorAll('.services-google-profile-card .services-profile-rating a').forEach(function (link, index) {
         if (googleProfileLinks[index]) link.href = googleProfileLinks[index];
       });
+      var profileImages = document.querySelectorAll('.services-google-profile-card .services-profile-gallery img');
+      if (profileImages[1]) {
+        profileImages[1].src = 'images/vadodara-reception.webp';
+        profileImages[1].alt = "Banker's Vascular Hospital Vadodara reception";
+      }
     }());
   </script>
 </body>
