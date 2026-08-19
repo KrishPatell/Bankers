@@ -561,5 +561,52 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       }
     }());
   </script>
+  <script>
+    (function () {
+      var doctors = {
+        'Dr. Tensi': { name: 'Dr. Tensi Trivedi', role: 'Interventional Radiologist', detail: 'Vascular &amp; Endovascular Specialist', image: 'images/doctor-card-tensi-trivedi.png' },
+        'Dr. Dimple': { name: 'Dr. Dimple Parmar', role: 'Operational Head &amp; Head Consultant', detail: 'BnG Vascular', image: 'images/doctor-card-dimple-parmar.png' },
+        'Dr. Pratiksha': { name: 'Dr. Pratiksha Patoliya', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-pratiksha-patoliya.png' },
+        'Dr. Payal': { name: 'Dr. Payal Vadlani', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-payal-vadlani.png' },
+        'Dr. Disha': { name: 'Dr. Disha Soni', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-disha-soni.png' }
+      };
+      var popup = document.createElement('div');
+      popup.className = 'services-doctor-popover';
+      popup.setAttribute('role', 'status');
+      document.body.appendChild(popup);
+      var hideTimer;
+      function hide() { popup.classList.remove('is-visible'); }
+      function scheduleHide() { clearTimeout(hideTimer); hideTimer = setTimeout(hide, 120); }
+      popup.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+      popup.addEventListener('mouseleave', scheduleHide);
+      document.querySelectorAll('.services-opd-table tbody td:nth-child(3)').forEach(function (cell) {
+        var key = cell.textContent.trim();
+        var doctor = doctors[key];
+        if (!doctor) return;
+        var trigger = document.createElement('span');
+        trigger.className = 'services-doctor-trigger';
+        trigger.tabIndex = 0;
+        trigger.textContent = key;
+        cell.textContent = '';
+        cell.appendChild(trigger);
+        function show() {
+          clearTimeout(hideTimer);
+          popup.innerHTML = '<img src="' + doctor.image + '" alt="' + doctor.name + '"><div class="services-doctor-popover-body"><strong>' + doctor.name + '</strong><span>' + doctor.role + '</span><small>' + doctor.detail + '</small><em>Know more&nbsp; →</em></div>';
+          var rect = trigger.getBoundingClientRect();
+          var width = 260;
+          var left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
+          var top = rect.bottom + 10;
+          if (top + 250 > window.innerHeight) top = Math.max(8, rect.top - 250);
+          popup.style.left = left + 'px';
+          popup.style.top = top + 'px';
+          popup.classList.add('is-visible');
+        }
+        trigger.addEventListener('mouseenter', show);
+        trigger.addEventListener('focus', show);
+        trigger.addEventListener('mouseleave', scheduleHide);
+        trigger.addEventListener('blur', scheduleHide);
+      });
+    }());
+  </script>
 </body>
 </html>
