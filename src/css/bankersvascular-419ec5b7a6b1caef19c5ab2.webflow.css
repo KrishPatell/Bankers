@@ -14443,3 +14443,22 @@ figure {
 @media screen and (max-width: 479px) {
   .gbp-hero-visual { background-position: center, center bottom; background-size: cover, cover; }
 }
+
+/* Keep every slider frame and its long heading inside the hero bounds. */
+.gbp-service-hero { overflow: hidden; }
+.gbp-hero-container { padding-top: 20px; padding-bottom: 20px; }
+.gbp-hero-copy { width: min(50%, 590px); max-width: 590px; }
+.gbp-hero-copy h1 { max-width: 100%; font-size: clamp(38px, 4.2vw, 64px); overflow-wrap: anywhere; }
+.gbp-hero-visual { width: 53%; background-position: center, right center; background-size: cover, contain; background-repeat: no-repeat; }
+@media screen and (max-width: 991px) {
+  .gbp-hero-container { padding-top: 18px; padding-bottom: 18px; }
+  .gbp-hero-copy { width: 52%; max-width: 52%; }
+  .gbp-hero-copy h1 { font-size: clamp(34px, 5.6vw, 54px); }
+  .gbp-hero-visual { width: 56%; background-size: cover, contain; }
+}
+@media screen and (max-width: 479px) {
+  .gbp-hero-container { padding-top: 34px; padding-bottom: 20px; }
+  .gbp-hero-copy { width: 100%; max-width: 100%; }
+  .gbp-hero-copy h1 { font-size: 40px; }
+  .gbp-hero-visual { width: 100%; background-position: center, center bottom; background-size: cover, contain; }
+}
