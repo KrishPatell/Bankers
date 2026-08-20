@@ -34,6 +34,26 @@
     return { city: cells[1].textContent.trim(), 'hospital name': cells[3].textContent.trim(), 'camp date': String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear(), 'doctor name': cells[2].textContent.trim() };
   }).filter(Boolean) : [];
 
+  function normalizeName(value) { return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+  function enrichFallbackRecords(sheetRecords) {
+    return fallbackRecords.map(function (fallback) {
+      var cityKey = normalizeName(fallback.city);
+      var hospitalKey = normalizeName(fallback['hospital name']);
+      var matches = sheetRecords.filter(function (item) {
+        var sheetCity = normalizeName(item.city);
+        var sheetHospital = normalizeName(item['hospital name']);
+        var cityMatch = sheetCity === cityKey || (cityKey && sheetCity.indexOf(cityKey) >= 0) || (sheetCity && cityKey.indexOf(sheetCity) >= 0);
+        var hospitalMatch = hospitalKey && sheetHospital && (sheetHospital.indexOf(hospitalKey) >= 0 || hospitalKey.indexOf(sheetHospital) >= 0);
+        return cityMatch && (hospitalMatch || sheetRecords.filter(function (candidate) { return normalizeName(candidate.city) === cityKey; }).length === 1);
+      });
+      if (!matches.length) return fallback;
+      var merged = Object.assign({}, fallback, matches[0]);
+      if (!matches[0]['camp date']) merged['camp date'] = fallback['camp date'];
+      if (!matches[0]['doctor name']) merged['doctor name'] = fallback['doctor name'];
+      return merged;
+    });
+  }
+
   function parseCsv(text) {
     var rows = [], row = [], field = '', quoted = false;
     for (var i = 0; i < text.length; i += 1) {
@@ -57,7 +77,10 @@
       var item = {};
       headers.forEach(function (header, index) { item[header] = (values[index] || '').trim(); });
       return item;
-    }).filter(function (item) { return item.city && item['hospital name'] && item['camp date']; });
+    }).filter(function (item) {
+      if (!item['camp date']) item['camp date'] = item.date || item['opd date'] || item['campdate'] || '';
+      return item.city && item['hospital name'];
+    });
   }
 
   function escapeText(value) {
@@ -91,6 +114,7 @@
     var match = Object.keys(doctorImages).filter(function (key) { return normalized.indexOf(key) === 0; })[0];
     return match ? doctorImages[match] : '';
   }
+  function sheetDoctorImage(value) { return /^https:\/\/drive\.google\.com\//i.test(value || '') ? value : ''; }
 
   function render(records) {
     var today = new Date(); today.setHours(0, 0, 0, 0);
@@ -117,7 +141,7 @@
     if (!body || !current.length) return;
     body.innerHTML = current.map(function (item) {
       var doctor = item['doctor name'] || 'Bankers Vascular team';
-      var image = doctorImage(doctor);
+      var image = sheetDoctorImage(item['dr.photo']) || doctorImage(doctor);
       var booking = safeBookingUrl(item['booking link']);
       var address = item.address || 'Address will be updated soon.';
       var map = mapUrlFor(item, address);
@@ -146,7 +170,11 @@
   function load() {
     fetch(endpoint + '&ts=' + Date.now(), { cache: 'no-store' })
       .then(function (response) { if (!response.ok) throw new Error('Sheet request failed'); return response.text(); })
-      .then(function (text) { render(parseCsv(text)); })
+      .then(function (text) {
+        var sheetRecords = parseCsv(text);
+        var hasDatedRows = sheetRecords.some(function (item) { return parseDate(item['camp date']); });
+        render(hasDatedRows ? sheetRecords : enrichFallbackRecords(sheetRecords));
+      })
       .catch(function () {
         /* Keep the complete source plan interactive if a browser blocks the
            shared-sheet request; the next five-minute refresh will retry it. */
