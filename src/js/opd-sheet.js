@@ -114,7 +114,12 @@
     var match = Object.keys(doctorImages).filter(function (key) { return normalized.indexOf(key) === 0; })[0];
     return match ? doctorImages[match] : '';
   }
-  function sheetDoctorImage(value) { return /^https:\/\/drive\.google\.com\//i.test(value || '') ? value : ''; }
+  function sheetDoctorImage(value) {
+    var source = String(value || '');
+    var fileMatch = source.match(/^https:\/\/drive\.google\.com\/file\/d\/([^/]+)/i);
+    if (fileMatch) return 'https://drive.google.com/uc?export=view&id=' + encodeURIComponent(fileMatch[1]);
+    return /^https:\/\/drive\.google\.com\//i.test(source) ? source : '';
+  }
 
   function render(records) {
     var today = new Date(); today.setHours(0, 0, 0, 0);
@@ -141,7 +146,7 @@
     if (!body || !current.length) return;
     body.innerHTML = current.map(function (item) {
       var doctor = item['doctor name'] || 'Bankers Vascular team';
-      var image = sheetDoctorImage(item['dr.photo']) || doctorImage(doctor);
+      var image = doctorImage(doctor) || sheetDoctorImage(item['dr.photo']);
       var booking = safeBookingUrl(item['booking link']);
       var address = item.address || 'Address will be updated soon.';
       var map = mapUrlFor(item, address);
