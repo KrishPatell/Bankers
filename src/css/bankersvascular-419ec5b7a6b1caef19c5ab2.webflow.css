@@ -14534,18 +14534,8 @@ figure {
 .services-insurance-intro { max-width: 720px; margin: 8px auto 25px; color: #5b6d77; }
 .services-insurance-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; text-align: left; }
 .services-insurance-card { min-height: 260px; padding: 16px; border: 1px solid #d1e5e7; border-radius: 17px; background: #fff; box-shadow: 0 8px 22px rgba(0, 104, 123, .09); }
-.services-insurance-logo { display: grid; place-items: center; min-height: 82px; margin-bottom: 13px; border-radius: 12px; color: #fff; font-size: 22px; font-weight: 900; letter-spacing: .02em; line-height: 1.05; text-align: center; }
-.services-insurance-logo small { display: block; font-size: 10px; letter-spacing: .09em; }
-.services-insurance-logo.tata { background: linear-gradient(135deg, #0c4c9c, #1685ce); }
-.services-insurance-logo.reliance { background: linear-gradient(135deg, #e37b16, #f1aa29); }
-.services-insurance-logo.birla { background: linear-gradient(135deg, #3a217c, #6f47ae); }
-.services-insurance-logo.hdfc { background: linear-gradient(135deg, #ec1b2f, #96203a); }
-.services-insurance-logo.icici { background: linear-gradient(135deg, #e76720, #c3291c); }
-.services-insurance-logo.bajaj { background: linear-gradient(135deg, #123a86, #2175c6); }
-.services-insurance-logo.star { background: linear-gradient(135deg, #007f9b, #11b8ad); }
-.services-insurance-logo.niva { background: linear-gradient(135deg, #008e97, #00b7b6); }
-.services-insurance-logo.care { background: linear-gradient(135deg, #0c7194, #1bb5bd); }
-.services-insurance-logo.sbi { background: linear-gradient(135deg, #0d4d97, #168ac8); }
+.services-insurance-logo { display: flex; align-items: center; justify-content: center; height: 70px; min-height: 70px; margin-bottom: 13px; padding: 10px 16px; border: 1px solid #e5eff0; border-radius: 10px; background: #fff; }
+.services-insurance-logo img { display: block; width: 100%; height: 100%; max-width: 180px; object-fit: contain; object-position: center; }
 .services-insurance-card h3 { margin: 0 0 11px; color: #12354b; font-size: 16px; }
 .services-insurance-card details { color: #5b6d77; font-size: 12px; line-height: 1.45; }
 .services-insurance-card summary { width: max-content; cursor: pointer; color: #007d85; font-size: 12px; font-weight: 800; }
@@ -14567,8 +14557,7 @@ figure {
 .services-insurance-showcase { padding: 30px 22px 28px; }
 .services-insurance-grid { gap: 13px; }
 .services-insurance-card { min-height: 218px; padding: 11px; border-radius: 14px; }
-.services-insurance-logo { min-height: 64px; margin-bottom: 9px; font-size: 18px; border-radius: 10px; }
-.services-insurance-logo small { font-size: 8px; }
+.services-insurance-logo { height: 64px; min-height: 64px; margin-bottom: 9px; padding: 9px 12px; }
 .services-insurance-card h3 { margin-bottom: 7px; font-size: 14px; }
 .services-insurance-card details, .services-insurance-card summary { font-size: 11px; }
 .services-insurance-card details p { margin: 7px 0 3px; }
@@ -14580,23 +14569,12 @@ figure {
   .services-insurance-card { padding: 12px; }
 }
 
-/* Compact insurer cards with a small brand-mark treatment. */
+/* Compact insurer cards with original logo assets. */
 .services-insurance-showcase { padding: 26px 20px 24px; }
 .services-insurance-intro { margin-bottom: 18px; }
 .services-insurance-grid { gap: 12px; }
 .services-insurance-card { min-height: 148px; padding: 10px; border-radius: 13px; }
-.services-insurance-logo { position: relative; min-height: 48px; margin-bottom: 8px; border-radius: 9px; font-size: 16px; }
-.services-insurance-logo::before { content: ''; position: absolute; left: 10px; top: 50%; display: grid; width: 23px; height: 23px; place-items: center; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; transform: translateY(-50%); font-size: 13px; line-height: 1; }
-.services-insurance-logo.tata::before { content: 'T'; }
-.services-insurance-logo.reliance::before { content: 'R'; }
-.services-insurance-logo.birla::before { content: 'A'; }
-.services-insurance-logo.hdfc::before { content: 'H'; }
-.services-insurance-logo.icici::before { content: 'I'; }
-.services-insurance-logo.bajaj::before { content: 'B'; }
-.services-insurance-logo.star::before { content: '★'; }
-.services-insurance-logo.niva::before { content: 'N'; }
-.services-insurance-logo.care::before { content: 'C'; }
-.services-insurance-logo.sbi::before { content: 'S'; }
+.services-insurance-logo { height: 64px; min-height: 64px; margin-bottom: 8px; padding: 8px 12px; border: 1px solid #e5eff0; border-radius: 9px; background: #fff; }
 .services-insurance-card h3 { margin-bottom: 6px; font-size: 13px; }
 .services-insurance-card details, .services-insurance-card summary { font-size: 11px; }
 .services-insurance-card details p { margin: 7px 0 3px; }
