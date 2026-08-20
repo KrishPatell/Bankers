@@ -636,6 +636,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       if (profileImages[1]) {
         profileImages[1].src = 'images/vadodara-reception.webp';
         profileImages[1].alt = "Banker's Vascular Hospital Vadodara reception";
+        profileImages[1].addEventListener('error', function () {
+          this.onerror = null;
+          this.src = 'images/reception-area-bankers-vascular-centre.jpg';
+        });
       }
     }());
   </script>
