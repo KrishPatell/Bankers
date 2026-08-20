@@ -48,6 +48,12 @@
     });
   }
   function safeMapUrl(value) { return /^https:\/\/([\w-]+\.)?google\.(com|co\.in)\/maps\//i.test(value || '') ? value : ''; }
+  function mapUrlFor(item, address) {
+    var supplied = safeMapUrl(item['google map link']);
+    if (supplied) return supplied;
+    var query = [item['hospital name'], address, item.city].filter(Boolean).join(', ');
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+  }
   function safeBookingUrl(value) { return /^https:\/\/bankersvascular\.com\//i.test(value || '') ? value : 'https://bankersvascular.com/contact-us'; }
   function parseDate(value) {
     var match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
@@ -81,9 +87,9 @@
     body.innerHTML = current.map(function (item) {
       var doctor = item['doctor name'] || 'Bankers Vascular team';
       var image = doctorImage(doctor);
-      var map = safeMapUrl(item['google map link']);
       var booking = safeBookingUrl(item['booking link']);
       var address = item.address || 'Address will be updated soon.';
+      var map = mapUrlFor(item, address);
       var photo = image ? '<img src="' + image + '" alt="' + escapeText(doctor) + '">' : '<span class="services-opd-location-photo-fallback" aria-hidden="true">👨‍⚕️</span>';
       var mapAction = map ? '<a href="' + escapeText(map) + '" target="_blank" rel="noopener">📍 Location</a>' : '';
       return '<tr><td>' + escapeText(formatDate(item._date)) + '</td><td>' + escapeText(item.city) + '</td><td>' + escapeText(doctor) + '</td><td class="services-opd-hospital"><button type="button" class="services-opd-location" aria-expanded="false"><span class="services-opd-location-icon" aria-hidden="true">📍</span>' + escapeText(item['hospital name']) + '</button><span class="services-opd-location-popover" role="tooltip">' + photo + '<span class="services-opd-location-popover-body"><strong>' + escapeText(item['hospital name']) + '</strong><small>' + escapeText(item.city) + '</small><p>📍 ' + escapeText(address) + '</p><p>📅 ' + escapeText(formatDate(item._date)) + ' · ' + escapeText(daysLabel(item._date)) + '</p><p>🕒 ' + escapeText(item['camp time'] || 'Time to be announced') + '</p><p>👨‍⚕️ ' + escapeText(doctor) + '</p><span class="services-opd-location-actions">' + mapAction + '<a href="' + booking + '" target="_blank" rel="noopener">Book appointment</a></span></span></span></td></tr>';
