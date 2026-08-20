@@ -245,7 +245,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </div>
       </div>
     </section>
-    <section class="gbp-social-trust" aria-label="Follow Banker's Vascular"><div class="w-layout-blockcontainer main-container w-container"><div class="gbp-social-panel"><p>Connect With Us On Social Media<small>Follow Banker's Vascular for updates and patient education</small></p><a href="https://www.instagram.com/bankersvascularcentre/" target="_blank" rel="noopener"><img src="images/instagram.svg" alt="">Instagram</a><a href="https://www.youtube.com/channel/UC6UCazRbcXgkVpIP6bhk74g" target="_blank" rel="noopener"><img src="images/mdi_youtube.svg" alt="">YouTube</a><a href="https://www.facebook.com/BankersVascularCentre/" target="_blank" rel="noopener"><img src="images/facebook.svg" alt="">Facebook</a><a href="https://www.google.com/search?q=Bankers+Vascular+Hospital" target="_blank" rel="noopener"><b>G</b>Google</a><a href="https://www.linkedin.com/company/bankersvascularcentre" target="_blank" rel="noopener"><img src="images/linkedin.svg" alt="">LinkedIn</a><a href="https://api.whatsapp.com/send/?phone=%2B919909908428&amp;text=Hello%20Bankers%20Vascular&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener"><img src="images/WhatsApp_icon.png.webp" alt="">WhatsApp</a></div><div class="gbp-phone-card" aria-label="Phone numbers"><a href="tel:+919909908428">+91 99099 08428</a><a class="gbp-phone-icon" href="tel:+919909908428" aria-label="Call Banker's Vascular">☎</a><a href="tel:+919909903449">+91 99099 03449</a></div></div></section>
+    <section class="gbp-social-trust" aria-label="Follow Banker's Vascular"><div class="w-layout-blockcontainer main-container w-container"><div class="gbp-social-panel"><p>Connect With Us On Social Media<small>Follow Banker's Vascular for updates and patient education</small></p><a href="https://www.instagram.com/bankersvascularcentre/" target="_blank" rel="noopener"><img src="images/instagram.svg" alt="">Instagram</a><a href="https://www.youtube.com/channel/UC6UCazRbcXgkVpIP6bhk74g" target="_blank" rel="noopener"><img src="images/mdi_youtube.svg" alt="">YouTube</a><a href="https://www.facebook.com/BankersVascularCentre/" target="_blank" rel="noopener"><img src="images/facebook.svg" alt="">Facebook</a><a href="https://www.google.com/search?q=Bankers+Vascular+Hospital" target="_blank" rel="noopener"><b>G</b>Google</a><a href="https://www.linkedin.com/company/bankersvascularcentre" target="_blank" rel="noopener"><img src="images/linkedin.svg" alt="">LinkedIn</a><a href="https://api.whatsapp.com/send/?phone=%2B919909908428&amp;text=Hello%20Bankers%20Vascular&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener"><img src="images/WhatsApp_icon.png.webp" alt="">WhatsApp</a></div><div class="gbp-phone-card" aria-label="Phone numbers"><a href="tel:+919909908428">+91 99099 08428</a><a class="gbp-phone-icon" href="tel:+919909908428" aria-label="Call Banker's Vascular">☎</a><a href="tel:+919909903449">+91 99099 03449</a></div><figure class="gbp-opd-map-card"><img src="images/gujarat-opd-map.png" alt="Banker's Vascular Centre OPD coverage across Gujarat" loading="lazy" decoding="async"><figcaption>OPD visits across Gujarat — Ahmedabad, Vadodara, Rajkot and Surat</figcaption></figure></div></section>
     <section id="services-list" class="services-condition-section" aria-labelledby="conditions-heading">
       <div class="w-layout-blockcontainer main-container w-container">
         <section class="services-branch-showcase" aria-labelledby="branches-heading">
@@ -278,7 +278,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <a class="services-promo-card" href="/" aria-label="Fibroids treatment"><img src="images/services/fibroids-treatment.png" alt="Fibroids treatment" loading="lazy"></a>
         </div>
         <a class="services-view-all" href="/products">View All Services</a>
-        <section class="services-opd-plan" aria-labelledby="services-opd-heading">
+        <section class="services-opd-plan" aria-labelledby="services-opd-heading" data-opd-sheet-url="https://docs.google.com/spreadsheets/d/1sIugeNlRJmUbjwkfiiheihqotMjaSLj_/export?format=csv">
           <div class="services-opd-plan-header">
             <div><p class="services-eyebrow">Visit us near you</p><h2 id="services-opd-heading">September 2026 OPD Plan</h2><p>Our visiting consultation schedule is updated every month.</p></div>
             <span class="services-opd-update">Monthly updates</span>
@@ -572,6 +572,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script src="js/webflow.js" type="text/javascript"></script>
   <script src="js/forms.js" type="text/javascript"></script>
   <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8182382315648187" crossorigin="anonymous"></script>
+  <script src="js/opd-sheet.js"></script>
   <script>
     (function () {
       var hero = document.querySelector('[data-hero-slider]');
@@ -655,7 +656,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       function scheduleHide() { clearTimeout(hideTimer); hideTimer = setTimeout(hide, 120); }
       popup.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
       popup.addEventListener('mouseleave', scheduleHide);
-      document.querySelectorAll('.services-opd-table tbody td:nth-child(3)').forEach(function (cell) {
+      function initDoctorTriggers() { document.querySelectorAll('.services-opd-table tbody td:nth-child(3)').forEach(function (cell) {
+        if (cell.querySelector('.services-doctor-trigger')) return;
         var key = cell.textContent.trim();
         var doctor = doctors[key];
         if (!doctor) return;
@@ -681,7 +683,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         trigger.addEventListener('focus', show);
         trigger.addEventListener('mouseleave', scheduleHide);
         trigger.addEventListener('blur', scheduleHide);
-      });
+      }); }
+      initDoctorTriggers();
+      document.addEventListener('services-opd-updated', initDoctorTriggers);
     }());
   </script>
 </body>
