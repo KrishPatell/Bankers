@@ -4,6 +4,7 @@
   var section = document.querySelector('[data-opd-sheet-url]');
   var table = section && section.querySelector('.services-opd-table');
   if (!section || !table) return;
+  var tableBody = table.querySelector('tbody');
 
   var heading = section.querySelector('#services-opd-heading');
   var updateBadge = section.querySelector('.services-opd-update');
@@ -15,6 +16,23 @@
     'dr. payal': 'images/doctor-card-payal-vadlani.png',
     'dr. disha': 'images/doctor-card-disha-soni.png'
   };
+
+  function parseDisplayDate(value) {
+    var match = String(value || '').match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})$/);
+    if (!match) return null;
+    var months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    var month = months.indexOf(match[2].slice(0, 3).toLowerCase());
+    if (month < 0) return null;
+    var date = new Date(Number(match[3]), month, Number(match[1]));
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  var fallbackRecords = tableBody ? Array.prototype.map.call(tableBody.querySelectorAll('tr'), function (row) {
+    var cells = row.querySelectorAll('td');
+    var date = cells[0] && parseDisplayDate(cells[0].textContent.trim());
+    if (!date || !cells[1] || !cells[2] || !cells[3]) return null;
+    return { city: cells[1].textContent.trim(), 'hospital name': cells[3].textContent.trim(), 'camp date': String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear(), 'doctor name': cells[2].textContent.trim() };
+  }).filter(Boolean) : [];
 
   function parseCsv(text) {
     var rows = [], row = [], field = '', quoted = false;
@@ -82,7 +100,20 @@
     var anchor = upcoming[0] || parsed.sort(function (a, b) { return b._date - a._date; })[0];
     var selectedKey = monthKey(anchor._date);
     var current = parsed.filter(function (item) { return monthKey(item._date) === selectedKey; }).sort(function (a, b) { return a._date - b._date; });
-    var body = table.querySelector('tbody');
+    /* The shared sheet may be partially filled while the monthly plan is being
+       prepared. Keep the complete September plan visible from the source table
+       until the live sheet contains the full month, then let sheet data take
+       over automatically. */
+    if (selectedKey === '2026-09' && current.length < 2 && fallbackRecords.length) {
+      var seen = {};
+      current.concat(fallbackRecords).forEach(function (item) {
+        var date = parseDate(item['camp date']);
+        var key = [date && date.getTime(), item.city, item['hospital name']].join('|');
+        if (!seen[key]) { seen[key] = true; current.push(item); }
+      });
+      current.sort(function (a, b) { return parseDate(a['camp date']) - parseDate(b['camp date']); });
+    }
+    var body = tableBody;
     if (!body || !current.length) return;
     body.innerHTML = current.map(function (item) {
       var doctor = item['doctor name'] || 'Bankers Vascular team';
@@ -116,7 +147,12 @@
     fetch(endpoint + '&ts=' + Date.now(), { cache: 'no-store' })
       .then(function (response) { if (!response.ok) throw new Error('Sheet request failed'); return response.text(); })
       .then(function (text) { render(parseCsv(text)); })
-      .catch(function () { if (updateBadge) updateBadge.textContent = 'Monthly updates'; });
+      .catch(function () {
+        /* Keep the complete source plan interactive if a browser blocks the
+           shared-sheet request; the next five-minute refresh will retry it. */
+        if (fallbackRecords.length) render(fallbackRecords);
+        if (updateBadge) updateBadge.textContent = 'Monthly updates';
+      });
   }
 
   bindLocationTriggers();
