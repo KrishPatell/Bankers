@@ -141,7 +141,7 @@
 .gbp-opd-map-3d-stage img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; mix-blend-mode: normal; opacity: 1; transform: rotateX(2deg) rotateY(-1deg) scale(1.01); filter: drop-shadow(0 18px 16px rgba(4, 45, 64, .22)); transition: transform .45s ease, filter .45s ease; }
 .gbp-opd-map-3d-stage:hover img { transform: rotateX(0) rotateY(0) scale(1.035); filter: saturate(1.02) contrast(1.05) drop-shadow(0 22px 18px rgba(4, 45, 64, .25)); }
 .gbp-opd-map-logo-pins { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-.gbp-opd-map-logo-pins img { position: absolute; left: var(--logo-x); top: var(--logo-y); width: 28px; height: 28px; object-fit: contain; transform: translate(-50%, -50%); border: 2px solid #fff; border-radius: 50%; background: #fff; box-shadow: 0 4px 10px rgba(4, 45, 64, .3); }
+.gbp-opd-map-logo-pins img { position: absolute; left: var(--logo-x); top: var(--logo-y); width: 18px; height: 18px; object-fit: contain; transform: translate(-50%, -50%); border: 0; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(4, 45, 64, .28); }
 .gbp-opd-map-3d-pins { position: absolute; inset: 0; z-index: 2; }.gbp-opd-map-3d-pins button { position: absolute; left: var(--pin-x); top: var(--pin-y); display: inline-flex; align-items: center; gap: 5px; transform: translate(-50%, -50%); border: 1px solid rgba(255,255,255,.85); border-radius: 999px; padding: 6px 10px; background: rgba(57, 105, 122, .92); color: #fff; font-size: 10px; font-weight: 800; box-shadow: 0 5px 12px rgba(4, 45, 64, .24); cursor: pointer; transition: transform .2s ease, background .2s ease; }.gbp-opd-map-3d-pins button::before { width: 7px; height: 7px; border: 2px solid #fff; border-radius: 50%; background: #d1bf6f; content: ''; }.gbp-opd-map-3d-pins button:hover,.gbp-opd-map-3d-pins button.is-active { background: #0a8890; transform: translate(-50%, -50%) scale(1.08); }
 .gbp-opd-map-selected { margin: 9px 0 0; color: var(--brand-deep-teal); font-size: 12px; font-weight: 800; text-align: center; }
 @media screen and (max-width: 767px) {
@@ -151,7 +151,7 @@
   .gbp-opd-map-3d { margin-top: 22px; }
   .gbp-opd-map-heading { margin-bottom: 18px; }.gbp-opd-map-heading strong { font-size: 14px; line-height: 1.35; }
   .gbp-opd-map-3d-stage img { aspect-ratio: 3 / 2; object-fit: contain; }
-  .gbp-opd-map-logo-pins img { width: 23px; height: 23px; }
+  .gbp-opd-map-logo-pins img { width: 14px; height: 14px; }
 }
 
 .services-branch-showcase,
