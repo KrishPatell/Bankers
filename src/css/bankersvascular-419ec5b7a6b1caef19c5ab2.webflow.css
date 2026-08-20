@@ -14571,3 +14571,45 @@ figure {
 @media screen and (max-width: 479px) {
   .services-insurance-card { min-height: 142px; }
 }
+
+/* Mobile hero: show the supplied disease artwork as a clear full-width strip,
+   then place the rotating headline in its own readable block. This avoids the
+   desktop cover crop becoming an oversized portrait image on phones. */
+@media screen and (max-width: 479px) {
+  .gbp-service-hero {
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    background: #b9d5d8;
+  }
+  .gbp-hero-visual {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 2.15 / 1;
+    background-position: center, center;
+    background-size: cover, cover;
+  }
+  .gbp-hero-container {
+    height: auto;
+    min-height: 0;
+    padding: 24px 16px 30px;
+  }
+  .gbp-hero-copy {
+    width: 100%;
+    max-width: none;
+  }
+  .gbp-hero-copy h1 {
+    min-height: 0;
+    margin: 0;
+    color: #062b43;
+    font-size: clamp(32px, 8.8vw, 40px);
+    line-height: 1.08;
+  }
+  .gbp-social-trust {
+    margin-top: 0;
+    padding-bottom: 28px;
+  }
+}
