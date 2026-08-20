@@ -14117,7 +14117,8 @@ figure {
   background-image: url('../images/doctors-group-photo-transparent-v2.png'), url('../images/hero-medical-pattern-v2.png') !important;
   background-position: 100% 100%, 100% 100% !important;
   background-repeat: no-repeat, no-repeat !important;
-  background-size: auto 88%, 90% !important;
+  /* Keep long article titles clear of the shared team artwork. */
+  background-size: auto 68%, 90% !important;
 }
 
 .blog-detail-hero .main-container {
@@ -14150,7 +14151,7 @@ figure {
 
 @media screen and (max-width: 767px) {
   .blog-detail-hero {
-    background-size: auto 66%, 130% !important;
+    background-size: auto 54%, 130% !important;
     background-position: 100% 100%, 100% 100% !important;
   }
 
