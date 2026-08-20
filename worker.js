@@ -53,7 +53,9 @@ async function contact(request, env) {
   if (String(body._gotcha || "").trim()) return json({ ok: true });
 
   const name = String(body.Name || body.name || "").trim();
-  const phone = String(body["Phone-Number"] || body.phone || "").trim();
+  const phone = String(body["Phone-Number"] || body.phone || body.mobile || "").trim();
+  const city = String(body.City || body.city || "").trim();
+  const disease = String(body.Disease || body.disease || "").trim();
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
   const preferredDate = String(body.Date || "").trim();
@@ -70,6 +72,8 @@ async function contact(request, env) {
   const rows = [
     ["Name", name],
     ...(phone ? [["Phone", phone]] : []),
+    ...(city ? [["City", city]] : []),
+    ...(disease ? [["Disease / Treatment", disease]] : []),
     ...(email ? [["Email", email]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),
     ...(message ? [["Message", message]] : []),
