@@ -9,6 +9,15 @@ const LEGACY_REDIRECTS = {
   "/departments/platelet-rich-plasma": "/treatment/platelet-rich-plasma",
   "/departments/varicose-vein": "/departments/varicose-veins",
   "/varicose-vein": "/varicose-veins/ahmedabad",
+  "/home": "/",
+  "/dr-mohal-banker": "/our-doctors/dr-mohal-banker",
+  "/varicose-veins": "/departments/varicose-veins",
+  "/author/drmohal": "/blog-author/dr-mohal",
+  "/blog-categories/health-care": "/blog-category/health-care",
+  "/blog/10-early-warning-signs-of-peripheral-artery-disease-pad-you-should-never-ignore": "/blog/10-early-signs-of-peripheral-artery-disease-pad-you-shouldn-t-ignore",
+  "/varicose-vein-treatment-ahmedabad-india": "/varicose-veins/ahmedabad",
+  "/diseases/varicose-vein/glue-therapy-for-varicose-veins": "/treatment/venaseal-glue-embolization",
+  "/our-doctors/dr-chandres-bharada": "/our-doctors/dr-chandresh-bharada",
 };
 
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => (
