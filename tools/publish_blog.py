@@ -237,7 +237,10 @@ def extract_docx_images(path, slug):
                 }.get(getattr(part, "content_type", ""), ".png")
                 dest = IMAGE_DIR / ("%s-inline-%d%s" % (slug, len(urls) + 1, ext))
                 if dest.exists():
-                    raise ValueError("refusing to overwrite existing inline image: %s" % dest)
+                    if dest.read_bytes() != part.blob:
+                        raise ValueError("refusing to overwrite a different inline image: %s" % dest)
+                    urls[image_id] = "/images/blog/%s" % dest.name
+                    continue
                 dest.write_bytes(part.blob)
                 written.append(dest)
                 urls[image_id] = "/images/blog/%s" % dest.name
@@ -376,6 +379,8 @@ def main():
     author_group.add_argument("--author", help="Existing doctor or Blog Author name")
     author_group.add_argument("--bankers-notes", action="store_true",
                               help="Publish as a Dr. Mohal Banker Bankers Note")
+    parser.add_argument("--published-on", type=lambda value: datetime.strptime(value, "%Y-%m-%d"),
+                        help="Scheduled publication date in YYYY-MM-DD (defaults to today)")
     parser.add_argument("--dry-run", action="store_true", help="Validate and preview without writing files")
     args = parser.parse_args()
     if not args.docx.is_file() or args.docx.suffix.lower() != ".docx":
@@ -404,7 +409,8 @@ def main():
     if extension not in {".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"}:
         raise SystemExit("thumbnail must be AVIF, GIF, JPG, PNG, or WebP")
     image_rel = "/images/blog/%s%s" % (slug, extension)
-    now = datetime.now(timezone.utc).strftime("%a %b %d %Y 00:00:00 GMT+0000 (Coordinated Universal Time)")
+    published_at = args.published_on.replace(tzinfo=timezone.utc) if args.published_on else datetime.now(timezone.utc)
+    now = published_at.strftime("%a %b %d %Y 00:00:00 GMT+0000 (Coordinated Universal Time)")
     row = {field: "" for field in fields}
     row.update({
         "Name": title, "Slug": slug, "Archived": "false", "Draft": "false",
