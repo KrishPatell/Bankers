@@ -10,11 +10,11 @@
   var updateBadge = section.querySelector('.services-opd-update');
   var endpoint = section.getAttribute('data-opd-sheet-url');
   var doctorImages = {
-    'dr. tensi': 'images/doctor-card-tensi-trivedi.png',
-    'dr. dimple': 'images/doctor-card-dimple-parmar.png',
-    'dr. pratiksha': 'images/doctor-card-pratiksha-patoliya.png',
-    'dr. payal': 'images/doctor-card-payal-vadlani.png',
-    'dr. disha': 'images/doctor-card-disha-soni.png'
+    'dr. tensi': '/images/doctor-card-tensi-trivedi.png',
+    'dr. dimple': '/images/doctor-card-dimple-parmar.png',
+    'dr. pratiksha': '/images/doctor-card-pratiksha-patoliya.png',
+    'dr. payal': '/images/doctor-card-payal-vadlani.png',
+    'dr. disha': '/images/doctor-card-disha-soni.png'
   };
 
   function parseDisplayDate(value) {
