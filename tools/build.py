@@ -58,6 +58,15 @@ MOHAL_PROFILE_URL = "/our-doctors/" + MOHAL_DOCTOR_SLUG
 
 # Verified consultation/branch locations used only on their matching city pages.
 CITY_LOCATION_DATA = {
+    "ahmedabad": {
+        "eyebrow": "Ahmedabad hospital",
+        "heading": "Visit Bankers Vascular Hospital in Ahmedabad",
+        "name": "Bankers Vascular Hospital",
+        "address": "2nd & 3rd Floor, RJP House, Opp. Scarlet Height Apartment, 100' Anandnagar Road, Satellite, Ahmedabad, Gujarat 380015",
+        "phone": "+91-99099-03449",
+        "city": "Ahmedabad",
+        "postal_code": "380015",
+    },
     "rajkot": {
         "eyebrow": "Rajkot consultation location",
         "heading": "Visit us at Akanksha IVF Hospital",
@@ -89,10 +98,10 @@ CITY_LOCATION_DATA = {
         "eyebrow": "Vadodara branch",
         "heading": "Visit Bankers Vascular Centre in Vadodara",
         "name": "Bankers Vascular Centre",
-        "address": "2nd Floor, Ignite, 201, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, Gujarat 390007",
+        "address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Near Urmi Circle, Akota, Vadodara, Gujarat 390020",
         "phone": "+91-99099-08428",
         "city": "Vadodara",
-        "postal_code": "390007",
+        "postal_code": "390020",
     },
     "rajasthan": {
         "eyebrow": "Rajasthan consultation location",
@@ -221,6 +230,10 @@ def _esc_attr(s):
 
 def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
                   noindex=False):
+    # Social crawlers need an absolute image URL.  Page content itself keeps
+    # root-relative assets, but Open Graph/Twitter metadata must not.
+    if image and image.startswith("/"):
+        image = CFG.SITE_URL + image
     if title is not None:
         html = re.sub(r"<title>.*?</title>",
                       lambda m: "<title>%s</title>" % htmllib.escape(title),
@@ -246,6 +259,9 @@ def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
     meta('name="twitter:title"', title)
     meta('name="twitter:description"', desc)
     meta('name="twitter:image"', image)
+    if canonical is not None:
+        meta('property="og:url"', canonical)
+        meta('name="twitter:card"', "summary_large_image")
 
     if canonical is not None:
         html = re.sub(r'<link href="[^"]*" rel="canonical">',
@@ -911,13 +927,15 @@ def add_seo_internal_links(html, url):
             '<div class="seo-location-copy"><p class="seo-location-eyebrow">%s</p>'
             '<h2>%s</h2><p>Visit <strong>%s</strong> at %s.</p>'
             '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=%s" '
-            'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a></div>'
+            'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a>'
+            '<p><a href="tel:%s">Call %s</a> to request an appointment.</p></div>'
             '<div class="seo-location-map"><iframe loading="lazy" title="%s" '
             'src="https://www.google.com/maps?q=%s&amp;output=embed" '
             'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
             '</section>' % tuple(htmllib.escape(value) for value in (
                 location_data["eyebrow"], location_data["eyebrow"], location_data["heading"],
                 location_data["name"], location_data["address"], query,
+                location_data["phone"].replace("-", ""), location_data["phone"],
                 location_data["name"], query,
             ))
         )
@@ -1440,19 +1458,50 @@ def add_page_schema(html, url, spec=None, item=None):
         # There is no published /our-doctors archive; do not manufacture one.
         crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
                               "name": item.name, "item": CFG.SITE_URL + url}]
+    canonical_url = CFG.SITE_URL + url
     graph = [{
         "@type": "BreadcrumbList", "@id": CFG.SITE_URL + url + "#breadcrumb",
         "itemListElement": crumbs,
+    }, {
+        "@type": "WebPage", "@id": canonical_url + "#webpage",
+        "url": canonical_url,
+        "isPartOf": {"@id": ENTITY_SCHEMA.ENTITY_IDS["website"]},
+        "about": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+        "breadcrumb": {"@id": canonical_url + "#breadcrumb"},
     }]
     if url == "/":
+        locations = []
+        for key, location in ENTITY_SCHEMA.LOCATIONS.items():
+            location_type = "Hospital" if key == "ahmedabad" else "MedicalClinic"
+            locations.append({
+                "@type": location_type,
+                "@id": location["id"],
+                "name": location["name"],
+                "url": canonical_url,
+                "telephone": location["telephone"],
+                "parentOrganization": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": location["street_address"],
+                    "addressLocality": location["city"],
+                    "addressRegion": "Gujarat",
+                    "postalCode": location["postal_code"],
+                    "addressCountry": "IN",
+                },
+            })
         graph.extend((
             {"@type": "WebSite", "@id": ENTITY_SCHEMA.ENTITY_IDS["website"],
-             "url": CFG.SITE_URL + "/", "name": "Bankers Vascular Centre",
+             "url": CFG.SITE_URL + "/", "name": "Bankers Vascular",
              "publisher": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]}},
             {"@type": "MedicalOrganization", "@id": ENTITY_SCHEMA.ENTITY_IDS["organization"],
-             "name": "Bankers Vascular Centre", "url": CFG.SITE_URL + "/",
-             "sameAs": list(ENTITY_SCHEMA.ORGANIZATION_SAME_AS)},
+             "name": "Bankers Vascular", "url": CFG.SITE_URL + "/",
+             "sameAs": list(ENTITY_SCHEMA.ORGANIZATION_SAME_AS),
+             "subOrganization": [{"@id": location["id"]} for location in ENTITY_SCHEMA.LOCATIONS.values()]},
         ))
+        graph.extend(locations)
+    city = url.rsplit("/", 1)[-1]
+    if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) and city in ENTITY_SCHEMA.LOCATIONS:
+        graph[1]["about"] = {"@id": ENTITY_SCHEMA.LOCATIONS[city]["id"]}
     if spec and spec.get("key") == "our-doctors" and item and item.slug == MOHAL_DOCTOR_SLUG:
         person_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]
         image = item.get_text("Doctor Details Image", "Doctor Thumbnail")

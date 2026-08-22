@@ -237,7 +237,9 @@ def check_entity_schema(pages):
     profile_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["profile_page"]
     organization_id = ENTITY_SCHEMA.ENTITY_IDS["organization"]
     website_id = ENTITY_SCHEMA.ENTITY_IDS["website"]
+    location_ids = {location["id"] for location in ENTITY_SCHEMA.LOCATIONS.values()}
     person_nodes = profile_nodes = organization_nodes = website_nodes = 0
+    location_nodes = Counter()
 
     for path, html in pages.items():
         for raw in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
@@ -256,6 +258,8 @@ def check_entity_schema(pages):
                     organization_nodes += 1
                 elif node_id == website_id:
                     website_nodes += 1
+                elif node_id in location_ids:
+                    location_nodes[node_id] += 1
                 if node_id and "#medical-clinic" in node_id:
                     fail("%s: obsolete #medical-clinic entity ID" % rel(path))
                 if (node.get("@type") == "BlogPosting"
@@ -268,6 +272,9 @@ def check_entity_schema(pages):
     if organization_nodes != 1 or website_nodes != 1:
         fail("expected one homepage Organization and WebSite node; found %d and %d"
              % (organization_nodes, website_nodes))
+    if set(location_nodes) != location_ids or any(n != 1 for n in location_nodes.values()):
+        fail("expected one structured-data entity for each verified branch; found %s"
+             % dict(location_nodes))
     if not failures:
         note("entity schema uses one primary organization, website, and Dr. Mohal Banker profile")
 
