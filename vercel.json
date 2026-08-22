@@ -24,7 +24,17 @@
 
     { "source": "/departments/platelet-rich-plasma", "destination": "/treatment/platelet-rich-plasma", "permanent": true },
     { "source": "/departments/varicose-vein", "destination": "/departments/varicose-veins", "permanent": true },
-    { "source": "/varicose-vein", "destination": "/varicose-veins/ahmedabad", "permanent": true }
+    { "source": "/varicose-vein", "destination": "/varicose-veins/ahmedabad", "permanent": true },
+
+    { "source": "/home", "destination": "/", "permanent": true },
+    { "source": "/dr-mohal-banker", "destination": "/our-doctors/dr-mohal-banker", "permanent": true },
+    { "source": "/varicose-veins", "destination": "/departments/varicose-veins", "permanent": true },
+    { "source": "/author/drmohal", "destination": "/blog-author/dr-mohal", "permanent": true },
+    { "source": "/blog-categories/health-care", "destination": "/blog-category/health-care", "permanent": true },
+    { "source": "/blog/10-early-warning-signs-of-peripheral-artery-disease-pad-you-should-never-ignore", "destination": "/blog/10-early-signs-of-peripheral-artery-disease-pad-you-shouldn-t-ignore", "permanent": true },
+    { "source": "/varicose-vein-treatment-ahmedabad-india", "destination": "/varicose-veins/ahmedabad", "permanent": true },
+    { "source": "/diseases/varicose-vein/glue-therapy-for-varicose-veins", "destination": "/treatment/venaseal-glue-embolization", "permanent": true },
+    { "source": "/our-doctors/dr-chandres-bharada", "destination": "/our-doctors/dr-chandresh-bharada", "permanent": true }
   ],
   "headers": [
     {
