@@ -17,6 +17,7 @@
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/bankersvascular-419ec5b7a6b1caef19c5ab2.webflow.css" rel="stylesheet" type="text/css">
+  <link href="css/services-gujarat.css" rel="stylesheet" type="text/css">
   <style>@media (max-width:991px) and (min-width:768px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="f0007497-9a2e-aed6-42a3-2046ac1832f3"] {width:100%;}html.w-mod-js:not(.w-mod-ix) [data-w-id="56fe0065-4750-08aa-5afa-d05d4916e2b3"] {-webkit-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="def45a6c-d256-c8d0-0f0f-1a479ac955d3"] {opacity:0;}}@media (max-width:767px) and (min-width:480px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="f0007497-9a2e-aed6-42a3-2046ac1832f3"] {width:100%;}html.w-mod-js:not(.w-mod-ix) [data-w-id="56fe0065-4750-08aa-5afa-d05d4916e2b3"] {-webkit-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="def45a6c-d256-c8d0-0f0f-1a479ac955d3"] {opacity:0;}}@media (max-width:479px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="f0007497-9a2e-aed6-42a3-2046ac1832f3"] {width:100%;}html.w-mod-js:not(.w-mod-ix) [data-w-id="56fe0065-4750-08aa-5afa-d05d4916e2b3"] {-webkit-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="def45a6c-d256-c8d0-0f0f-1a479ac955d3"] {opacity:0;}}</style>
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
@@ -1206,5 +1207,53 @@ document.addEventListener("submit", async function (e) {
   }
 });
 </script>
+  <aside class="services-reel-modal" data-services-reel-modal role="dialog" aria-modal="true" aria-label="Latest Banker's Vascular video" hidden>
+    <div class="services-reel-modal-backdrop" data-services-reel-close></div>
+    <div class="services-reel-dialog">
+      <button class="services-reel-close" type="button" data-services-reel-close aria-label="Close video banner">×</button>
+      <a class="services-reel-link" data-services-reel-link href="https://www.instagram.com/bankersvascularcentre/" target="_blank" rel="noopener" aria-label="Visit Banker's Vascular Centre on Instagram">
+        <img data-services-reel-image src="images/instagram-reel-breast-gland-part-2.png" alt="Banker's Vascular educational video about breast lump treatment" loading="eager">
+        <span class="services-reel-play">▶ <b>Visit @bankersvascularcentre</b></span>
+      </a>
+      <div class="services-reel-dots" aria-label="Choose a video">
+        <button type="button" data-services-reel-dot="0" aria-label="Show video 1" aria-current="true"></button>
+        <button type="button" data-services-reel-dot="1" aria-label="Show video 2"></button>
+        <button type="button" data-services-reel-dot="2" aria-label="Show video 3"></button>
+      </div>
+    </div>
+  </aside>
+  <script>
+    (function () {
+      var modal = document.querySelector('[data-services-reel-modal]');
+      if (!modal) return;
+      var videos = [
+        { href: 'https://www.instagram.com/bankersvascularcentre/', image: '/images/instagram-reel-breast-gland-part-2.png', alt: "Banker's Vascular educational video about breast lump treatment" },
+        { href: 'https://www.instagram.com/bankersvascularcentre/', image: '/images/instagram-reel-breast-cancer-part-1.png', alt: "Banker's Vascular educational video about breast cancer" },
+        { href: 'https://www.instagram.com/bankersvascularcentre/', image: '/images/instagram-reel-mri-knee.png', alt: "Banker's Vascular educational video about MRI and knee pain" }
+      ];
+      var current = 0;
+      var link = modal.querySelector('[data-services-reel-link]');
+      var image = modal.querySelector('[data-services-reel-image]');
+      var dots = modal.querySelectorAll('[data-services-reel-dot]');
+      var rotateTimer;
+      function showVideo(index) {
+        current = index;
+        var video = videos[current];
+        link.href = video.href;
+        image.src = video.image;
+        image.alt = video.alt;
+        dots.forEach(function (dot, dotIndex) { dot.setAttribute('aria-current', dotIndex === current ? 'true' : 'false'); });
+      }
+      function close() { modal.hidden = true; document.body.classList.remove('services-reel-open'); window.clearInterval(rotateTimer); }
+      modal.querySelectorAll('[data-services-reel-close]').forEach(function (button) { button.addEventListener('click', close); });
+      dots.forEach(function (dot) { dot.addEventListener('click', function () { showVideo(Number(this.getAttribute('data-services-reel-dot'))); }); });
+      document.addEventListener('keydown', function (event) { if (event.key === 'Escape') close(); });
+      window.setTimeout(function () {
+        modal.hidden = false;
+        document.body.classList.add('services-reel-open');
+        rotateTimer = window.setInterval(function () { showVideo((current + 1) % videos.length); }, 8000);
+      }, 850);
+    }());
+  </script>
 </body>
 </html>
