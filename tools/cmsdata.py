@@ -96,6 +96,45 @@ def _truthy(v):
     return (v or "").strip().lower() == "true"
 
 
+# A few historic Webflow exports contain UTF-8 text that was previously read
+# as Windows-1252.  That produces visible strings such as ``â€”`` and
+# ``â€`` in article headings and paragraphs.  Repair it while loading CMS
+# values so the original CSV remains untouched and every generated page uses
+# normal readable text.
+_MOJIBAKE_MARKERS = ("â", "Ã", "ð", "ï", "�")
+_INVISIBLE_TEXT_CHARS = re.compile(r"[\u200b\u200c\u200d\ufeff]")
+
+
+def _repair_mojibake(value):
+    if not isinstance(value, str):
+        return value
+
+    repaired = value
+    for _ in range(2):
+        if not any(marker in repaired for marker in _MOJIBAKE_MARKERS):
+            break
+        try:
+            raw = bytearray()
+            for char in repaired:
+                codepoint = ord(char)
+                # Preserve C1 controls that appear in malformed CP1252 text.
+                if 0x80 <= codepoint <= 0x9f:
+                    raw.append(codepoint)
+                else:
+                    raw.extend(char.encode("cp1252"))
+            candidate = bytes(raw).decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            break
+        if sum(candidate.count(marker) for marker in _MOJIBAKE_MARKERS) >= \
+                sum(repaired.count(marker) for marker in _MOJIBAKE_MARKERS):
+            break
+        repaired = candidate
+
+    # These characters have no visible content in the exported HTML; remove
+    # them instead of leaving a browser-dependent box glyph in the article.
+    return _INVISIBLE_TEXT_CHARS.sub("", repaired)
+
+
 class Item(dict):
     """A CSV row plus its resolved URL and collection."""
 
@@ -161,7 +200,9 @@ class Collections:
         for key, spec in self.specs.items():
             path = _find_csv(spec["csv"])
             with open(path, encoding="utf-8-sig", newline="") as fh:
-                rows = [Item(r) for r in csv.DictReader(fh)]
+                rows = [Item({field: _repair_mojibake(value)
+                              for field, value in r.items()})
+                        for r in csv.DictReader(fh)]
             forced = FORCE_PUBLISH.get(key, set())
             withdrawn = WITHDRAWN_CONTENT.get(key, set())
             keep, dropped = [], []
@@ -241,9 +282,15 @@ class Collections:
                 if p.get("_category") is not None and p["_category"].slug == slug]
 
     def blogs_newest(self):
+        def listing_priority(row):
+            try:
+                return int((row.get("Listing Priority") or "0").strip())
+            except ValueError:
+                return 0
+
         dated = sorted(
             self.published["blog"],
-            key=lambda r: (r["_date"] is not None, r["_date"] or datetime.min),
+            key=lambda r: (listing_priority(r), r["_date"] is not None, r["_date"] or datetime.min),
             reverse=True,
         )
         return dated

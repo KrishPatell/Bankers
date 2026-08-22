@@ -325,7 +325,8 @@ PAGE_LISTS = {
     ],
     "blog.html": [
         {"items_cls": "blog-archive", "collection": "blog",
-         "order": "newest", "paginate": 100, "bindings": "blog-card"},
+         "order": "newest", "paginate": 100, "bindings": "blog-card",
+         "topic_filter": True},
     ],
     "departments.html": [
         {"items_cls": "department-archive-list", "collection": "departments",
@@ -375,7 +376,7 @@ PAGE_LISTS["services-gujarat.html"] = PAGE_LISTS["products.html"]
 # Lists inside detail templates, resolved per rendered item.
 DETAIL_LISTS = {
     "detail_blog.html": [
-        {"items_cls": "blog-archive", "source": "recent_blogs", "limit": 3,
+        {"items_cls": "blog-archive", "source": "related_blogs", "limit": 4,
          "bindings": "blog-card"},
     ],
     "detail_blog-author.html": [

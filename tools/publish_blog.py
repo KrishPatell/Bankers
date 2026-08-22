@@ -381,6 +381,8 @@ def main():
                               help="Publish as a Dr. Mohal Banker Bankers Note")
     parser.add_argument("--published-on", type=lambda value: datetime.strptime(value, "%Y-%m-%d"),
                         help="Scheduled publication date in YYYY-MM-DD (defaults to today)")
+    parser.add_argument("--listing-priority", type=int, default=0,
+                        help="Optional blog listing priority; higher values appear before date-sorted posts")
     parser.add_argument("--dry-run", action="store_true", help="Validate and preview without writing files")
     args = parser.parse_args()
     if not args.docx.is_file() or args.docx.suffix.lower() != ".docx":
@@ -420,6 +422,7 @@ def main():
         # The build appends the established brand suffix exactly once.
         "Author": author_slug, "Meta Title": title,
         "Meta Description": short_description(rich, title),
+        "Listing Priority": str(args.listing_priority),
     })
     print("Title: %s\nSlug: %s\nAuthor: %s (%s)\nCanonical: https://bankersvascular.com/blog/%s"
           % (title, slug, author_name, author_kind, slug))

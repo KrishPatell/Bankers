@@ -1322,6 +1322,298 @@ figure {
   margin-top: 64px;
 }
 
+/* Blog topic filters: a compact progressive enhancement for the CMS archive. */
+.blog-topic-filter {
+  margin-top: 28px;
+  margin-bottom: 30px;
+}
+
+.blog-topic-filter-label {
+  margin-bottom: 12px;
+  color: #0b3552;
+  font-family: Satoshi, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.blog-topic-filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.blog-topic-filter-button {
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid #275e78;
+  border-radius: 999px;
+  background: #fff;
+  color: #123f5b;
+  cursor: pointer;
+  font-family: Satoshi, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.blog-topic-filter-button:hover,
+.blog-topic-filter-button:focus-visible,
+.blog-topic-filter-button.is-active {
+  border-color: #123f5b;
+  background: #123f5b;
+  color: #fff;
+}
+
+.blog-archive-item[hidden] {
+  display: none !important;
+}
+
+.blog-topic-empty {
+  margin-top: 26px;
+  color: #123f5b;
+  font-family: Satoshi, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.blog-detail-topic-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 28px;
+}
+
+.blog-detail-topic-label {
+  margin-right: 3px;
+  color: #123f5b;
+  font-family: Satoshi, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.blog-detail-topic-link {
+  padding: 7px 12px;
+  border: 1px solid #85a9bc;
+  border-radius: 999px;
+  color: #123f5b;
+  font-family: Satoshi, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.blog-detail-topic-link:hover,
+.blog-detail-topic-link:focus-visible {
+  border-color: #123f5b;
+  background: #123f5b;
+  color: #fff;
+}
+
+.blog-related-video {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 48px;
+  padding: 24px 28px;
+  border-radius: 12px;
+  background: #e9f4f5;
+}
+
+.blog-related-video-copy {
+  max-width: 620px;
+}
+
+.blog-related-video-eyebrow {
+  margin-bottom: 7px;
+  color: #123f5b;
+  font-family: Satoshi, sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.blog-related-video p {
+  margin: 0;
+  color: #264a5d;
+  font-family: Satoshi, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.blog-related-video-link {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: #123f5b;
+  color: #fff;
+  font-family: Satoshi, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.blog-related-video-link:hover,
+.blog-related-video-link:focus-visible {
+  background: #0a283c;
+  color: #fff;
+}
+
+/* Related blog and video discovery on individual blog pages. */
+.blog-discovery-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .42fr);
+  gap: 42px;
+  align-items: start;
+}
+
+.blog-related-articles-panel .blog-archive {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.blog-related-articles-panel .blog-archive-thumbnail.animation-image,
+.blog-related-articles-panel .blog-archive-thumbnail {
+  height: 9rem;
+}
+
+.blog-related-video-card {
+  position: sticky;
+  top: 112px;
+  padding: 22px;
+  border-radius: 12px;
+  background: #e9f4f5;
+}
+
+.blog-related-video-card .blog-related-video-link {
+  display: block;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #123f5b;
+  font-family: Satoshi, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.blog-related-video-card > .blog-related-video-link:last-child {
+  margin-top: 16px;
+}
+
+.blog-related-video-card .blog-related-video-link.w-inline-block {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #0b3552;
+}
+
+.blog-related-video-thumbnail {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.blog-related-video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e83f44;
+  color: #fff;
+  font-size: 20px;
+  transform: translate(-50%, -50%);
+}
+
+.blog-related-video-title {
+  margin: 16px 0 0;
+  color: #123f5b;
+  font-family: Satoshi, sans-serif;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+/* Keep suggested reading separate from the current article: it appears after
+   the full post, with four topic-related cards and the video below them. */
+.blog-bottom-related-section .blog-discovery-layout {
+  display: block;
+}
+
+.blog-bottom-related-section .blog-related-articles-panel .blog-archive {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.blog-bottom-related-section .blog-related-articles-panel .blog-archive-thumbnail.animation-image,
+.blog-bottom-related-section .blog-related-articles-panel .blog-archive-thumbnail {
+  height: 11rem;
+}
+
+.blog-bottom-related-section .blog-related-video-card {
+  position: static;
+  margin-top: 34px;
+}
+
+@media screen and (max-width: 991px) {
+  .blog-bottom-related-section .blog-related-articles-panel .blog-archive {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .blog-topic-filter-controls {
+    flex-wrap: nowrap;
+    margin-right: -16px;
+    padding-right: 16px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .blog-topic-filter-button {
+    flex: 0 0 auto;
+  }
+
+  .blog-detail-topic-links {
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .blog-detail-topic-label {
+    width: 100%;
+  }
+
+  .blog-related-video {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 34px;
+    padding: 20px;
+  }
+
+  .blog-discovery-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .blog-related-articles-panel .blog-archive {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-bottom-related-section .blog-related-articles-panel .blog-archive {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-related-video-card {
+    position: static;
+  }
+}
+
 .blog-archive {
   grid-column-gap: 30px;
   grid-row-gap: 30px;

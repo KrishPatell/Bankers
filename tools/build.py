@@ -39,6 +39,10 @@ SRC = os.path.join(ROOT, "src")
 STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
 
 STATIC_META = {
+    "products.html": {
+        "title": "Treatments and Consultation Locations | Bankers Vascular",
+        "desc": "Explore treatment information and consultation locations from Bankers Vascular in Gujarat.",
+    },
     "bankers-notes.html": {
         "title": "Bankers Notes | Dr. Mohal Banker | Bankers Vascular Centre",
         "desc": "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.",
@@ -55,6 +59,21 @@ STATIC_META = {
 
 MOHAL_DOCTOR_SLUG = "dr-mohal-banker"
 MOHAL_PROFILE_URL = "/our-doctors/" + MOHAL_DOCTOR_SLUG
+MOHAL_BLOG_AUTHOR_SLUG = "dr-mohal"
+
+# These overrides correct known metadata defects using only the corresponding
+# page's visible subject matter or profile identity.  They intentionally do
+# not add medical efficacy, availability, or credential claims.
+DETAIL_META_OVERRIDES = {
+    ("blog", "plantar-fasciitis-why-some-patients-continue-to-suffer-despite-conventional-treatment"):
+        "Understand why plantar fasciitis symptoms can persist despite conventional care and when to seek a clinical assessment.",
+    ("blog", "the-rise-of-minimally-invasive-treatments-why-patients-prefer-them-over-surgery-for-varicose-veins"):
+        "An overview of why some patients consider minimally invasive approaches for varicose veins and the questions to discuss with a clinician.",
+    ("our-doctors", "dr-dimple"):
+        "Learn about Dr. Dimple Parmar, a physiotherapist at Bankers Vascular Centre.",
+    ("our-doctors", "dr-janvi"):
+        "Learn about Dr. Janvi B. Shah and her professional profile at Bankers Vascular Centre.",
+}
 
 # Verified consultation/branch locations used only on their matching city pages.
 CITY_LOCATION_DATA = {
@@ -512,6 +531,51 @@ class Binder:
 
 # ------------------------------------------------------------- list population
 
+# Blog categories in the CMS are intentionally broad.  The public blog index
+# needs a more useful visitor-facing topic grouping without changing historic
+# CMS records or their URLs.  A post may belong to more than one topic.
+BLOG_TOPIC_PATTERNS = {
+    "varicose": (
+        r"\bvaricose\b", r"\bvenous\b", r"\bvein(?:s)?\b",
+        r"\bsclerotherap", r"\bvenaseal\b", r"\bchronic venous\b",
+    ),
+    "knee-joint": (
+        r"\bknee\b", r"\bjoint\b", r"\bosteoarthritis\b",
+        r"\bgenicular\b", r"\bgae\b", r"\bheel pain\b",
+        r"\bfrozen shoulder\b", r"\brotator cuff\b",
+    ),
+    "prp": (
+        r"\bprp\b", r"\bplatelet.rich plasma\b", r"\bregenerative\b",
+        r"\bmuscle strain\b", r"\bsports injur",
+    ),
+    "vascular": (
+        r"\bperipheral artery\b", r"\bpad\b", r"\bdeep vein thrombosis\b",
+        r"\bdvt\b", r"\bvascular ultrasound\b", r"\bultrasound\b",
+        r"\bvenous ulcer\b", r"\bblood circulation\b",
+    ),
+    "womens-health": (
+        r"\bpregnan", r"\buterine\b", r"\bfibroid\b", r"\bfibroadenoma\b",
+        r"\bbreast\b", r"\bwomen'?s health\b",
+    ),
+    "weight-metabolic": (
+        r"\bmounjaro\b", r"\btirzepatide\b", r"\bobes(?:ity|e)\b",
+        r"\bmetabolic\b", r"\bweight loss\b",
+    ),
+    "piles-prostate": (
+        r"\bpiles\b", r"\bhemorrhoid", r"\bprostate\b", r"\bpae\b",
+    ),
+}
+
+
+def blog_topics(item):
+    """Return visitor-friendly topic slugs inferred from published blog copy."""
+    content = " ".join(str(item.get(field) or "") for field in (
+        "Name", "Short Details", "Main Details",
+    ))
+    content = htmllib.unescape(re.sub(r"<[^>]+>", " ", content)).lower()
+    return [topic for topic, patterns in BLOG_TOPIC_PATTERNS.items()
+            if any(re.search(pattern, content) for pattern in patterns)]
+
 def find_list(html, spec):
     """Locate (dyn_list_block, items_block) for a list spec."""
     if spec.get("container_cls"):
@@ -563,7 +627,13 @@ def populate(html, spec, items, binder, urls=None, occurrence=0):
         render_item = dict(it) if overrides else it
         if overrides:
             render_item.update(overrides)
-        rendered.append(binder.apply(template, render_item, bindings, url=url))
+        card = binder.apply(template, render_item, bindings, url=url)
+        if spec.get("topic_filter"):
+            topics = " ".join(blog_topics(render_item) or ["general"])
+            card = W.edit_open_tag(
+                card, 0, lambda tag: W.set_attr(tag, "data-blog-topics", topics)
+            )
+        rendered.append(card)
     body = "".join(rendered)
 
     # Replace the items container's contents, then drop the "No items found."
@@ -878,6 +948,34 @@ def fix_dead_links(html):
     return html
 
 
+def normalize_verified_branch_nap(html):
+    """Keep the shared footer aligned with the verified Vadodara branch data.
+
+    The Webflow export repeats this legacy footer in every template.  Updating
+    it at build time keeps all generated pages consistent without hand-editing
+    a large number of exported templates.
+    """
+    legacy = (r'<strong>Baroda</strong><br>201, Ignite, Opp\. Agrawal Motors\. <br>'
+              r'Above Meera Clinic and Eye Hopsital,<br>Dinesh Mill Road, <br>'
+              r'Akota,\s*Vadodara-390020')
+    verified = ('<strong>Vadodara</strong><br>201, 2nd Floor, Ignite Complex,<br>'
+                'Above Meera Clinic and Eye Hospital,<br>Opp. Agrawal Cars,<br>'
+                'Near Urmi Circle, Akota,<br>Vadodara, Gujarat 390020')
+    return re.sub(legacy, verified, html)
+
+
+def fix_obvious_typos(html):
+    """Correct unambiguous export typos without changing medical claims."""
+    replacements = {
+        "Bankers Vacular": "Bankers Vascular",
+        "Ahmedbad": "Ahmedabad",
+        "Eye Hopsital": "Eye Hospital",
+    }
+    for old, new in replacements.items():
+        html = html.replace(old, new)
+    return html
+
+
 def add_seo_internal_links(html, url):
     """Create visible, contextual routes between conditions, procedures and cities."""
     city_links = {
@@ -894,14 +992,14 @@ def add_seo_internal_links(html, url):
     heading = "Related treatment information"
     if url == "/departments/varicose-veins":
         heading = "Varicose veins treatment locations"
-        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation")]
+        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url == "/departments/knee-pain" or url == "/treatment/genicular-artery-embolization":
         heading = "Non-surgical knee pain treatment locations"
-        links = city_links["knee"] + [("Genicular Artery Embolization", "/treatment/genicular-artery-embolization")]
+        links = city_links["knee"] + [("Genicular Artery Embolization", "/treatment/genicular-artery-embolization"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url.startswith("/varicose-veins/"):
-        links = [("Varicose veins treatment", "/departments/varicose-veins"), ("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation")]
+        links = [("Varicose veins treatment", "/departments/varicose-veins"), ("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url.startswith("/non-surgical-knee-pain/"):
-        links = [("Knee pain treatment", "/departments/knee-pain"), ("Genicular Artery Embolization", "/treatment/genicular-artery-embolization")]
+        links = [("Knee pain treatment", "/departments/knee-pain"), ("Genicular Artery Embolization", "/treatment/genicular-artery-embolization"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url.startswith("/blog/"):
         slug = url.lower()
         if any(k in slug for k in ("varicose", "vein", "venaseal")):
@@ -961,6 +1059,22 @@ def prepare_shell(html, cms, binder, page_label):
     html = remove_dead_lists(html)
     html = rewrite_links(html)
     html = fix_dead_links(html)
+    html = normalize_verified_branch_nap(html)
+    html = fix_obvious_typos(html)
+    if page_label in ("products.html", "services-gujarat.html"):
+        # The exported map cards reproduce Google Business Profile chrome and
+        # include unverified ratings, review counts, status, hours, and travel
+        # estimates. Keep the legitimate route and its location links, but do
+        # not present imported/profile-like claims as website content.
+        verified_locations = '''<section class="services-main-maps">
+          <p class="services-eyebrow">Contact our locations</p>
+          <div class="services-map-grid">
+            <article><div class="services-map-heading"><span aria-hidden="true">📍</span><div><strong>Bankers Vascular Hospital — Ahmedabad</strong><small>For appointments and directions, contact the Bankers Vascular team.</small></div></div><a href="/contact-us">Contact the Ahmedabad team</a></article>
+            <article><div class="services-map-heading"><span aria-hidden="true">📍</span><div><strong>Bankers Vascular Centre — Vadodara</strong><small>For appointments and directions, contact the Bankers Vascular team.</small></div></div><a href="/contact-us">Contact the Vadodara team</a></article>
+          </div>
+        </section>'''
+        html = re.sub(r'<section class="services-main-maps">.*?</section>',
+                      verified_locations, html, count=1, flags=re.S)
     html = apply_nav(html, cms, binder)
     html = wire_forms(html, page_label)
     return html
@@ -1171,7 +1285,7 @@ def build_shells(pages, cms, binder, assets):
             html = populate(html, spec, order_items(cms, spec), binder)
 
         if not paginated:
-            metadata = STATIC_META.get(page, {})
+            metadata = {**extra, **STATIC_META.get(page, {})}
             html = set_head_meta(html, title=metadata.get("title"),
                                  desc=metadata.get("desc"), canonical=CFG.SITE_URL + url,
                                  noindex=page in CFG.NOINDEX_PAGES)
@@ -1199,13 +1313,14 @@ def build_shells(pages, cms, binder, assets):
             rel = out_rel if p == 1 else "%s/page/%d.html" % (
                 out_rel.rsplit("/", 1)[0] if "/" in out_rel else out_rel[:-5], p)
             purl = url if p == 1 else "%s/page/%d" % (url.rstrip("/"), p)
-            metadata = STATIC_META.get(page, {})
+            metadata = {**extra, **STATIC_META.get(page, {})}
             page_html = set_head_meta(
                 page_html, canonical=CFG.SITE_URL + purl,
                 title=metadata.get("title") if p == 1 else "%s - Page %d %s" % (
                     "Bankers Notes" if page == "bankers-notes.html" else "Blog", p,
                     CFG.BRAND_TITLE),
-                desc=metadata.get("desc") if p == 1 else None)
+                desc=metadata.get("desc") if p == 1 else (
+                    "Browse page %d of Bankers Vascular's patient education articles and medical updates." % p))
             page_html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(page_html)), purl)
             page_html = add_page_schema(page_html, purl)
             write(rel, page_html)
@@ -1276,6 +1391,7 @@ def render_detail(base, spec, item, cms, binder, assets):
     html = fill_repeated_richtext(html, spec, item, assets)
     html = fill_author_block(html, spec, item, assets)
     html = fill_socials(html, spec, item)
+    html = fill_blog_discovery_links(html, spec, item, cms)
     html = fill_detail_lists(html, spec, item, cms, binder)
 
     title_txt = item.get_text(*spec.get("title", ["Name"]))
@@ -1287,6 +1403,19 @@ def render_detail(base, spec, item, cms, binder, assets):
     desc = item.get_text(*spec.get("desc", []))
     desc = re.sub(r"<[^>]+>", " ", desc)
     desc = re.sub(r"\s+", " ", htmllib.unescape(desc)).strip()[:300]
+    desc = DETAIL_META_OVERRIDES.get((spec["key"], item.slug), desc)
+    if spec["key"] == "blog-author" and item.slug == MOHAL_BLOG_AUTHOR_SLUG:
+        # The exported author record contains a fictional identity.  Keep this
+        # author archive distinct from the doctor profile, but point readers to
+        # the canonical existing profile without claiming authorship or review.
+        safe_bio = ("Dr. Mohal Banker is an Interventional Radiologist at "
+                    "Bankers Vascular Centre. "
+                    '<a href="%s">View Dr. Mohal Banker’s profile</a>.' % MOHAL_PROFILE_URL)
+        html = re.sub(
+            r'(<p\b[^>]*\bclass="[^"]*\bauthor-bio\b[^"]*"[^>]*>).*?(</p>)',
+            lambda match: match.group(1) + safe_bio + match.group(2), html,
+            count=1, flags=re.S)
+        desc = "Learn more about Dr. Mohal Banker, Interventional Radiologist at Bankers Vascular Centre."
     og = item.get_text(*spec.get("og_image", []))
     html = set_head_meta(
         html,
@@ -1393,6 +1522,14 @@ def fill_detail_lists(html, spec, item, cms, binder):
         source = lspec["source"]
         if source == "recent_blogs":
             items = [b for b in cms.blogs_newest() if b.slug != item.slug]
+        elif source == "related_blogs":
+            current_topics = set(blog_topics(item))
+            candidates = [b for b in cms.blogs_newest() if b.slug != item.slug]
+            # Keep newest ordering within each relevance tier, and fall back to
+            # recent posts when the CMS has no topic match for an older article.
+            matching = [b for b in candidates
+                        if current_topics.intersection(blog_topics(b))]
+            items = matching + [b for b in candidates if b not in matching]
         elif source == "author_posts":
             items = cms.posts_by_author(item.slug)
         elif source == "category_posts":
@@ -1404,6 +1541,89 @@ def fill_detail_lists(html, spec, item, cms, binder):
         if lspec.get("limit"):
             items = items[:lspec["limit"]]
         html = populate(html, lspec, items, binder)
+    return html
+
+
+BLOG_TOPIC_LABELS = {
+    "varicose": "Varicose veins",
+    "knee-joint": "Knee & joint pain",
+    "prp": "PRP & regenerative care",
+    "vascular": "Vascular health",
+    "womens-health": "Women’s health",
+    "weight-metabolic": "Weight & metabolic health",
+    "piles-prostate": "Piles & prostate",
+}
+
+
+def youtube_video_id(url):
+    """Return an embeddable id only from a direct YouTube video URL."""
+    parsed = urllib.parse.urlparse((url or "").strip())
+    host = parsed.netloc.casefold().removeprefix("www.")
+    if host == "youtu.be":
+        candidate = parsed.path.strip("/").split("/")[0]
+    elif host in {"youtube.com", "m.youtube.com"}:
+        candidate = urllib.parse.parse_qs(parsed.query).get("v", [""])[0]
+    else:
+        return ""
+    return candidate if re.fullmatch(r"[A-Za-z0-9_-]{11}", candidate or "") else ""
+
+
+def topic_video(item, cms):
+    """Find a verified direct Bankers YouTube video in the same topic."""
+    current_topics = set(blog_topics(item))
+    if not current_topics:
+        return None
+    candidates = [item] + [blog for blog in cms.blogs_newest()
+                           if blog.slug != item.slug]
+    for candidate in candidates:
+        video_url = (candidate.get("youtube") or "").strip()
+        video_id = youtube_video_id(video_url)
+        if video_id and current_topics.intersection(blog_topics(candidate)):
+            return candidate, video_url, video_id
+    return None
+
+
+def fill_blog_discovery_links(html, spec, item, cms):
+    """Add reusable topic links and verified video cards to blog details."""
+    if spec.get("template") != "detail_blog.html":
+        return html
+
+    topic_block = W.block_by_class(html, "blog-detail-topic-links")
+    topics = blog_topics(item)
+    if topic_block:
+        if not topics:
+            html = html[:topic_block[0]] + html[topic_block[1]:]
+        else:
+            links = "".join(
+                '<a class="blog-detail-topic-link" href="/blog?topic=%s">%s</a>' %
+                (topic, htmllib.escape(BLOG_TOPIC_LABELS[topic]))
+                for topic in topics
+            )
+            html = W.set_inner(html, topic_block,
+                               '<span class="blog-detail-topic-label">Related topics:</span>' + links)
+
+    video_block = W.block_by_class(html, "blog-related-video-card")
+    matched_video = topic_video(item, cms)
+    if video_block:
+        if not matched_video:
+            html = html[:video_block[0]] + html[video_block[1]:]
+        else:
+            video_item, video_url, video_id = matched_video
+            segment = html[video_block[0]:video_block[1]]
+            for start in reversed(list(W.iter_by_class(segment, "blog-related-video-link"))):
+                segment = W.edit_open_tag(segment, start, lambda tag: W.set_attr(
+                    W.set_attr(W.set_attr(tag, "href", _esc_attr(video_url)),
+                               "target", "_blank"), "rel", "noopener"))
+            thumb = W.find_by_class(segment, "blog-related-video-thumbnail")
+            if thumb >= 0:
+                segment = W.edit_open_tag(segment, thumb, lambda tag: W.set_attr(
+                    W.set_attr(tag, "src", "https://i.ytimg.com/vi/%s/hqdefault.jpg" % video_id),
+                    "alt", _esc_attr(video_item.name)))
+            title = W.find_by_class(segment, "blog-related-video-title")
+            if title >= 0:
+                segment = W.set_inner(segment, W.find_block(segment, title),
+                                      htmllib.escape(video_item.name))
+            html = html[:video_block[0]] + segment + html[video_block[1]:]
     return html
 
 
@@ -1502,6 +1722,10 @@ def add_page_schema(html, url, spec=None, item=None):
     city = url.rsplit("/", 1)[-1]
     if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) and city in ENTITY_SCHEMA.LOCATIONS:
         graph[1]["about"] = {"@id": ENTITY_SCHEMA.LOCATIONS[city]["id"]}
+    if spec and spec.get("key") == "blog-author" and item and item.slug == MOHAL_BLOG_AUTHOR_SLUG:
+        # Reference the one existing doctor Person rather than creating a
+        # second Person for the author archive.
+        graph[1]["about"] = {"@id": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]}
     if spec and spec.get("key") == "our-doctors" and item and item.slug == MOHAL_DOCTOR_SLUG:
         person_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]
         image = item.get_text("Doctor Details Image", "Doctor Thumbnail")
