@@ -311,4 +311,19 @@
   .services-branch-grid small { margin-top: 3px; font-size: 10px; line-height: 1.25; white-space: normal; }
   .services-branch-links { gap: 5px; margin-top: 12px; }
   .services-branch-links a { min-width: 0; padding: 7px 3px; font-size: 10px; line-height: 1.2; }
+
+  /* The September schedule is touch-first on mobile: tapping a doctor opens
+     the full detail card, including the doctor's photograph. */
+  .services-doctor-trigger {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 5px;
+    border-bottom: 1px dashed rgba(57, 105, 122, .55);
+  }
+  .services-doctor-popover {
+    grid-template-columns: 82px minmax(0, 1fr);
+    width: min(330px, calc(100vw - 24px));
+  }
+  .services-doctor-popover > img { width: 82px; min-height: 136px; }
 }
