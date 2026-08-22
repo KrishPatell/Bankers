@@ -327,3 +327,25 @@
   }
   .services-doctor-popover > img { width: 82px; min-height: 136px; }
 }
+
+/* Latest Instagram education reel: a lightweight poster popup is used instead
+   of a fragile third-party iframe. Clicking it always opens the original reel. */
+.services-reel-open { overflow: hidden; }
+.services-reel-modal[hidden] { display: none; }
+.services-reel-modal { position: fixed; z-index: 9999; inset: 0; display: grid; place-items: center; padding: 24px; }
+.services-reel-modal-backdrop { position: absolute; inset: 0; background: rgba(4, 34, 43, .68); backdrop-filter: blur(3px); }
+.services-reel-dialog { position: relative; z-index: 1; width: min(420px, 92vw); overflow: hidden; border: 4px solid rgba(255, 255, 255, .94); border-radius: 20px; background: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, .42); }
+.services-reel-link { position: relative; display: block; background: #063d51; color: #fff; text-decoration: none; }
+.services-reel-link img { display: block; width: 100%; max-height: min(72vh, 680px); object-fit: contain; }
+.services-reel-play { position: absolute; right: 16px; bottom: 16px; display: inline-flex; align-items: center; gap: 7px; padding: 11px 14px; border-radius: 999px; background: #e4252a; box-shadow: 0 5px 14px rgba(0, 0, 0, .22); font: 700 13px/1 Arial, sans-serif; }
+.services-reel-close { position: absolute; z-index: 2; top: 10px; right: 10px; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #fff; color: #12394a; box-shadow: 0 4px 14px rgba(0, 0, 0, .2); font: 700 25px/1 Arial, sans-serif; cursor: pointer; }
+.services-reel-close:hover { background: #e4252a; color: #fff; }
+.services-reel-dots { display: flex; justify-content: center; gap: 8px; padding: 11px; background: #fff; }
+.services-reel-dots button { width: 9px; height: 9px; border: 0; border-radius: 50%; background: #b8d5d8; cursor: pointer; }
+.services-reel-dots button[aria-current="true"] { width: 24px; border-radius: 99px; background: var(--brand-deep-teal); }
+@media screen and (max-width: 479px) {
+  .services-reel-modal { padding: 16px; }
+  .services-reel-dialog { width: min(360px, 92vw); border-radius: 16px; }
+  .services-reel-link img { max-height: 68vh; }
+  .services-reel-play { right: 12px; bottom: 12px; padding: 10px 12px; font-size: 12px; }
+}

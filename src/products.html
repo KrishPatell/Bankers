@@ -717,5 +717,54 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       });
     }());
   </script>
+  <aside class="services-reel-modal" data-services-reel-modal role="dialog" aria-modal="true" aria-label="Latest Banker's Vascular video" hidden>
+    <div class="services-reel-modal-backdrop" data-services-reel-close></div>
+    <div class="services-reel-dialog">
+      <button class="services-reel-close" type="button" data-services-reel-close aria-label="Close video banner">×</button>
+      <a class="services-reel-link" data-services-reel-link href="https://www.instagram.com/reel/DcIsz09BhFA/?igsh=bjBucHlibmtpcjU3" target="_blank" rel="noopener" aria-label="Watch the latest Banker's Vascular reel on Instagram">
+        <img data-services-reel-image src="images/instagram-reel-breast-gland-part-2.png" alt="Banker's Vascular educational video about breast lump treatment" loading="eager">
+        <span class="services-reel-play">▶ <b>Watch on Instagram</b></span>
+      </a>
+      <div class="services-reel-dots" aria-label="Choose a video">
+        <button type="button" data-services-reel-dot="0" aria-label="Show reel 1" aria-current="true"></button>
+        <button type="button" data-services-reel-dot="1" aria-label="Show reel 2"></button>
+        <button type="button" data-services-reel-dot="2" aria-label="Show reel 3"></button>
+      </div>
+    </div>
+  </aside>
+  <script>
+    (function () {
+      var modal = document.querySelector('[data-services-reel-modal]');
+      if (!modal) return;
+      var reels = [
+        { href: 'https://www.instagram.com/reel/DcIsz09BhFA/?igsh=bjBucHlibmtpcjU3', image: 'images/instagram-reel-breast-gland-part-2.png', alt: "Banker's Vascular educational video about breast lump treatment" },
+        { href: 'https://www.instagram.com/reel/DcNvnSrN7wo/?igsh=MWtocnltMjlveGt2bQ==', image: 'images/instagram-reel-breast-cancer-part-1.png', alt: "Banker's Vascular educational video about breast cancer" },
+        { href: 'https://www.instagram.com/reel/DcQMjeBupjx/?igsh=NXgwbzlieGhjNXFr', image: 'images/instagram-reel-mri-knee.png', alt: "Banker's Vascular educational video about MRI and knee pain" }
+      ];
+      var current = 0;
+      var link = modal.querySelector('[data-services-reel-link]');
+      var image = modal.querySelector('[data-services-reel-image]');
+      var dots = modal.querySelectorAll('[data-services-reel-dot]');
+      function showReel(index) {
+        current = index;
+        link.href = reels[index].href;
+        image.src = reels[index].image;
+        image.alt = reels[index].alt;
+        dots.forEach(function (dot, dotIndex) { dot.setAttribute('aria-current', dotIndex === index ? 'true' : 'false'); });
+      }
+      function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove('services-reel-open');
+      }
+      dots.forEach(function (dot) { dot.addEventListener('click', function () { showReel(Number(dot.getAttribute('data-services-reel-dot'))); }); });
+      modal.querySelectorAll('[data-services-reel-close]').forEach(function (button) { button.addEventListener('click', closeModal); });
+      document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
+      window.setTimeout(function () {
+        modal.hidden = false;
+        document.body.classList.add('services-reel-open');
+      }, 850);
+      window.setInterval(function () { if (!modal.hidden) showReel((current + 1) % reels.length); }, 8000);
+    }());
+  </script>
 </body>
 </html>
