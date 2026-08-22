@@ -18,6 +18,13 @@ const LEGACY_REDIRECTS = {
   "/varicose-vein-treatment-ahmedabad-india": "/varicose-veins/ahmedabad",
   "/diseases/varicose-vein/glue-therapy-for-varicose-veins": "/treatment/venaseal-glue-embolization",
   "/our-doctors/dr-chandres-bharada": "/our-doctors/dr-chandresh-bharada",
+  "/knee-pain": "/departments/knee-pain",
+  "/tennis-elbow": "/departments/tennis-elbow",
+  "/msk-embolization": "/treatment/msk-embolization",
+  "/benign-prostatic-hyperplasia": "/departments/prostate",
+  "/heel-pain-2": "/departments/heel-pain",
+  "/frozen-shoulder": "/departments/frozen-shoulder",
+  "/dr-rozil-gandhi": "/our-doctors/dr-rozil-gandhi",
 };
 
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => (
@@ -116,16 +123,20 @@ async function contact(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // Resolve verified legacy paths before origin normalisation so host aliases
+    // reach their canonical destination in one permanent redirect.
+    const legacyDestination = LEGACY_REDIRECTS[url.pathname.replace(/\/$/, "")];
+    if (legacyDestination) {
+      url.protocol = "https:";
+      url.hostname = "bankersvascular.com";
+      url.pathname = legacyDestination;
+      return Response.redirect(url.toString(), 301);
+    }
     // One canonical public origin prevents HTTP/www duplicate indexing. Keep
     // the path and query exactly as requested so legacy deep links remain safe.
     if (url.protocol !== "https:" || url.hostname !== "bankersvascular.com") {
       url.protocol = "https:";
       url.hostname = "bankersvascular.com";
-      return Response.redirect(url.toString(), 301);
-    }
-    const legacyDestination = LEGACY_REDIRECTS[url.pathname.replace(/\/$/, "")];
-    if (legacyDestination) {
-      url.pathname = legacyDestination;
       return Response.redirect(url.toString(), 301);
     }
     if (url.pathname === "/api/contact") return contact(request, env);
