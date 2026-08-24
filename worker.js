@@ -25,6 +25,7 @@ const LEGACY_REDIRECTS = {
   "/heel-pain-2": "/departments/heel-pain",
   "/frozen-shoulder": "/departments/frozen-shoulder",
   "/dr-rozil-gandhi": "/our-doctors/dr-rozil-gandhi",
+  "/blog/venous-veins-and-thrombus-": "/blog/venous-veins-and-thrombus",
 };
 
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => (
@@ -140,6 +141,14 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
     if (url.pathname === "/api/contact") return contact(request, env);
+    // The static-assets binding otherwise normalizes this directory index to
+    // /products/. Fetch its index internally so the sitemap/canonical URL
+    // itself remains the public 200 response.
+    if (url.pathname === "/products") {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = "/products/";
+      return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
     return env.ASSETS.fetch(request);
   },
 };
