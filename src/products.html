@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <title>Products</title>
-  <meta content="Banker Vascular Centre ( Unit Of BnG Vascular ) offers non-surgical treatments for every part of your body, including knee, heel, shoulder, and elbow pain. Dr. Mohal Banker is also a varicose vein expert, having completed over 12000 non-surgical varicose vein operations." name="description">
+  <meta content="Banker Vascular Centre offers non-surgical treatments for every part of your body, including knee, heel, shoulder, and elbow pain. Dr. Mohal Banker is also a varicose vein expert, having completed over 12000 non-surgical varicose vein operations." name="description">
   <meta content="Products" property="og:title">
-  <meta content="Banker Vascular Centre ( Unit Of BnG Vascular ) offers non-surgical treatments for every part of your body, including knee, heel, shoulder, and elbow pain. Dr. Mohal Banker is also a varicose vein expert, having completed over 12000 non-surgical varicose vein operations." property="og:description">
+  <meta content="Banker Vascular Centre offers non-surgical treatments for every part of your body, including knee, heel, shoulder, and elbow pain. Dr. Mohal Banker is also a varicose vein expert, having completed over 12000 non-surgical varicose vein operations." property="og:description">
   <meta content="Products" name="twitter:title">
-  <meta content="Banker Vascular Centre ( Unit Of BnG Vascular ) offers non-surgical treatments for every part of your body, including knee, heel, shoulder, and elbow pain. Dr. Mohal Banker is also a varicose vein expert, having completed over 12000 non-surgical varicose vein operations." name="twitter:description">
+  <meta content="Banker Vascular Centre offers non-surgical treatments for every part of your body, including knee, heel, shoulder, and elbow pain. Dr. Mohal Banker is also a varicose vein expert, having completed over 12000 non-surgical varicose vein operations." name="twitter:description">
   <meta property="og:type" content="website">
   <meta content="summary_large_image" name="twitter:card">
   <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -647,10 +647,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     (function () {
       var doctors = {
         'Dr. Tensi': { name: 'Dr. Tensi Trivedi', role: 'Interventional Radiologist', detail: 'Vascular &amp; Endovascular Specialist', image: 'images/doctor-card-tensi-trivedi.png', link: '/our-doctors/dr-tensi-trevedi.html' },
-        'Dr. Dimple': { name: 'Dr. Dimple Parmar', role: 'Operational Head &amp; Head Consultant', detail: 'BnG Vascular', image: 'images/doctor-card-dimple-parmar.png', link: '/our-doctors/dr-dimple.html' },
-        'Dr. Pratiksha': { name: 'Dr. Pratiksha Patoliya', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-pratiksha-patoliya.png', link: '/our-doctors/dr-pratiksha-patoliya.html' },
-        'Dr. Payal': { name: 'Dr. Payal Vadlani', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-payal-vadlani.png', link: '/our-doctors/dr-payal-vadlani.html' },
-        'Dr. Disha': { name: 'Dr. Disha Soni', role: 'Consultant Doctor', detail: 'BnG Vascular', image: 'images/doctor-card-disha-soni.png', link: '/our-doctors/dr-disha-soni.html' }
+        'Dr. Dimple': { name: 'Dr. Dimple Parmar', role: 'Operational Head &amp; Head Consultant', detail: '', image: 'images/doctor-card-dimple-parmar.png', link: '/our-doctors/dr-dimple.html' },
+        'Dr. Pratiksha': { name: 'Dr. Pratiksha Patoliya', role: 'Consultant Doctor', detail: '', image: 'images/doctor-card-pratiksha-patoliya.png', link: '/our-doctors/dr-pratiksha-patoliya.html' },
+        'Dr. Payal': { name: 'Dr. Payal Vadlani', role: 'Consultant Doctor', detail: '', image: 'images/doctor-card-payal-vadlani.png', link: '/our-doctors/dr-payal-vadlani.html' },
+        'Dr. Disha': { name: 'Dr. Disha Soni', role: 'Consultant Doctor', detail: '', image: 'images/doctor-card-disha-soni.png', link: '/our-doctors/dr-disha-soni.html' }
       };
       var popup = document.createElement('div');
       popup.className = 'services-doctor-popover';
@@ -682,7 +682,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         cell.appendChild(trigger);
         function show() {
           clearTimeout(hideTimer);
-          popup.innerHTML = '<img src="' + doctor.image + '" alt="' + doctor.name + '"><div class="services-doctor-popover-body"><strong>' + doctor.name + '</strong><span>' + doctor.role + '</span><small>' + doctor.detail + '</small><a href="' + doctor.link + '">Know more&nbsp; →</a></div>';
+          popup.innerHTML = '<img src="' + doctor.image + '" alt="' + doctor.name + '"><div class="services-doctor-popover-body"><strong>' + doctor.name + '</strong><span>' + doctor.role + '</span>' + (doctor.detail ? '<small>' + doctor.detail + '</small>' : '') + '<a href="' + doctor.link + '">Know more&nbsp; →</a></div>';
           var rect = trigger.getBoundingClientRect();
           var width = Math.min(330, window.innerWidth - 24);
           var left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));

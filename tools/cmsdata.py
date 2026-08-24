@@ -64,15 +64,24 @@ BLOG_AUTHOR_DOCTOR_IMAGE_OVERRIDES = {
 # description, and CMS biography. This lets team cards keep a consistent,
 # concise two-line presentation without changing doctor profile content.
 DOCTOR_CARD_DESIGNATION_OVERRIDES = {
-    "dr-mohal-banker": "Interventional Radiologist\nM.B.B.S., D.M.R.D.\nDirector - BnG Vascular",
-    "dr-rozil-gandhi": "Interventional Radiologist\nM.B.B.S., D.M.R.D.\nJoint Director - BnG Vascular",
-    "dr-chandresh-bharada": "Interventional Radiologist\nBnG Vascular",
-    "dr-dimple": "Operational Head & Head Consultant\nBnG Vascular",
-    "dr-pratiksha-patoliya": "Consultant Doctor\nBnG Vascular",
-    "dr-disha-soni": "Consultant Doctor\nBnG Vascular",
-    "dr-tensi-trevedi": "Consultant Doctor\nBnG Vascular",
-    "dr-payal-vadlani": "Consultant Doctor\nBnG Vascular",
-    "dr-janvi": "Consultant Doctor\nBnG Vascular",
+    "dr-mohal-banker": "Interventional Radiologist\nM.B.B.S., D.M.R.D.\nDirector",
+    "dr-rozil-gandhi": "Interventional Radiologist\nM.B.B.S., D.M.R.D.\nJoint Director",
+    "dr-chandresh-bharada": "Interventional Radiologist",
+    "dr-dimple": "Operational Head & Head Consultant",
+    "dr-pratiksha-patoliya": "Consultant Doctor",
+    "dr-disha-soni": "Consultant Doctor",
+    "dr-tensi-trevedi": "Consultant Doctor",
+    "dr-payal-vadlani": "Consultant Doctor",
+    "dr-janvi": "Consultant Doctor",
+}
+
+# The former BnG Vascular suffix is not part of a doctor's public role. Keep
+# only the actual role on profile pages and their metadata as well.
+DOCTOR_PROFILE_DESIGNATION_OVERRIDES = {
+    "dr-dimple": "Doctor",
+    "dr-janvi": "Doctor",
+    "dr-mohal-banker": "Director",
+    "dr-rozil-gandhi": "Joint Director",
 }
 
 # Keep the longest doctor card name fully readable in its narrow card without
@@ -218,6 +227,8 @@ class Collections:
                     r["Doctor Details Image"] = DOCTOR_PROFILE_IMAGE_OVERRIDES[slug]
                 if key == "our-doctors" and slug in DOCTOR_CARD_DESIGNATION_OVERRIDES:
                     r["Card Designation"] = DOCTOR_CARD_DESIGNATION_OVERRIDES[slug]
+                if key == "our-doctors" and slug in DOCTOR_PROFILE_DESIGNATION_OVERRIDES:
+                    r["Doctor Designation"] = DOCTOR_PROFILE_DESIGNATION_OVERRIDES[slug]
                 if key == "our-doctors" and slug in DOCTOR_CARD_NAME_OVERRIDES:
                     r["Card Name"] = DOCTOR_CARD_NAME_OVERRIDES[slug]
                 if key == "blog-author":

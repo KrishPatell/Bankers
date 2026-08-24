@@ -1386,6 +1386,19 @@ def render_detail(base, spec, item, cms, binder, assets):
     for b in spec.get("bind", []):
         html = binder._one(html, item, b, item.url) if b["kind"] != "link" else html
 
+    # Long blog headlines must remain wholly inside the shared hero, above the
+    # breadcrumb.  Mark them here instead of altering the published title or
+    # relying on a per-post manual layout adjustment.
+    if spec["key"] == "blog":
+        headline = item.get_text(*spec.get("title", ["Name"]))
+        if len(headline) >= 90:
+            heading = W.find_by_class(html, "breadcrumb-heading-3")
+            if heading >= 0:
+                html = W.edit_open_tag(
+                    html, heading,
+                    lambda tag: W.add_class(tag, "blog-title--long"),
+                )
+
     # The exported detail banners are desktop-wide canvases.  At phone and
     # tablet widths use a purpose-made version of *that item's* artwork so
     # every page keeps its own clinical image instead of sharing one banner.

@@ -13343,6 +13343,15 @@ figure {
   width: 100%;
   margin-top: 0;
   margin-bottom: 0;
+  font-size: clamp(34px, 2.5vw, 44px);
+  line-height: 1.08;
+}
+
+/* A long CMS headline must never overlap the breadcrumb or article content.
+   The build marks it without changing the text itself. */
+.blog-breadcrumb-wrapper .breadcrumb-heading-3.blog.blog-title--long {
+  font-size: clamp(30px, 2.05vw, 38px);
+  line-height: 1.1;
 }
 
 .blog-breadcrumb-trail.container-21.center {
