@@ -1257,6 +1257,12 @@ def customise_bankers_notes(html, cms):
         "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.")
     html = html.replace('class="about-hero-section about">',
                         'class="about-hero-section about bankers-notes-hero">', 1)
+    # Topic filters belong to the clinic-wide Blog archive, not Dr. Mohal's
+    # dedicated Bankers Notes travel directory.
+    for cls in ("blog-topic-filter", "blog-topic-empty"):
+        block = W.block_by_class(html, cls)
+        if block:
+            html = html[:block[0]] + html[block[1]:]
     directory = bankers_notes_destination_directory(cms)
     # The page is now a dedicated travel directory; keep the clinic's Mirchi
     # recognition post out of this layout.
