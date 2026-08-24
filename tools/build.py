@@ -73,6 +73,22 @@ DETAIL_META_OVERRIDES = {
         "Learn about Dr. Dimple Parmar, a physiotherapist at Bankers Vascular Centre.",
     ("our-doctors", "dr-janvi"):
         "Learn about Dr. Janvi B. Shah and her professional profile at Bankers Vascular Centre.",
+    ("our-doctors", "dr-payal-vadlani"):
+        "Learn about Dr. Payal Vadlani, a physiotherapist at Bankers Vascular Centre, focused on rehabilitation, conservative care and patient support.",
+    ("treatment", "foam-sclerotherap"):
+        "Explore foam sclerotherapy information from Bankers Vascular Centre and discuss whether this treatment option may be appropriate for your needs.",
+    ("blog", "uterine-fibroids"):
+        "Learn about uterine fibroids, including where they can develop, common symptoms, diagnosis considerations and treatment options to discuss with a clinician.",
+    ("blog", "venous-veins-and-thrombus"):
+        "Understand superficial and deep venous thrombus, how they can relate to varicose veins, and why timely clinical evaluation of symptoms matters.",
+    ("blog", "klippel-trenaunay-syndrome"):
+        "Learn about Klippel-Trenaunay syndrome, a congenital condition affecting blood vessels and tissues, and approaches used to manage symptoms.",
+    ("blog", "www-bankersvascular-ulcers"):
+        "Read a varicose vein ulcer case study covering chronic venous ulcers, symptoms, clinical assessment, management, prevention and follow-up care.",
+    ("blog", "why-obesity-is-a-major-cause-of-varicose-veins"):
+        "Learn how excess body weight can increase venous pressure, affect vein valves and contribute to varicose vein symptoms and related leg discomfort.",
+    ("blog", "piles"):
+        "Understand piles (hemorrhoids), including common causes, symptoms, self-care measures and when to seek clinical advice for persistent symptoms.",
 }
 
 # Verified consultation/branch locations used only on their matching city pages.
