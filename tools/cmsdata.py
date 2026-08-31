@@ -300,6 +300,13 @@ class Collections:
                 if p.get("_category") is not None and p["_category"].slug == slug]
 
     def blogs_newest(self):
+        """Return newest published blogs first on every public blog list.
+
+        The article date is the primary ordering rule.  ``Listing Priority``
+        is kept solely as a same-date tie breaker so an old editorially
+        prioritised article can never push a newly published article down the
+        archive or home-page cards.
+        """
         def listing_priority(row):
             try:
                 return int((row.get("Listing Priority") or "0").strip())
@@ -308,7 +315,7 @@ class Collections:
 
         dated = sorted(
             self.published["blog"],
-            key=lambda r: (listing_priority(r), r["_date"] is not None, r["_date"] or datetime.min),
+            key=lambda r: (r["_date"] is not None, r["_date"] or datetime.min, listing_priority(r)),
             reverse=True,
         )
         return dated
