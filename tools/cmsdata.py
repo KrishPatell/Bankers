@@ -206,6 +206,10 @@ class Collections:
 
     # ------------------------------------------------------------------ load
     def _load(self):
+        # Local-only review mode makes scheduled draft content visible without
+        # changing the production publish rules. It is deliberately opt-in so
+        # Vercel builds never expose a preview by accident.
+        preview_scheduled = os.environ.get("BANKERS_PREVIEW_SCHEDULED") == "1"
         for key, spec in self.specs.items():
             path = _find_csv(spec["csv"])
             with open(path, encoding="utf-8-sig", newline="") as fh:
@@ -248,14 +252,17 @@ class Collections:
                 if _truthy(r.get("Archived")):
                     dropped.append((slug, "archived"))
                     continue
-                if _truthy(r.get("Draft")) and slug not in forced:
+                if (_truthy(r.get("Draft")) and slug not in forced
+                        and not (preview_scheduled and key == "blog")):
                     dropped.append((slug, "draft"))
                     continue
                 # Scheduled blogs stay hidden until their calendar date.  This
                 # keeps future monthly entries in the source CSV while
                 # preventing early publication on listings, detail routes,
                 # related cards, and the sitemap.
-                if key == "blog" and r.get("_date") and r["_date"].date() > datetime.now().date():
+                if (key == "blog" and r.get("_date")
+                        and r["_date"].date() > datetime.now().date()
+                        and not preview_scheduled):
                     dropped.append((slug, "scheduled for a future date"))
                     continue
                 if spec.get("require_active") and not _truthy(r.get("Active")):

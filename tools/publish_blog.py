@@ -381,6 +381,10 @@ def main():
                               help="Publish as a Dr. Mohal Banker Bankers Note")
     parser.add_argument("--published-on", type=lambda value: datetime.strptime(value, "%Y-%m-%d"),
                         help="Scheduled publication date in YYYY-MM-DD (defaults to today)")
+    parser.add_argument("--draft", action="store_true",
+                        help="Keep the prepared CMS item out of production builds")
+    parser.add_argument("--meta-title", help="Use the approved SEO title instead of deriving one")
+    parser.add_argument("--meta-description", help="Use the approved SEO description instead of deriving one")
     parser.add_argument("--listing-priority", type=int, default=0,
                         help="Optional blog listing priority; higher values appear before date-sorted posts")
     parser.add_argument("--dry-run", action="store_true", help="Validate and preview without writing files")
@@ -415,13 +419,14 @@ def main():
     now = published_at.strftime("%a %b %d %Y 00:00:00 GMT+0000 (Coordinated Universal Time)")
     row = {field: "" for field in fields}
     row.update({
-        "Name": title, "Slug": slug, "Archived": "false", "Draft": "false",
+        "Name": title, "Slug": slug, "Archived": "false", "Draft": "true" if args.draft else "false",
         "Created On": now, "Updated On": now, "Published On": now, "time": now,
-        "Blog Thumbnail": image_rel, "Main Image": image_rel,
+        # Listing/OG thumbnails are not repeated in the article body.
+        "Blog Thumbnail": image_rel, "Main Image": "",
         "Short Details": short_description(rich, title), "Main Details": rich,
         # The build appends the established brand suffix exactly once.
-        "Author": author_slug, "Meta Title": title,
-        "Meta Description": short_description(rich, title),
+        "Author": author_slug, "Meta Title": args.meta_title or title,
+        "Meta Description": args.meta_description or short_description(rich, title),
         "Listing Priority": str(args.listing_priority),
     })
     print("Title: %s\nSlug: %s\nAuthor: %s (%s)\nCanonical: https://bankersvascular.com/blog/%s"
