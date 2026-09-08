@@ -992,6 +992,27 @@ def fix_obvious_typos(html):
     return html
 
 
+GA4_MEASUREMENT_ID = "G-KJGLGHF9XR"
+
+
+def ensure_direct_ga4(html):
+    """Add the confirmed production GA4 tag exactly once per page."""
+    config = re.compile(
+        r"gtag\(\s*['\"]config['\"]\s*,\s*['\"]%s['\"]\s*\)"
+        % re.escape(GA4_MEASUREMENT_ID)
+    )
+    if config.search(html):
+        return html
+    # Every public template already loads the Google tag for AW-337269747.
+    # Reuse that single loader and add GA4 as a second destination rather than
+    # loading gtag.js again, which keeps the page-view configuration singular.
+    tag = '''  <script>
+  gtag('config', '%s');
+  </script>
+</head>''' % GA4_MEASUREMENT_ID
+    return html.replace("</head>", tag, 1)
+
+
 def add_seo_internal_links(html, url):
     """Create visible, contextual routes between conditions, procedures and cities."""
     city_links = {
@@ -1077,6 +1098,7 @@ def prepare_shell(html, cms, binder, page_label):
     html = fix_dead_links(html)
     html = normalize_verified_branch_nap(html)
     html = fix_obvious_typos(html)
+    html = ensure_direct_ga4(html)
     if page_label in ("products.html", "services-gujarat.html"):
         # The exported map cards reproduce Google Business Profile chrome and
         # include unverified ratings, review counts, status, hours, and travel
