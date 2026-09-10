@@ -994,6 +994,7 @@ def fix_obvious_typos(html):
 
 GA4_MEASUREMENT_ID = "G-KJGLGHF9XR"
 META_PIXEL_ID = "1994474461275883"
+META_TEST_PIXEL_ID = "4646870475584513"
 
 
 def ensure_direct_ga4(html):
@@ -1028,22 +1029,28 @@ def ensure_direct_meta_pixel(html):
         html,
         flags=re.S,
     )
-    init_rx = re.compile(
-        r"fbq\(\s*[\"']init[\"']\s*,\s*[\"']%s[\"']\s*\)"
-        % re.escape(META_PIXEL_ID)
-    )
+    def init_rx(pixel_id):
+        return re.compile(
+            r"fbq\(\s*[\"']init[\"']\s*,\s*[\"']%s[\"']\s*\)"
+            % re.escape(pixel_id)
+        )
     pageview_rx = re.compile(
         r"fbq\(\s*[\"']track[\"']\s*,\s*[\"']PageView[\"']\s*\)"
     )
-    noscript_rx = re.compile(
-        r"facebook\.com/tr\?id=%s(?:&amp;|&)ev=PageView(?:&amp;|&)noscript=1"
-        % re.escape(META_PIXEL_ID),
-        re.I,
-    )
-    if init_rx.search(html) and pageview_rx.search(html) and noscript_rx.search(html):
-        return html
+    def noscript_rx(pixel_id):
+        return re.compile(
+            r"facebook\.com/tr\?id=%s(?:&amp;|&)ev=PageView(?:&amp;|&)noscript=1"
+            % re.escape(pixel_id), re.I,
+        )
 
-    tag = '''  <script>
+    production_init = init_rx(META_PIXEL_ID).search(html)
+    test_init = init_rx(META_TEST_PIXEL_ID).search(html)
+    pageview = pageview_rx.search(html)
+    production_noscript = noscript_rx(META_PIXEL_ID).search(html)
+    test_noscript = noscript_rx(META_TEST_PIXEL_ID).search(html)
+
+    if not production_init:
+        tag = '''  <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
