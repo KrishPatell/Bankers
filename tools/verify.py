@@ -68,8 +68,8 @@ def check_placeholders(pages):
 
 
 def redirect_sources():
-    """Paths that resolve via a 301 in vercel.json rather than a file."""
-    p = os.path.join(ROOT, "vercel.json")
+    """Paths handled by Worker redirects rather than a file."""
+    p = os.path.join(ROOT, "wrangler.jsonc")
     if not os.path.exists(p):
         return set()
     cfg = json.load(open(p, encoding="utf-8"))
@@ -83,7 +83,7 @@ def redirect_sources():
 
 
 def check_link_integrity(pages):
-    """Every internal href/src must resolve under Vercel's cleanUrls."""
+    """Every internal href/src must resolve under the Worker's clean URLs."""
     # Files actually shipped, plus the extensionless forms cleanUrls serves.
     on_disk = set()
     for base, _dirs, files in os.walk(DIST):
@@ -430,7 +430,7 @@ def check_repo_layout():
     """The export must stay under src/, never at the repository root.
 
     This is what stops a misconfigured deploy from silently publishing the
-    unbound templates. It happened once: Vercel served the repo root, so the
+    unbound templates. It happened once: the host served the repo root, so the
     live site showed empty collection lists and "No items found." on every
     section while dist/ was perfectly correct. With no index.html at the root
     that mistake 404s instead of looking like a successful deploy.
@@ -448,28 +448,17 @@ def check_repo_layout():
         note("export is under src/; the repo root cannot be served as a site")
 
 
-def check_vercel():
-    p = os.path.join(ROOT, "vercel.json")
+def check_cloudflare():
+    p = os.path.join(ROOT, "wrangler.jsonc")
     if not os.path.exists(p):
-        return fail("vercel.json missing from the repo root")
-    cfg = json.load(open(p, encoding="utf-8"))
-    if not cfg.get("cleanUrls"):
-        fail("vercel.json: cleanUrls must be true for /blog/<slug> to resolve")
-    if cfg.get("trailingSlash") is not False:
-        fail("vercel.json: trailingSlash should be false")
-    # Vercel builds from the repo root, so it has to be told where the
-    # generated site lands or it looks for public/ and fails the deploy.
-    if cfg.get("outputDirectory") != "dist":
-        fail('vercel.json: outputDirectory must be "dist"')
-    if not cfg.get("buildCommand"):
-        fail("vercel.json: buildCommand missing")
+        return fail("wrangler.jsonc missing from the repo root")
     if not os.path.isdir(os.path.join(ROOT, "api")):
         fail("api/ missing from the repo root - the form endpoint would 404")
     # Directory-page collision guard.
     for page in CFG.DIRECTORY_PAGES:
         if os.path.exists(os.path.join(DIST, page)):
             fail("%s exists alongside its folder - ambiguous under cleanUrls" % page)
-    note("vercel.json is sane and no listing page collides with a CMS folder")
+    note("Cloudflare Worker config is present and no listing page collides with a CMS folder")
 
 
 def main():
@@ -492,7 +481,7 @@ def main():
     check_sitemap(pages)
     check_encoding()
     check_repo_layout()
-    check_vercel()
+    check_cloudflare()
 
     print("=" * 70)
     for n in notes:

@@ -12,8 +12,8 @@ before changing content, templates, styles, CMS data, or deployment settings.
   for collection content.
 - `tools/` turns the templates and CSV rows into the deployable site.
 - `dist/` is generated output. Never edit it directly.
-- `api/contact.js` is the Vercel serverless lead-form endpoint.
-- Vercel builds from the repository root and deploys `dist/`.
+- `worker.js` is the Cloudflare Worker and lead-form endpoint.
+- Cloudflare deploys the generated `dist/` assets through the Worker.
 
 The project is deliberately structured so the unbound Webflow export cannot be
 deployed accidentally. The root must not contain a deployable `index.html`.
@@ -56,7 +56,7 @@ python3 tools/build.py --skip-assets
 # Structural production checks against dist/.
 python3 tools/verify.py
 
-# Serve dist/ locally, with the same clean URL/redirect rules as Vercel.
+# Serve dist/ locally for Cloudflare output checks.
 python3 tools/serve.py 3111
 
 # Optional local smoke test, once the server is running.
@@ -81,15 +81,32 @@ placeholders and is not a valid preview.
 
 ## Deployment
 
-- Remote: `https://github.com/Thorfin69/Bankers`
+- Remote: `https://github.com/KrishPatell/Bankers/`
 - Production branch: `main`
-- Host: Vercel
-- Vercel build command: `python tools/build.py`
-- Vercel output directory: `dist`
-- Vercel dashboard root directory: repository root (leave it empty; never set
-  it to `dist`).
+- Host: Cloudflare Workers
+- Build command: `python tools/build.py`
+- Worker configuration: `wrangler.jsonc`
 
-Required Vercel environment variables for forms:
+### Production deployment policy
+
+Production deployment for this project is exclusively:
+
+```text
+GitHub origin/main -> automatic production deployment
+```
+
+- Do not use or request Cloudflare dashboard access, Wrangler, API tokens, or
+  direct deployment credentials for normal production releases.
+- Push approved commits normally to `origin/main`; do not force-push, rewrite
+  history, or overwrite newer remote work merely to trigger deployment.
+- If production is stale, fetch `origin`, confirm the approved commit remains
+  in `origin/main`, safely fast-forward the local branch if needed without
+  disturbing unrelated dirty files, then create and push one empty retrigger
+  commit with message `chore: retrigger production deployment`.
+- Keep any unrelated dirty working-tree files unstaged and uncommitted during
+  this process.
+
+Required Cloudflare environment variables for forms:
 
 | Variable | Purpose |
 | --- | --- |
@@ -120,7 +137,7 @@ site displays its form error state rather than falsely accepting a lead.
 | `tools/assets.py` | Asset localisation and image optimisation |
 | `tools/verify.py` | Build acceptance checks |
 | `tools/smoke.py` | Running/live deployment checks |
-| `vercel.json` | Clean URLs, redirects, security/cache headers, build config |
+| `wrangler.jsonc` | Cloudflare Worker, assets, and environment configuration |
 | `api/contact.js` | Lead-delivery endpoint |
 
 ## Current source pages
@@ -300,6 +317,21 @@ breadcrumb is line-clamped on mobile. Do not place a full blog excerpt into a
 single non-wrapping breadcrumb line. Check long post titles and descriptions at
 mobile width whenever changing this area.
 
+### Blog discovery
+
+- The main `/blog` archive has topic filters for Varicose Veins, Knee & Joint
+  Pain, PRP & Regenerative Care, Vascular Health, Women’s Health, Weight &
+  Metabolic Health, and Piles & Prostate. Topics are inferred at build time
+  from existing blog content so historic CMS URLs and broad CMS categories are
+  not changed.
+- Blog detail pages show the complete current article first. Below it, show a
+  clearly separate related-content section with four topic-related article
+  cards (each with its thumbnail), followed by a separate card for a verified
+  direct Bankers YouTube video from the same topic. Do not show a random video
+  or a generic channel link when there is no direct verified video. If no
+  related article match exists, the related articles safely fall back to recent
+  posts.
+
 ### Images and visual checks
 
 - Background image cards must receive a real `background-image` URL; a grey
@@ -347,7 +379,7 @@ failure states.
    static page through `PAGE_LISTS` or `DETAIL_LISTS`.
 5. Add a nav list only if it is truly a global navigation taxonomy.
 6. Confirm publish/active rules in `tools/cmsdata.py` and create redirects for
-   any legacy URLs in `vercel.json`.
+   any legacy URLs in the Cloudflare Worker routing logic.
 7. Build, verify, test multiple rows (long title, short title, no image,
    draft/archived row), and inspect `/sitemap.xml`.
 
@@ -413,8 +445,8 @@ contract.
   canonicals, redirects, and generated output. Never introduce or present
   `https://www.bankersvascular.com/...`.
 - `cleanUrls: true` and `trailingSlash: false` are part of the URL contract.
-- Redirects in `vercel.json` protect old `.html`, raw detail-template, and
-  known legacy URLs. Preserve them when refactoring.
+- Redirects in `worker.js` protect old `.html`, raw detail-template, and known
+  legacy URLs. Preserve them when refactoring.
 - Detail page title, description, OG image, and canonical output are populated
   from the `title`, `desc`, and `og_image` declarations in `tools/wfconfig.py`.
 - Do not ship a CMS item with missing essential SEO data without an intentional

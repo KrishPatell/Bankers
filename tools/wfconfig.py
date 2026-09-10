@@ -401,7 +401,7 @@ DETAIL_LISTS = {
 # ---------------------------------------------------------------- page setup
 
 # Listings that must ship as <folder>/index.html because a CMS folder of the
-# same name exists. Serving both blog.html and blog/<slug>.html under Vercel
+# same name exists. Serving both blog.html and blog/<slug>.html on Cloudflare
 # cleanUrls is ambiguous; directory form removes the ambiguity.
 DIRECTORY_PAGES = {
     "blog.html": "blog/index.html",

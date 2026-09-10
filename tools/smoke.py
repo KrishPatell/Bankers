@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Check a *deployed* URL is serving the built site, not the raw export.
 
-    python tools/smoke.py https://your-deployment.vercel.app
+    python tools/smoke.py https://bankersvascular.com
 
 tools/verify.py checks dist/ on disk and cannot catch a deployment that
-publishes the wrong directory. That happened: Vercel served the repository root,
+publishes the wrong directory. The Cloudflare Worker must serve the generated dist/,
 so production showed empty doctor/blog sections and "No items found." on every
 page while dist/ was flawless and every local check passed.
 

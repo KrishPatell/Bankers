@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Clipboard image capture</title>
+<p>Paste the copied Google Docs content here.</p>
+<div id="capture" contenteditable="true" style="width:100vw;height:80vh;border:1px solid #999"></div>
+<button id="save">Save image locally</button>
+<script>
+let imagePayload = null;
+document.getElementById('capture').addEventListener('paste', (event) => {
+  const html = event.clipboardData.getData('text/html');
+  const dataImage = html.match(/<img[^>]+src="(data:image\/[^"]+)"/i);
+  if (dataImage) {
+    const comma = dataImage[1].indexOf(',');
+    imagePayload = {type: dataImage[1].slice(5, comma), data: dataImage[1].slice(comma + 1)};
+  }
+  for (const item of event.clipboardData.items) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = () => { imagePayload = {type: file.type, data: reader.result.split(',')[1]}; };
+      reader.readAsDataURL(file);
+    }
+  }
+});
+document.getElementById('save').onclick = async () => {
+  const response = await fetch('/capture-image', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(imagePayload || {}),
+  });
+  document.title = response.ok ? 'Image saved locally' : 'Save failed';
+};
+</script>

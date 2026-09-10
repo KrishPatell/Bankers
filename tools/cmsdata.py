@@ -208,7 +208,7 @@ class Collections:
     def _load(self):
         # Local-only review mode makes scheduled draft content visible without
         # changing the production publish rules. It is deliberately opt-in so
-        # Vercel builds never expose a preview by accident.
+        # Cloudflare production builds never expose a preview by accident.
         preview_scheduled = os.environ.get("BANKERS_PREVIEW_SCHEDULED") == "1"
         for key, spec in self.specs.items():
             path = _find_csv(spec["csv"])

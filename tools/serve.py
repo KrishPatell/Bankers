@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
-"""Serve dist/ the way Vercel will, for local checking.
+"""Serve the Cloudflare dist/ output locally for checking.
 
     python tools/serve.py [port]
 
-Applies the vercel.json rules that affect whether a URL resolves - cleanUrls,
-trailingSlash and the redirect table - so a page that works here works on
-Vercel. `vercel dev` is the real thing but needs an authenticated account; this
-needs nothing. It does not run api/contact.js (Node), so form POSTs answer 501.
+Applies the clean URL rules used by the Worker,
+trailingSlash and Worker redirects. It does not run the API source locally.
 """
 
 import http.server
-import json
 import mimetypes
 import os
 import posixpath
@@ -26,11 +23,7 @@ mimetypes.add_type("image/webp", ".webp")
 mimetypes.add_type("font/otf", ".otf")
 mimetypes.add_type("application/json", ".json")
 
-with open(os.path.join(ROOT, "vercel.json"), encoding="utf-8") as fh:
-    CFG = json.load(fh)
-
-REDIRECTS = {r["source"].rstrip("/") or "/": r["destination"]
-             for r in CFG.get("redirects", [])}
+REDIRECTS = {}
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -41,10 +34,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
     # api/contact.js is a Node function this server cannot execute, but it
     # answers the two statuses the real one does for non-POST/POST, so
-    # tools/smoke.py gives the same verdict here as against Vercel.
+    # tools/smoke.py gives the same local verdict as against the Worker.
     def do_POST(self):
         if self.path == "/api/contact":
-            self.send_error(501, "api/contact.js needs `vercel dev` or Node")
+            self.send_error(501, "api/contact.js is handled by the Cloudflare Worker")
         else:
             self.send_error(405)
 

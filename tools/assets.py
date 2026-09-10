@@ -32,7 +32,7 @@ IMAGES = os.path.join(ROOT, "src", "images")
 #   cms-opt/  the same images re-encoded as WebP, ~95% smaller. This is what
 #             ships, and it IS committed.
 #
-# The split exists because Vercel refused to build otherwise: a 978 MB
+# The split exists because the previous host refused to build otherwise: a 978 MB
 # deployment came back BLOCKED on the Hobby plan with an empty build log and
 # could not even be redeployed. Committing the optimised copies also means the
 # CI build neither re-downloads ~1,500 CDN assets nor needs Pillow installed -
@@ -162,7 +162,7 @@ def optimise(raw_path, opt_dir, raw_name, quality=WEBP_QUALITY):
     Returns (shipped_name, src_bytes, out_bytes). Normally that is a WebP
     re-encode; if the image cannot be decoded, is animated, or does not
     actually get smaller, the original is copied through *under its original
-    name* instead. Keeping the real extension matters: Vercel sets
+    name* instead. Keeping the real extension matters: the host sets
     Content-Type from it, so a PNG living at a .webp path would be served as
     image/webp.
     """
@@ -265,7 +265,7 @@ class AssetMap:
             return self.map[raw]
 
         # Already optimised on a previous run (or committed to the repo): serve
-        # it without touching the network or Pillow. This is the path the Vercel
+        # it without touching the network or Pillow. This is the path the Cloudflare
         # build takes for every asset, which is why CI needs neither.
         shipped = shipped_name(raw)
         if os.path.exists(os.path.join(CMS_OPT, shipped)):

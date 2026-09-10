@@ -2,7 +2,7 @@
 // newsletter). The Webflow export left all of them as method="get" with no
 // action, so submissions were silently dropped once the site left Webflow.
 //
-// Required env vars (Vercel project settings):
+// Required environment variables (Cloudflare deployment settings):
 //   RESEND_API_KEY   - https://resend.com API key
 //   CONTACT_TO_EMAIL - where enquiries are delivered
 //   CONTACT_FROM_EMAIL (optional) - verified sender, defaults to onboarding@resend.dev

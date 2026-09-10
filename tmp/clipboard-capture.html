@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Local clipboard capture</title>
+<button id="save">Save locally</button>
+<textarea id="capture" autofocus style="width:100vw;height:90vh"></textarea>
+<script>
+document.getElementById('save').onclick = async () => {
+  const response = await fetch('/capture', {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: document.getElementById('capture').value,
+  });
+  document.title = response.ok ? 'Saved locally' : 'Save failed';
+};
+</script>

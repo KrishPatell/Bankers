@@ -30,7 +30,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
 
 # The Webflow export lives in src/, deliberately not at the repository root.
-# A root full of ready-looking index.html/css/images is dangerous: if Vercel is
+# A root full of ready-looking index.html/css/images is dangerous: if the host is
 # ever pointed at the root it will happily publish the *unbound* templates -
 # empty collection lists, "No items found." everywhere - and the deploy looks
 # successful. With the export under src/ that misconfiguration 404s instead.
@@ -133,10 +133,10 @@ CITY_LOCATION_DATA = {
         "eyebrow": "Vadodara branch",
         "heading": "Visit Bankers Vascular Centre in Vadodara",
         "name": "Bankers Vascular Centre",
-        "address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Near Urmi Circle, Akota, Vadodara, Gujarat 390020",
+        "address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, Gujarat 390007",
         "phone": "+91-99099-08428",
         "city": "Vadodara",
-        "postal_code": "390020",
+        "postal_code": "390007",
     },
     "rajasthan": {
         "eyebrow": "Rajasthan consultation location",
@@ -976,7 +976,7 @@ def normalize_verified_branch_nap(html):
               r'Akota,\s*Vadodara-390020')
     verified = ('<strong>Vadodara</strong><br>201, 2nd Floor, Ignite Complex,<br>'
                 'Above Meera Clinic and Eye Hospital,<br>Opp. Agrawal Cars,<br>'
-                'Near Urmi Circle, Akota,<br>Vadodara, Gujarat 390020')
+                'Laxmi Colony, Anand Nagar, Akota,<br>Vadodara, Gujarat 390007')
     return re.sub(legacy, verified, html)
 
 
@@ -1060,15 +1060,35 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '%s');
+fbq('init', '%s');
 fbq('track', 'PageView');
 </script>
-''' % META_PIXEL_ID
-    noscript = '''  <noscript>
+''' % (META_PIXEL_ID, META_TEST_PIXEL_ID)
+        html = html.replace("</head>", tag + "</head>", 1)
+        pageview = True
+    elif not test_init:
+        init = "fbq('init', '%s');\n" % META_TEST_PIXEL_ID
+        if pageview:
+            html = html[:pageview.start()] + init + html[pageview.start():]
+        else:
+            html = html.replace("</head>", "  <script>\n" + init + "</script>\n</head>", 1)
+
+    if not pageview:
+        html = html.replace("</head>", "  <script>\nfbq('track', 'PageView');\n</script>\n</head>", 1)
+
+    missing_noscripts = []
+    if not production_noscript:
+        missing_noscripts.append(META_PIXEL_ID)
+    if not test_noscript:
+        missing_noscripts.append(META_TEST_PIXEL_ID)
+    if not missing_noscripts:
+        return html
+
+    noscript = "".join('''  <noscript>
 <img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=%s&ev=PageView&noscript=1" />
 </noscript>
-''' % META_PIXEL_ID
-    html = html.replace("</head>", tag + "</head>", 1)
+''' % pixel_id for pixel_id in missing_noscripts)
     if re.search(r"<body\b[^>]*>", html, re.I):
         html = re.sub(r"(<body\b[^>]*>)", r"\1\n" + noscript,
                       html, count=1, flags=re.I)
@@ -1980,8 +2000,8 @@ def copy_static(assets):
         shutil.copytree(opt, os.path.join(DIST, "images", "cms"),
                         dirs_exist_ok=True)
     assets.static_report = assets.repair_static_images(DIST)
-    # Nothing else is copied in. Vercel builds this project from the repo root
-    # with outputDirectory "dist", so vercel.json, package.json and the
+    # Nothing else is copied in. Cloudflare deploys the generated dist/ assets;
+    # package.json and the
     # api/ functions are read from the root - copying them into dist/ would
     # only publish the function's source at /api/contact.js and serve the
     # config as a static file.

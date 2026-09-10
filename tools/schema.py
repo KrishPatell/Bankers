@@ -35,9 +35,9 @@ LOCATIONS = {
         "id": ENTITY_IDS["vadodara_location"],
         "name": "Bankers Vascular Centre",
         "telephone": "+91-99099-08428",
-        "street_address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Near Urmi Circle, Akota",
+        "street_address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota",
         "city": "Vadodara",
-        "postal_code": "390020",
+        "postal_code": "390007",
     },
 }
 

@@ -7,7 +7,7 @@
 
 # NOTE: src/images/cms-opt/ is deliberately NOT ignored. It holds the WebP
 # copies that actually ship (~90 MB), and committing them is what lets the
-# Vercel build run without re-downloading ~1,500 CDN assets or needing Pillow.
+# Cloudflare build run without re-downloading ~1,500 CDN assets or needing Pillow.
 
 # Build byproducts
 /tools/__pycache__/
@@ -16,7 +16,6 @@
 
 .DS_Store
 Thumbs.db
-.vercel
 .dev.vars
 .env*
 node_modules/
