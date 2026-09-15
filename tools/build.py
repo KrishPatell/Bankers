@@ -993,8 +993,6 @@ def fix_obvious_typos(html):
 
 
 GA4_MEASUREMENT_ID = "G-KJGLGHF9XR"
-META_PIXEL_ID = "1994474461275883"
-META_TEST_PIXEL_ID = "4646870475584513"
 
 
 def ensure_direct_ga4(html):
@@ -1013,95 +1011,6 @@ def ensure_direct_ga4(html):
   </script>
 </head>''' % GA4_MEASUREMENT_ID
     return html.replace("</head>", tag, 1)
-
-
-def ensure_direct_meta_pixel(html):
-    """Add the approved Meta Pixel base tags exactly once per page.
-
-    Both pixels share one loader and one standard PageView call.  The old
-    homepage-only Lead callback is removed from generated output so adding the
-    base pixels cannot activate a non-approved custom event on form submission.
-    """
-    html = re.sub(
-        r"\s*if\s*\(\s*window\.fbq\s*\)\s*\{\s*"
-        r"window\.fbq\(\s*[\"']track[\"']\s*,\s*[\"']Lead[\"']\s*\)\s*;?\s*\}",
-        "",
-        html,
-        flags=re.S,
-    )
-    def init_rx(pixel_id):
-        return re.compile(
-            r"fbq\(\s*[\"']init[\"']\s*,\s*[\"']%s[\"']\s*\)"
-            % re.escape(pixel_id)
-        )
-    pageview_rx = re.compile(
-        r"fbq\(\s*[\"']track[\"']\s*,\s*[\"']PageView[\"']\s*\)"
-    )
-    def noscript_rx(pixel_id):
-        return re.compile(
-            r"facebook\.com/tr\?id=%s(?:&amp;|&)ev=PageView(?:&amp;|&)noscript=1"
-            % re.escape(pixel_id), re.I,
-        )
-
-    production_init = init_rx(META_PIXEL_ID).search(html)
-    test_init = init_rx(META_TEST_PIXEL_ID).search(html)
-    pageview = pageview_rx.search(html)
-    production_noscript = noscript_rx(META_PIXEL_ID).search(html)
-    test_noscript = noscript_rx(META_TEST_PIXEL_ID).search(html)
-
-    if not production_init and not test_init:
-        tag = '''  <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '%s');
-fbq('init', '%s');
-%s
-</script>
-''' % (META_PIXEL_ID, META_TEST_PIXEL_ID,
-       "fbq('track', 'PageView');" if not pageview else "")
-        html = html.replace("</head>", tag + "</head>", 1)
-    else:
-        missing_inits = []
-        if not production_init:
-            missing_inits.append("fbq('init', '%s');" % META_PIXEL_ID)
-        if not test_init:
-            missing_inits.append("fbq('init', '%s');" % META_TEST_PIXEL_ID)
-        if missing_inits:
-            insert = "\n".join(missing_inits) + "\n"
-            pageview = pageview_rx.search(html)
-            if pageview:
-                html = html[:pageview.start()] + insert + html[pageview.start():]
-            else:
-                html = html.replace("</head>", "  <script>\n" + insert +
-                                    "</script>\n</head>", 1)
-        if not pageview_rx.search(html):
-            html = html.replace("</head>",
-                                "  <script>\nfbq('track', 'PageView');\n</script>\n</head>",
-                                1)
-
-    missing_noscript = []
-    if not production_noscript:
-        missing_noscript.append(META_PIXEL_ID)
-    if not test_noscript:
-        missing_noscript.append(META_TEST_PIXEL_ID)
-    for pixel_id in missing_noscript:
-        noscript = '''  <noscript>
-<img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=%s&ev=PageView&noscript=1" />
-</noscript>
-''' % pixel_id
-        if re.search(r"<body\b[^>]*>", html, re.I):
-            html = re.sub(r"(<body\b[^>]*>)", r"\1\n" + noscript,
-                          html, count=1, flags=re.I)
-        else:
-            html = html.replace("</head>", noscript + "</head>", 1)
-    return html
 
 
 def add_seo_internal_links(html, url):
@@ -1190,7 +1099,6 @@ def prepare_shell(html, cms, binder, page_label):
     html = normalize_verified_branch_nap(html)
     html = fix_obvious_typos(html)
     html = ensure_direct_ga4(html)
-    html = ensure_direct_meta_pixel(html)
     if page_label in ("products.html", "services-gujarat.html"):
         # The exported map cards reproduce Google Business Profile chrome and
         # include unverified ratings, review counts, status, hours, and travel

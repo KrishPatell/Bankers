@@ -320,6 +320,27 @@ def check_submit_controls(pages):
         note("no form is left without a submit control")
 
 
+def check_meta_pixel_absent(pages):
+    """Meta/Facebook browser tracking must remain fully removed."""
+    patterns = {
+        "Meta Pixel 1994474461275883": r"1994474461275883",
+        "Meta Pixel 4646870475584513": r"4646870475584513",
+        "Meta fbevents.js loader": r"fbevents\.js",
+        "Meta fbq call": r"\bfbq\s*\(",
+        "Meta noscript pixel fallback": r"facebook\.com/tr(?:\?|&amp;)",
+    }
+    found = False
+    for label, pattern in patterns.items():
+        hits = [rel(path) for path, html in pages.items()
+                if re.search(pattern, html, re.I)]
+        if hits:
+            found = True
+            fail("%s remains on %d generated page(s), including %s"
+                 % (label, len(hits), hits[0]))
+    if not found:
+        note("Meta Pixel browser tracking is absent from every generated page")
+
+
 def check_assets(pages):
     """No page may still depend on the Webflow CDN for a CMS image."""
     remaining = Counter()
@@ -476,6 +497,7 @@ def main():
     check_blog_featured_image_policy(pages, cms)
     check_forms(pages)
     check_submit_controls(pages)
+    check_meta_pixel_absent(pages)
     check_assets(pages)
     check_animations(pages)
     check_sitemap(pages)
