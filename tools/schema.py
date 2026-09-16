@@ -18,6 +18,27 @@ ENTITY_IDS = {
     },
 }
 
+# Confirmed Google Business Profile hours used by location-aware city pages.
+# Keep unconfirmed consultation locations out of this map rather than guessing
+# their opening times.
+LOCATION_HOURS = {
+    "ahmedabad": {
+        "display": "08:00 AM - 07:00 PM",
+        "opens": "08:00",
+        "closes": "19:00",
+    },
+    "vadodara": {
+        "display": "09:00 AM - 07:00 PM",
+        "opens": "09:00",
+        "closes": "19:00",
+    },
+    "rajkot": {
+        "display": "09:00 AM - 05:00 PM",
+        "opens": "09:00",
+        "closes": "17:00",
+    },
+}
+
 # Branch facts used in structured data and matching local-page modules.  These
 # values deliberately live outside individual templates so the brand and its
 # two legitimate locations cannot drift apart.  Map short links are omitted:
@@ -30,6 +51,7 @@ LOCATIONS = {
         "street_address": "2nd & 3rd Floor, RJP House, Opp. Scarlet Height Apartment, 100' Anandnagar Road, Satellite",
         "city": "Ahmedabad",
         "postal_code": "380015",
+        "opening_hours": LOCATION_HOURS["ahmedabad"],
     },
     "vadodara": {
         "id": ENTITY_IDS["vadodara_location"],
@@ -38,6 +60,7 @@ LOCATIONS = {
         "street_address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota",
         "city": "Vadodara",
         "postal_code": "390007",
+        "opening_hours": LOCATION_HOURS["vadodara"],
     },
 }
 

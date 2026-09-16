@@ -976,6 +976,41 @@ def normalize_verified_branch_nap(html):
     return re.sub(legacy, verified, html)
 
 
+def confirmed_location_hours(url):
+    """Return confirmed hours only for a supported city landing-page URL."""
+    if not url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")):
+        return None
+    city = url.rsplit("/", 1)[-1]
+    return ENTITY_SCHEMA.LOCATION_HOURS.get(city)
+
+
+def apply_city_opening_hours(html, url):
+    """Apply the confirmed city's hours to its visible location surfaces."""
+    hours = confirmed_location_hours(url)
+    if not hours:
+        return html
+    display = hours["display"]
+
+    # City pages inherit the shared footer template, but the footer must not
+    # contradict the location-specific hours shown on the page.
+    html = re.sub(
+        r"<footer\b[^>]*>.*?</footer>",
+        lambda match: match.group(0).replace("08:00 AM - 07:00 PM", display),
+        html, count=1, flags=re.S | re.I)
+
+    # The detail templates also contain a general Hospital Timings block.
+    timing_pattern = (
+        r'(<h5\b[^>]*>\s*Hospital Timings\s*</h5>\s*'
+        r'<p\b[^>]*>)Monday\s*-\s*Saturday\s*\([^<]*\)'
+        r'(<br>\s*Sunday\s*\(Closed\)\s*</p>)')
+    html = re.sub(
+        timing_pattern,
+        lambda match: match.group(1) +
+        "Monday - Saturday (%s)" % htmllib.escape(display) + match.group(2),
+        html, count=1, flags=re.S | re.I)
+    return html
+
+
 def fix_obvious_typos(html):
     """Correct unambiguous export typos without changing medical claims."""
     replacements = {
@@ -1072,6 +1107,14 @@ def add_seo_internal_links(html, url):
                 location_data["name"], query,
             ))
         )
+        hours = confirmed_location_hours(url)
+        if hours:
+            hours_markup = (
+                '<p>Opening hours: Monday - Saturday: <strong>%s</strong><br>'
+                'Sunday: <strong>Closed</strong></p>'
+                % htmllib.escape(hours["display"])
+            )
+            location = location.replace('<p>Call ', hours_markup + '<p>Call ', 1)
     module = ('<section class="seo-links-section" data-seo-links="true" aria-label="Related treatment links">'
               '<div class="seo-links-inner"><h2>%s</h2><ul>%s</ul>%s</div></section>'
               % (htmllib.escape(heading), items, location))
@@ -1448,6 +1491,7 @@ def render_detail(base, spec, item, cms, binder, assets):
     html = fill_socials(html, spec, item)
     html = fill_blog_discovery_links(html, spec, item, cms)
     html = fill_detail_lists(html, spec, item, cms, binder)
+    html = apply_city_opening_hours(html, item.url)
 
     title_txt = item.get_text(*spec.get("title", ["Name"]))
     tpl_title = re.search(r"<title>(.*?)</title>", base, re.S).group(1).strip()
@@ -1748,7 +1792,7 @@ def add_page_schema(html, url, spec=None, item=None):
         locations = []
         for key, location in ENTITY_SCHEMA.LOCATIONS.items():
             location_type = "Hospital" if key == "ahmedabad" else "MedicalClinic"
-            locations.append({
+            location_node = {
                 "@type": location_type,
                 "@id": location["id"],
                 "name": location["name"],
@@ -1763,7 +1807,17 @@ def add_page_schema(html, url, spec=None, item=None):
                     "postalCode": location["postal_code"],
                     "addressCountry": "IN",
                 },
-            })
+            }
+            hours = location.get("opening_hours")
+            if hours:
+                location_node["openingHoursSpecification"] = [{
+                    "@type": "OpeningHoursSpecification",
+                    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday",
+                                   "Friday", "Saturday"],
+                    "opens": hours["opens"],
+                    "closes": hours["closes"],
+                }]
+            locations.append(location_node)
         graph.extend((
             {"@type": "WebSite", "@id": ENTITY_SCHEMA.ENTITY_IDS["website"],
              "url": CFG.SITE_URL + "/", "name": "Bankers Vascular",
