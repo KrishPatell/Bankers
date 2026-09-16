@@ -98,7 +98,6 @@ CITY_LOCATION_DATA = {
         "heading": "Visit Bankers Vascular Hospital in Ahmedabad",
         "name": "Bankers Vascular Hospital",
         "address": "2nd & 3rd Floor, RJP House, Opp. Scarlet Height Apartment, 100' Anandnagar Road, Satellite, Ahmedabad, Gujarat 380015",
-        "phone": "+91-99099-03449",
         "city": "Ahmedabad",
         "postal_code": "380015",
     },
@@ -107,7 +106,6 @@ CITY_LOCATION_DATA = {
         "heading": "Visit us at Akanksha IVF Hospital",
         "name": "Akanksha IVF Hospital",
         "address": "Akshar Square, near Raiya Circle, Tirupati Nagar, Rajkot, Gujarat 360001",
-        "phone": "+91-93282-94934",
         "city": "Rajkot",
         "postal_code": "360001",
     },
@@ -116,7 +114,6 @@ CITY_LOCATION_DATA = {
         "heading": "Visit us at Bajrangdas Arogyadham",
         "name": "Shree Bajrangdasbapa Arogyadham",
         "address": "Chowk, Panwadi, Bhavnagar, Gujarat 364001",
-        "phone": "+91-278-664-0664",
         "city": "Bhavnagar",
         "postal_code": "364001",
     },
@@ -125,7 +122,6 @@ CITY_LOCATION_DATA = {
         "heading": "Visit us at Gastron Hospital",
         "name": "Gastron Hospital - By Dr Vimal Dhaduk",
         "address": "202, Ayush Doctor House Station to Lal Darwaja Station Road, Lal Darwaja, Surat, Gujarat 395003",
-        "phone": "+91-72111-40222",
         "city": "Surat",
         "postal_code": "395003",
     },
@@ -134,7 +130,6 @@ CITY_LOCATION_DATA = {
         "heading": "Visit Bankers Vascular Centre in Vadodara",
         "name": "Bankers Vascular Centre",
         "address": "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, Gujarat 390007",
-        "phone": "+91-99099-08428",
         "city": "Vadodara",
         "postal_code": "390007",
     },
@@ -143,11 +138,12 @@ CITY_LOCATION_DATA = {
         "heading": "Visit us at Gyayak Hospital, Banswara",
         "name": "GYAYAK HOSPITAL",
         "address": "GCHF+3J5, 40, Banswara Road, Industrial Area, Banswara, Rajasthan 327001",
-        "phone": "+91-74140-32100",
         "city": "Banswara",
         "postal_code": "327001",
     },
 }
+
+CITY_LOCATION_PHONES = ("9909908428", "9909903449")
 
 
 # Shell pages copied through the shell-rewrite pass.
@@ -1063,14 +1059,16 @@ def add_seo_internal_links(html, url):
             '<h2>%s</h2><p>Visit <strong>%s</strong> at %s.</p>'
             '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=%s" '
             'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a>'
-            '<p><a href="tel:%s">Call %s</a> to request an appointment.</p></div>'
+            '<p>Call <a href="tel:+91%s">%s</a> or '
+            '<a href="tel:+91%s">%s</a> to request an appointment.</p></div>'
             '<div class="seo-location-map"><iframe loading="lazy" title="%s" '
             'src="https://www.google.com/maps?q=%s&amp;output=embed" '
             'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
             '</section>' % tuple(htmllib.escape(value) for value in (
                 location_data["eyebrow"], location_data["eyebrow"], location_data["heading"],
                 location_data["name"], location_data["address"], query,
-                location_data["phone"].replace("-", ""), location_data["phone"],
+                CITY_LOCATION_PHONES[0], CITY_LOCATION_PHONES[0],
+                CITY_LOCATION_PHONES[1], CITY_LOCATION_PHONES[1],
                 location_data["name"], query,
             ))
         )
