@@ -28,6 +28,12 @@ const LEGACY_REDIRECTS = {
   "/blog/venous-veins-and-thrombus-": "/blog/venous-veins-and-thrombus",
 };
 
+// These indexable listings are emitted as <folder>/index.html, but their
+// sitemap and canonical URLs intentionally omit the trailing slash.
+const CANONICAL_DIRECTORY_LISTINGS = new Set([
+  "/blog", "/departments", "/bankers-notes", "/services-gujarat",
+]);
+
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => (
   { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]
 ));
@@ -141,6 +147,17 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
     if (url.pathname === "/api/contact") return contact(request, env);
+    if (url.pathname.endsWith("/") && CANONICAL_DIRECTORY_LISTINGS.has(url.pathname.slice(0, -1))) {
+      url.pathname = url.pathname.slice(0, -1);
+      return Response.redirect(url.toString(), 301);
+    }
+    // Fetch only these directory indexes internally so the public canonical
+    // paths return 200 without Cloudflare's automatic /folder/ redirect.
+    if (CANONICAL_DIRECTORY_LISTINGS.has(url.pathname)) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname += "/";
+      return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
     // The static-assets binding otherwise normalizes this directory index to
     // /products/. Fetch its index internally so the sitemap/canonical URL
     // itself remains the public 200 response.
