@@ -14914,3 +14914,71 @@ figure {
     padding-bottom: 28px;
   }
 }
+
+/* Homepage media features: a compact, clickable logo row above Our Reach. */
+.press-coverage-section {
+  padding: 36px 0 32px;
+  border-top: 1px solid rgba(23, 83, 97, .42);
+  border-bottom: 1px solid rgba(23, 83, 97, .42);
+  background: #bddadd;
+}
+.press-coverage-heading {
+  align-items: center;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.press-coverage-heading .subtitle-block {
+  justify-content: center;
+  width: 100%;
+}
+.press-coverage-heading .section-heading {
+  margin: 8px auto 0;
+  text-align: center;
+}
+.press-coverage-intro {
+  max-width: 720px;
+  margin: 6px auto 0;
+  color: #3f5664;
+  font-size: 16px;
+  line-height: 1.55;
+  text-align: center;
+}
+.press-coverage-logos {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 840px;
+  margin: 0 auto;
+}
+.press-coverage-link {
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(19, 83, 101, .22);
+  border-radius: 14px;
+  background: #062333;
+  box-shadow: 0 8px 20px rgba(23, 72, 86, .16);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.press-coverage-link:hover,
+.press-coverage-link:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 28px rgba(23, 72, 86, .26);
+}
+.press-coverage-link:focus-visible { outline: 3px solid #008dcc; outline-offset: 3px; }
+.press-coverage-link img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+@media screen and (max-width: 991px) {
+  .press-coverage-section { padding: 32px 0 30px; }
+  .press-coverage-logos { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 570px; }
+}
+@media screen and (max-width: 479px) {
+  .press-coverage-section { padding: 28px 0 26px; }
+  .press-coverage-heading { margin-bottom: 16px; }
+  .press-coverage-intro { padding: 0 8px; font-size: 14px; }
+  .press-coverage-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .press-coverage-link { border-radius: 11px; }
+}
