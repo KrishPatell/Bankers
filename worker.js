@@ -1,3 +1,5 @@
+import { youtubeFeed } from "./api/youtube.js";
+
 // Cloudflare Worker for the static site and its single lead-capture endpoint.
 // It runs before static assets so the canonical-origin redirect applies to every
 // public URL, including sitemap.xml and robots.txt.
@@ -146,6 +148,7 @@ export default {
       url.hostname = "bankersvascular.com";
       return Response.redirect(url.toString(), 301);
     }
+    if (url.pathname === "/api/youtube-feed") return youtubeFeed(request, env);
     if (url.pathname === "/api/contact") return contact(request, env);
     if (url.pathname.endsWith("/") && CANONICAL_DIRECTORY_LISTINGS.has(url.pathname.slice(0, -1))) {
       url.pathname = url.pathname.slice(0, -1);
