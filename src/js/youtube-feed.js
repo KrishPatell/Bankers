@@ -17,6 +17,9 @@
     if (!data.ok) throw new Error(data.error || "Unable to load videos");
     render(popular, data.popular, true); render(latest, data.latest, false);
   }).catch((error) => {
-    popular.innerHTML = latest.innerHTML = `<p class="youtube-status youtube-error">${error.message}</p>`;
+    popular.innerHTML = '<p class="youtube-status youtube-error">Videos are temporarily unavailable. <a href="https://www.youtube.com/@bankersvascular" target="_blank" rel="noopener">Visit our YouTube channel</a> to watch the latest uploads.</p>';
+    latest.innerHTML = "";
+    const latestSection = latest.closest("section");
+    if (latestSection) latestSection.hidden = true;
   });
 })();
