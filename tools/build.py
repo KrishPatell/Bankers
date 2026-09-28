@@ -1084,10 +1084,31 @@ def add_seo_internal_links(html, url):
     heading = "Related treatment information"
     if url == "/departments/varicose-veins":
         heading = "Varicose veins treatment locations"
-        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
+        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Foam Sclerotherapy", "/treatment/foam-sclerotherap"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url == "/departments/knee-pain" or url == "/treatment/genicular-artery-embolization":
         heading = "Non-surgical knee pain treatment locations"
         links = city_links["knee"] + [("Genicular Artery Embolization", "/treatment/genicular-artery-embolization"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
+    elif url == "/departments/prostate":
+        heading = "Related prostate treatment information"
+        links = [("Prostate Artery Embolization", "/treatment/prostate-artery-embolization"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/piles":
+        heading = "Related piles treatment information"
+        links = [("Hemorrhoids treatment", "/treatment/hemorrhoids"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url in ("/departments/frozen-shoulder", "/departments/heel-pain", "/departments/tennis-elbow", "/departments/sirva", "/departments/tendoachilitis"):
+        heading = "Related musculoskeletal treatment information"
+        links = [("MSK Embolization", "/treatment/msk-embolization"), ("Platelet-Rich Plasma", "/treatment/platelet-rich-plasma"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/platelet-rich-plasma":
+        heading = "Related PRP treatment information"
+        links = [("Platelet-Rich Plasma treatment", "/treatment/platelet-rich-plasma"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/vascular-malformation":
+        heading = "Related vascular malformation treatment information"
+        links = [("Absolute Ethanol Embolization", "/treatment/absolute-ethanol-embolization-for-vascular-malformations"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/breast-fibroadenoma":
+        heading = "Related breast fibroadenoma information"
+        links = [("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/lymphedema":
+        heading = "Related lymphedema information"
+        links = [("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
     elif url.startswith("/varicose-veins/"):
         links = [("Varicose veins treatment", "/departments/varicose-veins"), ("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url.startswith("/non-surgical-knee-pain/"):
