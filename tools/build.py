@@ -39,6 +39,30 @@ SRC = os.path.join(ROOT, "src")
 STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
 
 STATIC_META = {
+    "index.html": {
+        "title": "Bankers Vascular Centre | Minimally Invasive Treatment in Gujarat",
+        "desc": "Explore treatment information for varicose veins, knee pain, enlarged prostate, piles, fibroadenoma and other vascular or musculoskeletal conditions at Bankers Vascular Centre.",
+    },
+    "about-banker-vascular-center.html": {
+        "title": "About Bankers Vascular Centre | Interventional Radiology Care",
+        "desc": "Learn about Bankers Vascular Centre, its interventional radiology approach, clinical team and minimally invasive treatment services in Gujarat.",
+    },
+    "contact-us.html": {
+        "title": "Contact Bankers Vascular Centre | Appointments & Locations",
+        "desc": "Contact Bankers Vascular Centre for appointment information, clinic locations and guidance about available vascular and minimally invasive treatment services.",
+    },
+    "departments.html": {
+        "title": "Treatments & Conditions | Bankers Vascular Centre",
+        "desc": "Browse treatment information for vascular, joint and other conditions managed at Bankers Vascular Centre, including varicose veins, knee pain and enlarged prostate.",
+    },
+    "training.html": {
+        "title": "Interventional Radiology Training | Bankers Vascular Centre",
+        "desc": "Explore interventional radiology training information and educational opportunities from Bankers Vascular Centre.",
+    },
+    "interview-of-patients-after-g-a-e-procedure.html": {
+        "title": "Patient Experiences After GAE | Bankers Vascular Centre",
+        "desc": "Watch patient interviews about their experiences after genicular artery embolization (GAE) and learn what the treatment journey may involve.",
+    },
     "products.html": {
         "title": "Treatments and Consultation Locations | Bankers Vascular",
         "desc": "Explore treatment information and consultation locations from Bankers Vascular in Gujarat.",
