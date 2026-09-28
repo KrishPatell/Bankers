@@ -39,6 +39,30 @@ SRC = os.path.join(ROOT, "src")
 STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
 
 STATIC_META = {
+    "index.html": {
+        "title": "Bankers Vascular Centre | Minimally Invasive Treatment in Gujarat",
+        "desc": "Explore treatment information for varicose veins, knee pain, enlarged prostate, piles, fibroadenoma and other vascular or musculoskeletal conditions at Bankers Vascular Centre.",
+    },
+    "about-banker-vascular-center.html": {
+        "title": "About Bankers Vascular Centre | Interventional Radiology Care",
+        "desc": "Learn about Bankers Vascular Centre, its interventional radiology approach, clinical team and minimally invasive treatment services in Gujarat.",
+    },
+    "contact-us.html": {
+        "title": "Contact Bankers Vascular Centre | Appointments & Locations",
+        "desc": "Contact Bankers Vascular Centre for appointment information, clinic locations and guidance about available vascular and minimally invasive treatment services.",
+    },
+    "departments.html": {
+        "title": "Treatments & Conditions | Bankers Vascular Centre",
+        "desc": "Browse treatment information for vascular, joint and other conditions managed at Bankers Vascular Centre, including varicose veins, knee pain and enlarged prostate.",
+    },
+    "training.html": {
+        "title": "Interventional Radiology Training | Bankers Vascular Centre",
+        "desc": "Explore interventional radiology training information and educational opportunities from Bankers Vascular Centre.",
+    },
+    "interview-of-patients-after-g-a-e-procedure.html": {
+        "title": "Patient Experiences After GAE | Bankers Vascular Centre",
+        "desc": "Watch patient interviews about their experiences after genicular artery embolization (GAE) and learn what the treatment journey may involve.",
+    },
     "products.html": {
         "title": "Treatments and Consultation Locations | Bankers Vascular",
         "desc": "Explore treatment information and consultation locations from Bankers Vascular in Gujarat.",
@@ -1060,10 +1084,31 @@ def add_seo_internal_links(html, url):
     heading = "Related treatment information"
     if url == "/departments/varicose-veins":
         heading = "Varicose veins treatment locations"
-        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
+        links = city_links["varicose"] + [("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Foam Sclerotherapy", "/treatment/foam-sclerotherap"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url == "/departments/knee-pain" or url == "/treatment/genicular-artery-embolization":
         heading = "Non-surgical knee pain treatment locations"
         links = city_links["knee"] + [("Genicular Artery Embolization", "/treatment/genicular-artery-embolization"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
+    elif url == "/departments/prostate":
+        heading = "Related prostate treatment information"
+        links = [("Prostate Artery Embolization", "/treatment/prostate-artery-embolization"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/piles":
+        heading = "Related piles treatment information"
+        links = [("Hemorrhoids treatment", "/treatment/hemorrhoids"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url in ("/departments/frozen-shoulder", "/departments/heel-pain", "/departments/tennis-elbow", "/departments/sirva", "/departments/tendoachilitis"):
+        heading = "Related musculoskeletal treatment information"
+        links = [("MSK Embolization", "/treatment/msk-embolization"), ("Platelet-Rich Plasma", "/treatment/platelet-rich-plasma"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/platelet-rich-plasma":
+        heading = "Related PRP treatment information"
+        links = [("Platelet-Rich Plasma treatment", "/treatment/platelet-rich-plasma"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/vascular-malformation":
+        heading = "Related vascular malformation treatment information"
+        links = [("Absolute Ethanol Embolization", "/treatment/absolute-ethanol-embolization-for-vascular-malformations"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/breast-fibroadenoma":
+        heading = "Related breast fibroadenoma information"
+        links = [("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
+    elif url == "/departments/lymphedema":
+        heading = "Related lymphedema information"
+        links = [("Dr. Mohal Banker", MOHAL_PROFILE_URL), ("Contact Bankers Vascular Centre", "/contact-us")]
     elif url.startswith("/varicose-veins/"):
         links = [("Varicose veins treatment", "/departments/varicose-veins"), ("VenaSeal Glue Treatment", "/treatment/venaseal-glue-embolization"), ("Radiofrequency Ablation", "/treatment/radiofrequency-ablation"), ("Dr. Mohal Banker", MOHAL_PROFILE_URL)]
     elif url.startswith("/non-surgical-knee-pain/"):
