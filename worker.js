@@ -1,4 +1,4 @@
-import { youtubeFeed } from "./api/youtube.js";
+import { syncAndMarkStale, youtubeFeed } from "./api/youtube.js";
 
 // Cloudflare Worker for the static site and its single lead-capture endpoint.
 // It runs before static assets so the canonical-origin redirect applies to every
@@ -170,6 +170,14 @@ export default {
       return env.ASSETS.fetch(new Request(assetUrl, request));
     }
     return env.ASSETS.fetch(request);
+  },
+
+  async scheduled(_controller, env, ctx) {
+    ctx.waitUntil(syncAndMarkStale(env).catch((error) => {
+      // The sync helper retains the last good KV snapshot. Log only its safe
+      // internal code; never log the upstream URL, response body, or API key.
+      console.error("youtube: scheduled sync failed", error?.code || "unknown");
+    }));
   },
 };
 

@@ -11,6 +11,7 @@
     "build": "python tools/build.py",
     "build:fast": "python tools/build.py --skip-assets",
     "verify": "python tools/verify.py",
-    "serve": "python tools/serve.py 3111"
+    "serve": "python tools/serve.py 3111",
+    "test:youtube": "node tools/test_youtube_feed.mjs"
   }
 }

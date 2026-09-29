@@ -47,6 +47,10 @@ STATIC_META = {
         "title": "Bankers Notes | Dr. Mohal Banker | Bankers Vascular Centre",
         "desc": "Expert notes, practical guidance, and treatment insights personally shared by Dr. Mohal Banker.",
     },
+    "youtube.html": {
+        "title": "YouTube Videos | Bankers Vascular Centre",
+        "desc": "Watch the latest vascular health, knee pain, varicose vein, and minimally invasive treatment videos from Bankers Vascular Centre.",
+    },
     "bng-con-2025.html": {
         "title": "BnG Con 2025 | Bankers Vascular Centre",
         "desc": "Learn about BnG Con 2025, a Bankers Vascular Centre conference for vascular and interventional radiology professionals.",
@@ -1184,6 +1188,28 @@ def add_bankers_notes_nav(html, current=False):
     return re.sub(pattern, r'\1\n                ' + link, html, count=1)
 
 
+def add_youtube_nav(html, current=False):
+    """Add the YouTube page to the shared header and footer when absent."""
+    if re.search(r'href="/youtube"[^>]*>\s*YouTube\s*</a>', html):
+        return html
+    current_attr = ' aria-current="page"' if current else ''
+    current_class = ' w--current' if current else ''
+    nav_link = ('<li class="nav-list-item position-relative">\n'
+                '                  <div class="nav-line"></div>\n'
+                '                  <a href="/youtube"%s class="nav-link text-block-8%s">YouTube</a>\n'
+                '                </li>') % (current_attr, current_class)
+    nav_pattern = (r'(<li class="nav-list-item position-relative">\s*'
+                   r'<div class="nav-line"></div>\s*'
+                   r'<a href="/(?:bankers-notes|blog)"[^>]*>[^<]+</a>\s*</li>)')
+    html = re.sub(nav_pattern, r'\1\n                ' + nav_link, html, count=1, flags=re.S)
+    footer_link = ('<a href="/youtube" class="footer-link-two w-inline-block">'
+                   '<div class="w-embed"><span aria-hidden="true">›</span></div>'
+                   '<div>YouTube</div></a>')
+    footer_pattern = r'(<a href="/blog" class="footer-link-two w-inline-block">.*?</a>)'
+    return re.sub(footer_pattern, r'\1\n                ' + footer_link,
+                  html, count=1, flags=re.S)
+
+
 LOVE_U_ZINDAGI_GUJARAT = [
     ("Patan Ni Vav — Reversal of Taj Mahal", "https://loveuzindagiorg.wordpress.com/2015/11/20/%e0%aa%aa%e0%aa%be%e0%aa%9f%e0%aa%a3-%e0%aa%a8%e0%ab%80-%e0%aa%b5%e0%aa%be%e0%aa%b5-reversal-of-tajmahal/", "https://mohalbankerdotcom.files.wordpress.com/2015/11/img_20241.jpg"),
     ("Kutchh Rann Utsav — Mhaaro Kutchhdo", "https://loveuzindagiorg.wordpress.com/2016/02/21/kutchh-rann-utsav-%e0%aa%ae%e0%ab%8d%e0%aa%b9%e0%aa%be%e0%aa%b0%e0%ab%8b-%e0%aa%95%e0%aa%9a%e0%ab%8d%e0%aa%9b%e0%aa%a1%e0%ab%8b-%e0%aa%ac%e0%aa%be%e0%aa%b0%e0%ab%87-%e0%aa%ae%e0%aa%be%e0%aa%b8/", "https://mohalbankerdotcom.files.wordpress.com/2016/02/img_4413.jpg"),
@@ -1359,7 +1385,10 @@ def build_shells(pages, cms, binder, assets):
         html = prepare_shell(read(os.path.join(SRC, source)), cms, binder, page)
         if page == "bankers-notes.html":
             html = customise_bankers_notes(html, cms)
-        html = add_bankers_notes_nav(html, current=(page == "bankers-notes.html"))
+        html = add_youtube_nav(
+            add_bankers_notes_nav(html, current=(page == "bankers-notes.html")),
+            current=(page == "youtube.html"),
+        )
         out_rel = extra.get("output", CFG.DIRECTORY_PAGES.get(page, page))
         url = page_url(page)
         specs = CFG.PAGE_LISTS.get(page, [])
@@ -1424,8 +1453,8 @@ def build_details(cms, binder, assets):
         key = spec["key"]
         # The nav/junk/link/form work is identical for every item, so do it
         # once per template rather than 282 times.
-        base = add_bankers_notes_nav(
-            prepare_shell(read(os.path.join(SRC, tpl)), cms, binder, tpl))
+        base = add_youtube_nav(add_bankers_notes_nav(
+            prepare_shell(read(os.path.join(SRC, tpl)), cms, binder, tpl)))
         items = cms.published[key]
         for item in items:
             html = render_detail(base, spec, item, cms, binder, assets)

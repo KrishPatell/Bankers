@@ -1,0 +1,3 @@
+# Local-only placeholders. Never commit real YouTube credentials.
+YOUTUBE_API_KEY=replace-with-a-test-or-development-key
+YOUTUBE_CHANNEL_ID=replace-with-the-channel-id
