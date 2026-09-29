@@ -117,6 +117,15 @@ Required Cloudflare environment variables for forms:
 Without the first two variables, the API intentionally returns 503 and the
 site displays its form error state rather than falsely accepting a lead.
 
+Optional variables for `/api/youtube-feed` (`api/youtube.js`):
+
+| Variable | Purpose |
+| --- | --- |
+| `YOUTUBE_CHANNEL_ID` | Channel override; defaults to `UC6UCazRbcXgkVpIP6bhk74g` (@bankersvascular) |
+| `YOUTUBE_API_KEY` | Enables the Data API (50 uploads, real view counts); otherwise the public channel RSS feed (15 newest) is used |
+
+The feed needs no configuration. An API failure falls back to the RSS feed.
+
 ## Architecture and ownership
 
 | Path | Owns |
@@ -303,6 +312,23 @@ The `team-member-section` is CMS-driven by `.doctor-archive-list`.
   image/name/designation visibility is forced after interaction initialisation.
 - Do not return this list to a shrinking flex layout. Flex-shrunk 350px items
   plus fixed-width inner cards caused the original overlapping-photo bug.
+
+### Home patient videos
+
+The `Patient Experiences` section (`[data-patient-videos]`) is a horizontal
+scroll-snap carousel driven by `src/js/patient-videos.js`.
+
+- It fetches `/api/youtube-feed` and shows the 12 newest channel uploads, so
+  new YouTube videos appear without a build or deploy.
+- The four videos in `src/index.html` are the no-JS/feed-failure fallback.
+  Keep them valid; they are replaced only when the feed returns videos.
+- Cards are thumbnail facades. The YouTube player (`youtube-nocookie.com`)
+  loads only after a visitor presses play; do not return to one iframe per
+  card.
+- Layout: three cards visible on desktop, two on tablet, one with the next
+  peeking on mobile. Arrows page by whole cards and hide when nothing
+  overflows. Titles clamp to two lines.
+- The outer `about-us-button-wrapper` keeps its Webflow `data-w-id` reveal.
 
 ### Breadcrumbs
 
