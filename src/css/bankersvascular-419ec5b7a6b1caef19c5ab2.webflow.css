@@ -14982,3 +14982,213 @@ figure {
   .press-coverage-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .press-coverage-link { border-radius: 11px; }
 }
+
+/* Home "Patient Experiences" video carousel. Cards are thumbnails until a
+   visitor presses play, so the newest channel uploads cost one small image
+   each instead of a full YouTube player per video. */
+.patient-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.patient-videos-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.patient-videos-channel {
+  color: var(--color--primary-02);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.patient-videos-channel:hover,
+.patient-videos-channel:focus-visible {
+  text-decoration: underline;
+}
+
+.patient-videos-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.patient-videos.is-static .patient-videos-nav {
+  display: none;
+}
+
+.patient-videos-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(27, 60, 116, .22);
+  border-radius: 50%;
+  background: var(--color--white);
+  color: var(--color--primary-02);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .2s, color .2s, border-color .2s, opacity .2s;
+}
+
+.patient-videos-arrow:hover:not(:disabled),
+.patient-videos-arrow:focus-visible {
+  border-color: var(--color--primary-02);
+  background: var(--color--primary-02);
+  color: var(--color--white);
+}
+
+.patient-videos-arrow:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.patient-videos-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 40px) / 3);
+  gap: 20px;
+  padding-bottom: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.patient-videos-track:focus-visible,
+.patient-videos-arrow:focus-visible,
+.patient-video-play:focus-visible,
+.patient-videos-channel:focus-visible {
+  outline: 3px solid var(--color--primary-01);
+  outline-offset: 3px;
+}
+
+.patient-video-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.patient-video-play,
+.patient-video-frame {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 6px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  background: #062333;
+}
+
+.patient-video-play {
+  cursor: pointer;
+}
+
+/* hqdefault thumbnails are 4:3 with letterbox bars; cover crops the bars. */
+.patient-video-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+
+.patient-video-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 8px 22px rgba(6, 35, 51, .35);
+  transform: translate(-50%, -50%);
+  transition: background-color .2s, transform .2s;
+}
+
+.patient-video-icon::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  border-style: solid;
+  border-width: 10px 0 10px 16px;
+  border-color: transparent transparent transparent var(--color--primary-02);
+  transform: translate(-50%, -50%);
+  transition: border-color .2s;
+}
+
+.patient-video-play:hover .patient-video-thumb,
+.patient-video-play:focus-visible .patient-video-thumb {
+  transform: scale(1.04);
+}
+
+.patient-video-play:hover .patient-video-icon,
+.patient-video-play:focus-visible .patient-video-icon {
+  background: var(--color--primary-02);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.patient-video-play:hover .patient-video-icon::before,
+.patient-video-play:focus-visible .patient-video-icon::before {
+  border-left-color: var(--color--white);
+}
+
+.patient-video-title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color--primary-02);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.patient-video-date {
+  margin: 0;
+  color: var(--color--secondary-03);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patient-videos-track { scroll-behavior: auto; }
+  .patient-video-thumb,
+  .patient-video-icon { transition: none; }
+}
+
+@media screen and (max-width: 991px) {
+  .patient-videos-track {
+    grid-auto-columns: calc((100% - 16px) / 2);
+    gap: 16px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .patient-videos { gap: 16px; }
+  .patient-videos-channel { font-size: 15px; }
+  .patient-videos-arrow { width: 40px; height: 40px; }
+  /* One readable card with the next one peeking, matching the team carousel. */
+  .patient-videos-track { grid-auto-columns: min(84%, 340px); }
+  .patient-video-title { font-size: 16px; }
+}
