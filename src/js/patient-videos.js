@@ -22,10 +22,10 @@
     const date = formatDate(video.publishedAt);
     return `
       <article class="patient-video-card">
-        <button type="button" class="patient-video-play" data-video-id="${esc(video.id)}" data-video-title="${title}" aria-label="Play video: ${title}">
+        <a href="https://www.youtube.com/watch?v=${esc(video.id)}" target="_blank" rel="noopener" class="patient-video-play" data-video-id="${esc(video.id)}" data-video-title="${title}" aria-label="Play video: ${title}">
           <img src="https://i.ytimg.com/vi/${esc(video.id)}/hqdefault.jpg" loading="lazy" width="480" height="360" alt="" class="patient-video-thumb">
           <span class="patient-video-icon" aria-hidden="true"></span>
-        </button>
+        </a>
         <h3 class="patient-video-title">${title}</h3>
         ${date ? `<p class="patient-video-date">${date}</p>` : ""}
       </article>`;
@@ -58,7 +58,10 @@
 
   track.addEventListener("click", (event) => {
     const button = event.target.closest(".patient-video-play");
-    if (!button) return;
+    // Cards are real YouTube links so they still work without this script;
+    // modified clicks keep the browser's open-in-new-tab behaviour.
+    if (!button || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
     const iframe = document.createElement("iframe");
     iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(button.dataset.videoId)}?autoplay=1&rel=0`;
     iframe.title = button.dataset.videoTitle || "YouTube video";

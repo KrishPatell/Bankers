@@ -322,7 +322,8 @@ scroll-snap carousel driven by `src/js/patient-videos.js`.
   new YouTube videos appear without a build or deploy.
 - The four videos in `src/index.html` are the no-JS/feed-failure fallback.
   Keep them valid; they are replaced only when the feed returns videos.
-- Cards are thumbnail facades. The YouTube player (`youtube-nocookie.com`)
+- Cards are thumbnail links to the video on YouTube (so they work without
+  JS). The script intercepts plain clicks and loads the player (`youtube-nocookie.com`)
   loads only after a visitor presses play; do not return to one iframe per
   card.
 - Layout: three cards visible on desktop, two on tablet, one with the next
