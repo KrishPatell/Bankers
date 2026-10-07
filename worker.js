@@ -58,7 +58,6 @@ function rateLimited(ip) {
 
 async function fetchAssetPath(request, env, pathname) {
   const assetUrl = new URL(request.url);
-  assetUrl.hostname = "assets.local";
   assetUrl.pathname = pathname;
   return env.ASSETS.fetch(new Request(assetUrl, request));
 }
