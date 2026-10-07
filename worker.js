@@ -181,6 +181,9 @@ export default {
     ) {
       const assetUrl = new URL(request.url);
       assetUrl.pathname += ".html";
+      // Use the binding's internal hostname so the asset lookup cannot apply
+      // the public URL's HTML redirect back onto the same clean route.
+      assetUrl.hostname = "assets.local";
       const response = await env.ASSETS.fetch(new Request(assetUrl, request));
       if (response.status !== 404) return response;
     }
