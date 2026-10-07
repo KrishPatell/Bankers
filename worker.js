@@ -56,12 +56,6 @@ function rateLimited(ip) {
   return recent.length > MAX_PER_WINDOW;
 }
 
-async function fetchAssetPath(request, env, pathname) {
-  const assetUrl = new URL(request.url);
-  assetUrl.pathname = pathname;
-  return env.ASSETS.fetch(new Request(assetUrl, request));
-}
-
 function renderEmail(rows, formName) {
   const rowHtml = rows.map(([label, value]) => `
     <tr><td style="padding:12px 16px;border-bottom:1px solid #e6edf0;color:#58717d;font:600 12px/18px Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;vertical-align:top;width:132px">${esc(label)}</td><td style="padding:12px 16px;border-bottom:1px solid #e6edf0;color:#152b36;font:400 15px/22px Arial,sans-serif;word-break:break-word">${esc(value)}</td></tr>`).join("");
@@ -156,33 +150,9 @@ export default {
     }
     if (url.pathname === "/api/youtube-feed") return youtubeFeed(request, env);
     if (url.pathname === "/api/contact") return contact(request, env);
-    if (url.pathname === "/") {
-      return fetchAssetPath(request, env, "/index.html");
-    }
     if (url.pathname.endsWith("/") && CANONICAL_DIRECTORY_LISTINGS.has(url.pathname.slice(0, -1))) {
       url.pathname = url.pathname.slice(0, -1);
       return Response.redirect(url.toString(), 301);
-    }
-    // Fetch only these directory indexes internally so the public canonical
-    // paths return 200 without Cloudflare's automatic /folder/ redirect.
-    if (CANONICAL_DIRECTORY_LISTINGS.has(url.pathname)) {
-      return fetchAssetPath(request, env, `${url.pathname}/index.html`);
-    }
-    // The static-assets binding otherwise normalizes this directory index to
-    // /products/. Fetch its index internally so the sitemap/canonical URL
-    // itself remains the public 200 response.
-    if (url.pathname === "/products") {
-      return fetchAssetPath(request, env, "/products/index.html");
-    }
-    // Clean public pages are generated as .html files (or directory indexes)
-    // while static assets are configured with HTML handling disabled. Resolve
-    // the clean URL explicitly so it still returns the canonical page content.
-    const lastSegment = url.pathname.slice(url.pathname.lastIndexOf("/") + 1);
-    if (!url.pathname.endsWith("/") && !lastSegment.includes(".")) {
-      for (const assetPath of [`${url.pathname}.html`, `${url.pathname}/index.html`]) {
-        const response = await fetchAssetPath(request, env, assetPath);
-        if (response.status !== 404) return response;
-      }
     }
     return env.ASSETS.fetch(request);
   },
