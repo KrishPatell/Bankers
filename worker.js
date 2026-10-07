@@ -169,24 +169,6 @@ export default {
       assetUrl.pathname = "/products/";
       return env.ASSETS.fetch(new Request(assetUrl, request));
     }
-    // Blog detail pages are generated as /blog/<slug>.html while the public
-    // URL contract uses the clean /blog/<slug> form. Resolve that form
-    // explicitly so newly deployed detail assets do not depend on an edge
-    // clean-URL rewrite or a stale cached route.
-    if (
-      url.pathname.startsWith("/blog/") &&
-      !url.pathname.endsWith("/") &&
-      !url.pathname.endsWith(".html") &&
-      !url.pathname.startsWith("/blog/page/")
-    ) {
-      const assetUrl = new URL(request.url);
-      assetUrl.pathname += ".html";
-      // Use the binding's internal hostname so the asset lookup cannot apply
-      // the public URL's HTML redirect back onto the same clean route.
-      assetUrl.hostname = "assets.local";
-      const response = await env.ASSETS.fetch(new Request(assetUrl, request));
-      if (response.status !== 404) return response;
-    }
     return env.ASSETS.fetch(request);
   },
 };
