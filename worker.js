@@ -156,6 +156,9 @@ export default {
     }
     if (url.pathname === "/api/youtube-feed") return youtubeFeed(request, env);
     if (url.pathname === "/api/contact") return contact(request, env);
+    if (url.pathname === "/") {
+      return fetchAssetPath(request, env, "/index.html");
+    }
     if (url.pathname.endsWith("/") && CANONICAL_DIRECTORY_LISTINGS.has(url.pathname.slice(0, -1))) {
       url.pathname = url.pathname.slice(0, -1);
       return Response.redirect(url.toString(), 301);
