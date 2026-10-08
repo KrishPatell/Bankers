@@ -28,6 +28,8 @@ const LEGACY_REDIRECTS = {
   "/frozen-shoulder": "/departments/frozen-shoulder",
   "/dr-rozil-gandhi": "/our-doctors/dr-rozil-gandhi",
   "/blog/venous-veins-and-thrombus-": "/blog/venous-veins-and-thrombus",
+  "/blog/what-is-genicular-artery-embolisation-a-game-changer-for-knee-pain-in-older-adults": "/blog/gae-for-elderly-patients",
+  "/blog/before-you-replace-your-knee-read-this-how-gae-is-changing-knee-pain-treatment": "/blog/gae-vs-knee-replacement-which-one-is-right-for-you",
 };
 
 // These indexable listings are emitted as <folder>/index.html, but their
