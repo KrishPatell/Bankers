@@ -284,7 +284,7 @@ def _esc_attr(s):
 
 
 def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
-                  noindex=False):
+                  noindex=False, keywords=None):
     # Social crawlers need an absolute image URL.  Page content itself keeps
     # root-relative assets, but Open Graph/Twitter metadata must not.
     if image and image.startswith("/"):
@@ -308,6 +308,7 @@ def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
             html = html.replace("</head>", "  %s\n</head>" % repl, 1)
 
     meta('name="description"', desc)
+    meta('name="keywords"', keywords)
     meta('property="og:title"', title)
     meta('property="og:description"', desc)
     meta('property="og:image"', image)
@@ -1571,8 +1572,14 @@ def render_detail(base, spec, item, cms, binder, assets):
     if spec["key"] == "our-doctors" and item.slug == MOHAL_DOCTOR_SLUG:
         html = set_head_meta(
             html,
-            title="Dr. Mohal Banker | Interventional Radiologist | Bankers Vascular Centre",
-            desc="Dr. Mohal Banker is an Interventional Radiologist at Bankers Vascular Centre.",
+            title="Dr. Mohal Banker | Interventional Radiologist in Ahmedabad & Vadodara",
+            desc=("Meet Dr. Mohal Banker, Interventional Radiologist at Bankers Vascular Centre. "
+                  "Explore minimally invasive treatments for varicose veins, knee pain (GAE), "
+                  "enlarged prostate (PAE) and piles (HAE)."),
+            keywords=("Dr Mohal Banker, Interventional Radiologist Ahmedabad, "
+                      "Interventional Radiologist Vadodara, Varicose Veins Treatment, "
+                      "Genicular Artery Embolization GAE, Prostatic Artery Embolization PAE, "
+                      "Hemorrhoidal Artery Embolization HAE, Non-Surgical Knee Pain Treatment"),
         )
         html = re.sub(r'<meta(?=[^>]*\bproperty="og:type")[^>]*>',
                       '<meta property="og:type" content="profile">', html, count=1)
@@ -1884,13 +1891,36 @@ def add_page_schema(html, url, spec=None, item=None):
         person_id = ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["person"]
         image = item.get_text("Doctor Details Image", "Doctor Thumbnail")
         person = {
-            "@type": "Person", "@id": person_id, "name": "Dr. Mohal Banker",
+            "@type": ["Person", "Physician"], "@id": person_id,
+            "name": "Dr. Mohal Banker",
             "honorificPrefix": "Dr.", "url": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["url"],
             "jobTitle": "Interventional Radiologist",
+            "medicalSpecialty": "Interventional Radiology",
+            "description": ("Dr. Mohal Banker is an Interventional Radiologist and Chairman of "
+                            "Bankers Vascular Centre, offering advanced minimally invasive and "
+                            "image-guided treatment options in Ahmedabad and Vadodara, Gujarat. "
+                            "His clinical areas of focus include varicose veins, knee osteoarthritis "
+                            "treated with Genicular Artery Embolization (GAE), enlarged prostate "
+                            "treated with Prostatic Artery Embolization (PAE), hemorrhoids treated "
+                            "with Hemorrhoidal Artery Embolization (HAE), uterine fibroids and other "
+                            "vascular conditions. These modern procedures may provide suitable "
+                            "patients with alternatives to conventional surgery."),
             "worksFor": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
             "affiliation": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
-            "knowsAbout": ["Interventional Radiology", "Varicose Vein Treatment",
-                           "Genicular Artery Embolization", "Vascular Malformations"],
+            "knowsAbout": [
+                "Interventional Radiology",
+                "Varicose Veins Treatment",
+                "Endovenous Laser Ablation",
+                "Radiofrequency Ablation",
+                "VenaSeal Glue Treatment",
+                "Foam Sclerotherapy",
+                "Genicular Artery Embolization",
+                "Prostatic Artery Embolization",
+                "Hemorrhoidal Artery Embolization",
+                "Uterine Fibroid Embolization",
+                "Image-Guided Vascular Interventions",
+                "Vascular Malformation Embolization",
+            ],
         }
         if image:
             image_url = image if image.startswith(("http://", "https://")) else CFG.SITE_URL + image
@@ -1898,7 +1928,7 @@ def add_page_schema(html, url, spec=None, item=None):
         graph.extend((
             {"@type": "ProfilePage", "@id": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["profile_page"],
              "url": ENTITY_SCHEMA.ENTITY_IDS["mohal_banker"]["url"],
-             "name": "Dr. Mohal Banker | Bankers Vascular Centre",
+             "name": "Dr. Mohal Banker | Interventional Radiologist in Ahmedabad & Vadodara",
              "isPartOf": {"@id": ENTITY_SCHEMA.ENTITY_IDS["website"]},
              "mainEntity": {"@id": person_id}, "about": {"@id": person_id}},
             person,
