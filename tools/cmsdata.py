@@ -84,6 +84,43 @@ DOCTOR_PROFILE_DESIGNATION_OVERRIDES = {
     "dr-rozil-gandhi": "Joint Director",
 }
 
+# The legacy Webflow export is retained as the historic CMS record, but the
+# lead doctor's public copy is maintained here as the canonical, reviewed
+# profile. Keeping it in the existing CMS override layer prevents unrelated
+# doctor records from changing and ensures a future build cannot reintroduce
+# incorrect pediatric specialty text.
+DOCTOR_PROFILE_CONTENT_OVERRIDES = {
+    "dr-mohal-banker": {
+        "Doctor Bio": (
+            "<h3>About Me</h3>"
+            "<p>Dr. Mohal Banker is an Interventional Radiologist and Chairman "
+            "of Bankers Vascular Centre. He specializes in minimally invasive, "
+            "image-guided treatments for vascular, musculoskeletal and pain "
+            "conditions in Ahmedabad and Vadodara, Gujarat.</p>"
+            "<p>His approach focuses on accurate diagnosis, patient comfort and "
+            "personalized treatment planning. Depending on the condition and "
+            "clinical assessment, these procedures may offer suitable patients an "
+            "alternative to conventional surgery with a shorter recovery period.</p>"
+        ),
+        "Speciality": (
+            "<h3>Speciality</h3>"
+            "<p>Interventional Radiology uses image guidance to perform precise, "
+            "minimally invasive treatments through small access points. Dr. Mohal "
+            "Banker provides individualized treatment recommendations after a "
+            "clinical evaluation.</p>"
+            "<h3>Areas of Expertise</h3><ul>"
+            "<li>Varicose Veins – Laser, RFA, VenaSeal</li>"
+            "<li>Knee Osteoarthritis – Genicular Artery Embolization (GAE)</li>"
+            "<li>Enlarged Prostate (BPH) – Prostatic Artery Embolization (PAE)</li>"
+            "<li>Piles – Hemorrhoidal Artery Embolization (HAE)</li>"
+            "<li>Uterine Fibroids – Uterine Fibroid Embolization (UFE)</li>"
+            "<li>Frozen Shoulder – Minimally Invasive Treatment</li>"
+            "<li>Chronic Heel Pain – Image-Guided Treatment</li>"
+            "<li>Breast Fibroadenoma – Vacuum-Assisted Excision (VABB)</li>"
+            "</ul>"
+        ),
+    },
+}
 # Keep the longest doctor card name fully readable in its narrow card without
 # changing the name used on the profile, navigation, or structured data.
 DOCTOR_CARD_NAME_OVERRIDES = {
@@ -233,6 +270,8 @@ class Collections:
                     r["Card Designation"] = DOCTOR_CARD_DESIGNATION_OVERRIDES[slug]
                 if key == "our-doctors" and slug in DOCTOR_PROFILE_DESIGNATION_OVERRIDES:
                     r["Doctor Designation"] = DOCTOR_PROFILE_DESIGNATION_OVERRIDES[slug]
+                if key == "our-doctors" and slug in DOCTOR_PROFILE_CONTENT_OVERRIDES:
+                    r.update(DOCTOR_PROFILE_CONTENT_OVERRIDES[slug])
                 if key == "our-doctors" and slug in DOCTOR_CARD_NAME_OVERRIDES:
                     r["Card Name"] = DOCTOR_CARD_NAME_OVERRIDES[slug]
                 if key == "blog-author":

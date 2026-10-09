@@ -1573,13 +1573,13 @@ def render_detail(base, spec, item, cms, binder, assets):
         html = set_head_meta(
             html,
             title="Dr. Mohal Banker | Interventional Radiologist in Ahmedabad & Vadodara",
-            desc=("Meet Dr. Mohal Banker, Interventional Radiologist at Bankers Vascular Centre. "
-                  "Explore minimally invasive treatments for varicose veins, knee pain (GAE), "
-                  "enlarged prostate (PAE) and piles (HAE)."),
+            desc=("Dr. Mohal Banker is an Interventional Radiologist at Bankers Vascular Centre, "
+                  "specializing in minimally invasive, image-guided treatments for varicose veins, "
+                  "knee osteoarthritis, enlarged prostate, piles, uterine fibroids and pain conditions."),
             keywords=("Dr Mohal Banker, Interventional Radiologist Ahmedabad, "
-                      "Interventional Radiologist Vadodara, Varicose Veins Treatment, "
+                      "Interventional Radiologist Vadodara, Varicose Veins Laser RFA VenaSeal, "
                       "Genicular Artery Embolization GAE, Prostatic Artery Embolization PAE, "
-                      "Hemorrhoidal Artery Embolization HAE, Non-Surgical Knee Pain Treatment"),
+                      "Hemorrhoidal Artery Embolization HAE, Uterine Fibroid Embolization UFE"),
         )
         html = re.sub(r'<meta(?=[^>]*\bproperty="og:type")[^>]*>',
                       '<meta property="og:type" content="profile">', html, count=1)
@@ -1897,29 +1897,21 @@ def add_page_schema(html, url, spec=None, item=None):
             "jobTitle": "Interventional Radiologist",
             "medicalSpecialty": "Interventional Radiology",
             "description": ("Dr. Mohal Banker is an Interventional Radiologist and Chairman of "
-                            "Bankers Vascular Centre, offering advanced minimally invasive and "
-                            "image-guided treatment options in Ahmedabad and Vadodara, Gujarat. "
-                            "His clinical areas of focus include varicose veins, knee osteoarthritis "
-                            "treated with Genicular Artery Embolization (GAE), enlarged prostate "
-                            "treated with Prostatic Artery Embolization (PAE), hemorrhoids treated "
-                            "with Hemorrhoidal Artery Embolization (HAE), uterine fibroids and other "
-                            "vascular conditions. These modern procedures may provide suitable "
-                            "patients with alternatives to conventional surgery."),
+                            "Bankers Vascular Centre, specializing in minimally invasive, image-guided "
+                            "treatments for vascular, musculoskeletal and pain conditions in Ahmedabad "
+                            "and Vadodara, Gujarat."),
             "worksFor": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
             "affiliation": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
             "knowsAbout": [
                 "Interventional Radiology",
-                "Varicose Veins Treatment",
-                "Endovenous Laser Ablation",
-                "Radiofrequency Ablation",
-                "VenaSeal Glue Treatment",
-                "Foam Sclerotherapy",
-                "Genicular Artery Embolization",
-                "Prostatic Artery Embolization",
-                "Hemorrhoidal Artery Embolization",
-                "Uterine Fibroid Embolization",
-                "Image-Guided Vascular Interventions",
-                "Vascular Malformation Embolization",
+                "Varicose Veins - Laser, RFA, VenaSeal",
+                "Knee Osteoarthritis - Genicular Artery Embolization (GAE)",
+                "Enlarged Prostate (BPH) - Prostatic Artery Embolization (PAE)",
+                "Piles - Hemorrhoidal Artery Embolization (HAE)",
+                "Uterine Fibroids - Uterine Fibroid Embolization (UFE)",
+                "Frozen Shoulder - Minimally Invasive Treatment",
+                "Chronic Heel Pain - Image-Guided Treatment",
+                "Breast Fibroadenoma - Vacuum-Assisted Excision (VABB)",
             ],
         }
         if image:
