@@ -1267,52 +1267,33 @@ document.addEventListener("submit", async function (e) {
   }
 });
 </script>
-  <aside class="services-reel-modal" data-services-reel-modal role="dialog" aria-modal="true" aria-label="Latest Banker's Vascular video" hidden>
-    <div class="services-reel-modal-backdrop" data-services-reel-close></div>
-    <div class="services-reel-dialog">
-      <button class="services-reel-close" type="button" data-services-reel-close aria-label="Close video banner">×</button>
-      <a class="services-reel-link" data-services-reel-link href="https://www.instagram.com/reel/DcXogX7DPwh/?utm_source=ig_web_copy_link&amp;igsi=MzRlODBiNWFlZA==" target="_blank" rel="noopener" aria-label="Watch the Banker's Vascular knee pain reel on Instagram">
-        <img data-services-reel-image src="images/instagram-reel-knee-warning-signs.png" alt="Five warning signs of knee pain requiring medical evaluation" loading="eager">
-        <span class="services-reel-play">▶ <b>Watch video on Instagram</b></span>
+  <aside class="home-offer-modal" data-home-offer-modal role="dialog" aria-modal="true" aria-label="Knee pain special offer" hidden>
+    <div class="home-offer-modal-backdrop" data-home-offer-close></div>
+    <div class="home-offer-dialog">
+      <button class="home-offer-close" type="button" data-home-offer-close aria-label="Close special offer">×</button>
+      <a class="home-offer-link" href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the knee pain special offer">
+        <img src="images/knee-pain-special-offer-nov-2026.png" alt="Special offer for knee pain treatment: consultation charge reduced to 500 rupees and X-ray charge reduced to 200 rupees, valid 16 November to 21 November 2026" loading="eager">
       </a>
-      <div class="services-reel-dots" aria-label="Choose a video">
-        <button type="button" data-services-reel-dot="0" aria-label="Show video 1" aria-current="true"></button>
-        <button type="button" data-services-reel-dot="1" aria-label="Show video 2"></button>
-        <button type="button" data-services-reel-dot="2" aria-label="Show video 3"></button>
-      </div>
     </div>
   </aside>
   <script>
     (function () {
-      var modal = document.querySelector('[data-services-reel-modal]');
+      var modal = document.querySelector('[data-home-offer-modal]');
       if (!modal) return;
-      var videos = [
-        { href: 'https://www.instagram.com/reel/DcXogX7DPwh/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==', image: '/images/instagram-reel-knee-warning-signs.png', alt: 'Five warning signs of knee pain requiring medical evaluation' },
-        { href: 'https://www.instagram.com/reel/DcgO_s7No1U/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==', image: '/images/instagram-reel-knee-pain-age-33.png', alt: 'Knee pain at age 33 educational video' },
-        { href: 'https://www.instagram.com/reel/Dca7wh-JWnx/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==', image: '/images/instagram-reel-knee-pain-mistakes.png', alt: 'Five mistakes to avoid with knee pain educational video' }
-      ];
-      var current = 0;
-      var link = modal.querySelector('[data-services-reel-link]');
-      var image = modal.querySelector('[data-services-reel-image]');
-      var dots = modal.querySelectorAll('[data-services-reel-dot]');
-      var rotateTimer;
-      function showVideo(index) {
-        current = index;
-        var video = videos[current];
-        link.href = video.href;
-        image.src = video.image;
-        image.alt = video.alt;
-        dots.forEach(function (dot, dotIndex) { dot.setAttribute('aria-current', dotIndex === current ? 'true' : 'false'); });
+      function close() {
+        modal.hidden = true;
+        document.body.classList.remove('home-offer-open');
       }
-      function close() { modal.hidden = true; document.body.classList.remove('services-reel-open'); window.clearInterval(rotateTimer); }
-      modal.querySelectorAll('[data-services-reel-close]').forEach(function (button) { button.addEventListener('click', close); });
-      dots.forEach(function (dot) { dot.addEventListener('click', function () { showVideo(Number(this.getAttribute('data-services-reel-dot'))); }); });
-      document.addEventListener('keydown', function (event) { if (event.key === 'Escape') close(); });
+      modal.querySelectorAll('[data-home-offer-close]').forEach(function (button) {
+        button.addEventListener('click', close);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !modal.hidden) close();
+      });
       window.setTimeout(function () {
         modal.hidden = false;
-        document.body.classList.add('services-reel-open');
-        rotateTimer = window.setInterval(function () { showVideo((current + 1) % videos.length); }, 8000);
-      }, 850);
+        document.body.classList.add('home-offer-open');
+      }, 700);
     }());
   </script>
 </body>
