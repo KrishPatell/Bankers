@@ -121,7 +121,7 @@ CITY_LOCATION_DATA = {
         "eyebrow": "Ahmedabad hospital",
         "heading": "Visit Bankers Vascular Hospital in Ahmedabad",
         "name": "Bankers Vascular Hospital",
-        "address": "2nd & 3rd Floor, RJP House, Opp. Scarlet Height Apartment, 100' Anandnagar Road, Satellite, Ahmedabad, Gujarat 380015",
+        "address": "2nd & 3rd Floor, RJP House, 100 Ft Anand Nagar Rd, Opp. Scarlet Heights, Nr Gopi Restaurant, Ahmedabad, Gujarat 380015",
         "city": "Ahmedabad",
         "postal_code": "380015",
     },

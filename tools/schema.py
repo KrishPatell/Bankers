@@ -48,7 +48,7 @@ LOCATIONS = {
         "id": ENTITY_IDS["ahmedabad_location"],
         "name": "Bankers Vascular Hospital",
         "telephone": "+91-99099-03449",
-        "street_address": "2nd & 3rd Floor, RJP House, Opp. Scarlet Height Apartment, 100' Anandnagar Road, Satellite",
+        "street_address": "2nd & 3rd Floor, RJP House, 100 Ft Anand Nagar Rd, Opp. Scarlet Heights, Nr Gopi Restaurant",
         "city": "Ahmedabad",
         "postal_code": "380015",
         "opening_hours": LOCATION_HOURS["ahmedabad"],
