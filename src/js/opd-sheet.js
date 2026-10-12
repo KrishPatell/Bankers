@@ -167,6 +167,11 @@
   }
 
   function load() {
+    if (!endpoint) {
+      render(fallbackRecords);
+      if (updateBadge) updateBadge.textContent = 'October 2026 schedule';
+      return;
+    }
     fetch(endpoint + '&ts=' + Date.now(), { cache: 'no-store' })
       .then(function (response) { if (!response.ok) throw new Error('Sheet request failed'); return response.text(); })
       .then(function (text) {
