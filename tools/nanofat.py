@@ -339,6 +339,7 @@ PAGE_HTML = r'''
           </div>
         </section>
       </div>
+      </div>
       <div class="sidebar-wrapper">
         <div class="sidebar-form-heading-wrapper">
           <h3 class="sidebar-form-heding">Book An Appointment For</h3>
