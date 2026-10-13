@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import cmsdata
+import nanofat
 import schema as ENTITY_SCHEMA
 import wfconfig as CFG
 import wfhtml as W
@@ -1403,6 +1404,11 @@ def build_shells(pages, cms, binder, assets):
         extra = CFG.EXTRA_SHELL_PAGES.get(page, {})
         source = extra.get("source", page)
         html = prepare_shell(read(os.path.join(SRC, source)), cms, binder, page)
+        if page == "nanofat-for-joint-pain.html":
+            html = nanofat.customise_shell(html)
+            # The standalone form is injected after the shared shell pass, so
+            # run the same normalisation used by every source form on it.
+            html = wire_forms(html, page)
         if page == "bankers-notes.html":
             html = customise_bankers_notes(html, cms)
         html = add_bankers_notes_nav(html, current=(page == "bankers-notes.html"))
@@ -1419,10 +1425,13 @@ def build_shells(pages, cms, binder, assets):
             metadata = {**extra, **STATIC_META.get(page, {})}
             html = set_head_meta(html, title=metadata.get("title"),
                                  desc=metadata.get("desc"), canonical=CFG.SITE_URL + url,
+                                 keywords=metadata.get("keywords"),
                                  noindex=page in CFG.NOINDEX_PAGES)
             if page not in CFG.NOINDEX_PAGES:
                 html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(html)), url)
                 html = add_page_schema(html, url)
+                if page == "nanofat-for-joint-pain.html":
+                    html = nanofat.add_schema(html, CFG.SITE_URL)
             write(out_rel, html)
             written.append((out_rel, url, page not in CFG.NOINDEX_PAGES))
             continue

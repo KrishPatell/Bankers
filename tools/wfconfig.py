@@ -356,6 +356,14 @@ PAGE_LISTS = {
 # Bankers Notes reuses the blog archive but is intentionally limited to the
 # lead doctor's authored articles.
 EXTRA_SHELL_PAGES = {
+    "nanofat-for-joint-pain.html": {
+        "source": "contact-us.html",
+        "output": "nanofat-for-joint-pain/index.html",
+        "url": "/nanofat-for-joint-pain",
+        "title": "NanoFat for Joint Pain | Knee Osteoarthritis Treatment",
+        "desc": "Learn about NanoFat for joint pain and knee osteoarthritis, including how it works, potential benefits, procedure, risks and current research.",
+        "keywords": "NanoFat for joint pain, NanoFat treatment for joint pain, NanoFat knee osteoarthritis, NanoFat knee pain treatment, fat-derived joint therapy, joint pain treatment Ahmedabad, knee osteoarthritis treatment Vadodara, NanoFat vs PRP, joint rejuvenation treatment",
+    },
     "bankers-notes.html": {
         "source": "blog.html",
         "output": "bankers-notes/index.html",
