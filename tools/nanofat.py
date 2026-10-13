@@ -303,14 +303,6 @@ PAGE_HTML = r'''
           </ul>
           <p>Larger randomized controlled trials are necessary to determine which patients, if any, benefit most and how the treatment compares with established osteoarthritis management.</p>
           <p>Researchers must also clarify long-term safety, standardization and regulatory considerations.</p>
-          <div>
-            <h3>Selected peer-reviewed references</h3>
-            <ol>
-              <li>Hohmann E, Keough N, Frank RM, Rodeo S. <a href="https://pubmed.ncbi.nlm.nih.gov/38467171/" target="_blank" rel="noopener noreferrer">Micro-Fragmented Adipose Tissue Demonstrates Comparable Clinical Efficacy to Other Orthobiologic Injections in Treating Symptomatic Knee Osteoarthritis</a>. Arthroscopy. 2025;41(2):418-441.e14.</li>
-              <li>Ye X, Shen Z, Li X, et al. <a href="https://pubmed.ncbi.nlm.nih.gov/39851028/" target="_blank" rel="noopener noreferrer">Microfragmented adipose tissue versus platelet-rich plasma in the treatment of knee osteoarthritis: a systematic review and meta-analysis</a>. Acta Orthop Belg. 2024;90(3):549-558.</li>
-              <li>Di Matteo B, et al. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10780289/" target="_blank" rel="noopener noreferrer">Adipose Tissue-Derived Minimally Manipulated Products versus Platelet-Rich Plasma for the Treatment of Knee Osteoarthritis</a>. 2023 systematic review of clinical evidence and meta-analysis.</li>
-            </ol>
-          </div>
         </section>
 
         <section aria-labelledby="why-bankers-heading">
