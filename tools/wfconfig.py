@@ -357,7 +357,7 @@ PAGE_LISTS = {
 # lead doctor's authored articles.
 EXTRA_SHELL_PAGES = {
     "nanofat-for-joint-pain.html": {
-        "source": "detail_departments.html",
+        "source": "detail_varicose-veins.html",
         "output": "nanofat-for-joint-pain/index.html",
         "url": "/nanofat-for-joint-pain",
         "title": "NanoFat for Joint Pain | Knee Osteoarthritis Treatment",

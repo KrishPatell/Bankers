@@ -5,6 +5,215 @@
   font-style: normal;
   font-display: swap;
 }
+/* Home "Patient Experiences" video carousel. Cards are thumbnails until a
+   visitor presses play, so the newest channel uploads cost one small image
+   each instead of a full YouTube player per video. */
+.patient-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.patient-videos-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.patient-videos-channel {
+  color: var(--color--primary-02);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.patient-videos-channel:hover,
+.patient-videos-channel:focus-visible {
+  text-decoration: underline;
+}
+
+.patient-videos-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.patient-videos.is-static .patient-videos-nav {
+  display: none;
+}
+
+.patient-videos-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(27, 60, 116, .22);
+  border-radius: 50%;
+  background: var(--color--white);
+  color: var(--color--primary-02);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .2s, color .2s, border-color .2s, opacity .2s;
+}
+
+.patient-videos-arrow:hover:not(:disabled),
+.patient-videos-arrow:focus-visible {
+  border-color: var(--color--primary-02);
+  background: var(--color--primary-02);
+  color: var(--color--white);
+}
+
+.patient-videos-arrow:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.patient-videos-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 40px) / 3);
+  gap: 20px;
+  padding-bottom: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.patient-videos-track:focus-visible,
+.patient-videos-arrow:focus-visible,
+.patient-video-play:focus-visible,
+.patient-videos-channel:focus-visible {
+  outline: 3px solid var(--color--primary-01);
+  outline-offset: 3px;
+}
+
+.patient-video-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.patient-video-play,
+.patient-video-frame {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 6px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  background: #062333;
+}
+
+.patient-video-play {
+  cursor: pointer;
+}
+
+/* hqdefault thumbnails are 4:3 with letterbox bars; cover crops the bars. */
+.patient-video-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+
+.patient-video-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 8px 22px rgba(6, 35, 51, .35);
+  transform: translate(-50%, -50%);
+  transition: background-color .2s, transform .2s;
+}
+
+.patient-video-icon::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  border-style: solid;
+  border-width: 10px 0 10px 16px;
+  border-color: transparent transparent transparent var(--color--primary-02);
+  transform: translate(-50%, -50%);
+  transition: border-color .2s;
+}
+
+.patient-video-play:hover .patient-video-thumb,
+.patient-video-play:focus-visible .patient-video-thumb {
+  transform: scale(1.04);
+}
+
+.patient-video-play:hover .patient-video-icon,
+.patient-video-play:focus-visible .patient-video-icon {
+  background: var(--color--primary-02);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.patient-video-play:hover .patient-video-icon::before,
+.patient-video-play:focus-visible .patient-video-icon::before {
+  border-left-color: var(--color--white);
+}
+
+.patient-video-title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color--primary-02);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.patient-video-date {
+  margin: 0;
+  color: var(--color--secondary-03);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patient-videos-track { scroll-behavior: auto; }
+  .patient-video-thumb,
+  .patient-video-icon { transition: none; }
+}
+
+@media screen and (max-width: 991px) {
+  .patient-videos-track {
+    grid-auto-columns: calc((100% - 16px) / 2);
+    gap: 16px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .patient-videos { gap: 16px; }
+  .patient-videos-channel { font-size: 15px; }
+  .patient-videos-arrow { width: 40px; height: 40px; }
+  /* One readable card with the next one peeking, matching the team carousel. */
+  .patient-videos-track { grid-auto-columns: min(84%, 340px); }
+  .patient-video-title { font-size: 16px; }
+}
 
 @font-face {
   font-family: Satoshi;
@@ -14981,668 +15190,4 @@ figure {
   .press-coverage-intro { padding: 0 8px; font-size: 14px; }
   .press-coverage-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .press-coverage-link { border-radius: 11px; }
-}
-
-/* Home "Patient Experiences" video carousel. Cards are thumbnails until a
-   visitor presses play, so the newest channel uploads cost one small image
-   each instead of a full YouTube player per video. */
-.patient-videos {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  min-width: 0;
-}
-
-.patient-videos-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-
-.patient-videos-channel {
-  color: var(--color--primary-02);
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.patient-videos-channel:hover,
-.patient-videos-channel:focus-visible {
-  text-decoration: underline;
-}
-
-.patient-videos-nav {
-  display: flex;
-  gap: 10px;
-}
-
-.patient-videos.is-static .patient-videos-nav {
-  display: none;
-}
-
-.patient-videos-arrow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid rgba(27, 60, 116, .22);
-  border-radius: 50%;
-  background: var(--color--white);
-  color: var(--color--primary-02);
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color .2s, color .2s, border-color .2s, opacity .2s;
-}
-
-.patient-videos-arrow:hover:not(:disabled),
-.patient-videos-arrow:focus-visible {
-  border-color: var(--color--primary-02);
-  background: var(--color--primary-02);
-  color: var(--color--white);
-}
-
-.patient-videos-arrow:disabled {
-  opacity: .35;
-  cursor: default;
-}
-
-.patient-videos-track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: calc((100% - 40px) / 3);
-  gap: 20px;
-  padding-bottom: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-}
-
-.patient-videos-track:focus-visible,
-.patient-videos-arrow:focus-visible,
-.patient-video-play:focus-visible,
-.patient-videos-channel:focus-visible {
-  outline: 3px solid var(--color--primary-01);
-  outline-offset: 3px;
-}
-
-.patient-video-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  scroll-snap-align: start;
-}
-
-.patient-video-play,
-.patient-video-frame {
-  display: block;
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  margin-bottom: 6px;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  border-radius: 14px;
-  background: #062333;
-}
-
-.patient-video-play {
-  cursor: pointer;
-}
-
-/* hqdefault thumbnails are 4:3 with letterbox bars; cover crops the bars. */
-.patient-video-thumb {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform .4s ease;
-}
-
-.patient-video-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .92);
-  box-shadow: 0 8px 22px rgba(6, 35, 51, .35);
-  transform: translate(-50%, -50%);
-  transition: background-color .2s, transform .2s;
-}
-
-.patient-video-icon::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 54%;
-  border-style: solid;
-  border-width: 10px 0 10px 16px;
-  border-color: transparent transparent transparent var(--color--primary-02);
-  transform: translate(-50%, -50%);
-  transition: border-color .2s;
-}
-
-.patient-video-play:hover .patient-video-thumb,
-.patient-video-play:focus-visible .patient-video-thumb {
-  transform: scale(1.04);
-}
-
-.patient-video-play:hover .patient-video-icon,
-.patient-video-play:focus-visible .patient-video-icon {
-  background: var(--color--primary-02);
-  transform: translate(-50%, -50%) scale(1.06);
-}
-
-.patient-video-play:hover .patient-video-icon::before,
-.patient-video-play:focus-visible .patient-video-icon::before {
-  border-left-color: var(--color--white);
-}
-
-.patient-video-title {
-  display: -webkit-box;
-  margin: 0;
-  overflow: hidden;
-  color: var(--color--primary-02);
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-align: left;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.patient-video-date {
-  margin: 0;
-  color: var(--color--secondary-03);
-  font-size: 14px;
-  line-height: 1.4;
-  text-align: left;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .patient-videos-track { scroll-behavior: auto; }
-  .patient-video-thumb,
-  .patient-video-icon { transition: none; }
-}
-
-@media screen and (max-width: 991px) {
-  .patient-videos-track {
-    grid-auto-columns: calc((100% - 16px) / 2);
-    gap: 16px;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  .patient-videos { gap: 16px; }
-  .patient-videos-channel { font-size: 15px; }
-  .patient-videos-arrow { width: 40px; height: 40px; }
-  /* One readable card with the next one peeking, matching the team carousel. */
-  .patient-videos-track { grid-auto-columns: min(84%, 340px); }
-  .patient-video-title { font-size: 16px; }
-}
-
-/* NanoFat for Joint Pain standalone page. These scoped rules extend the
-   existing Webflow system without changing the shared page templates. */
-.nanofat-page {
-  color: #173f4c;
-  background: #fff;
-}
-.nanofat-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
-  min-height: 388px;
-  margin-top: 120px;
-  background: #396273;
-  overflow: hidden;
-}
-.nanofat-hero-copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 58px clamp(28px, 7vw, 112px);
-  color: #fff;
-}
-.nanofat-eyebrow { display: none; }
-.nanofat-kicker {
-  margin: 0 0 14px;
-  color: #96dce2;
-  font-family: Generalsans, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .14em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-.nanofat-hero h1 {
-  max-width: 680px;
-  margin: 0;
-  color: #fff;
-  font-family: Satoshi, sans-serif;
-  font-size: clamp(38px, 3.2vw, 54px);
-  font-weight: 600;
-  letter-spacing: -.035em;
-  line-height: 1.2;
-}
-.nanofat-hero-subtitle {
-  display: none;
-}
-.nanofat-breadcrumb {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-  color: rgba(255, 255, 255, .82);
-  font-family: Satoshi, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-}
-.nanofat-breadcrumb a {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.nanofat-breadcrumb a:hover,
-.nanofat-breadcrumb a:focus-visible { color: #b8f0f1; }
-.nanofat-hero-media {
-  min-height: 388px;
-  overflow: hidden;
-  background: #e9edef;
-  clip-path: ellipse(90% 100% at 100% 50%);
-}
-.nanofat-hero-media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 388px;
-  object-fit: cover;
-  object-position: center;
-}
-.nanofat-page-body {
-  width: min(1217px, calc(100% - 48px));
-  margin: 0 auto;
-  padding: 50px 0 88px;
-}
-.nanofat-disclaimer {
-  border-left: 4px solid #d46b4c;
-  border-radius: 0 12px 12px 0;
-  background: #fff7f2;
-  color: #5a3a31;
-  font-family: Satoshi, sans-serif;
-  font-size: 15px;
-  line-height: 1.65;
-}
-.nanofat-disclaimer--top { display: none; margin-bottom: 52px; padding: 18px 22px; }
-.nanofat-disclaimer--bottom { margin: 48px 0 0; padding: 20px 22px; }
-.nanofat-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 400px;
-  align-items: start;
-  gap: 20px;
-}
-.nanofat-article-column {
-  min-width: 0;
-}
-.nanofat-toc {
-  display: none;
-}
-.nanofat-toc-title {
-  margin: 0 0 6px;
-  color: #00687b;
-  font-family: Generalsans, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: .04em;
-}
-.nanofat-toc a {
-  color: #50707b;
-  font-family: Satoshi, sans-serif;
-  font-size: 13px;
-  line-height: 1.35;
-  text-decoration: none;
-}
-.nanofat-toc a:hover,
-.nanofat-toc a:focus-visible { color: #00687b; text-decoration: underline; }
-.nanofat-article { min-width: 0; }
-.nanofat-section {
-  margin: 0;
-  padding: 0 0 56px;
-  scroll-margin-top: 26px;
-}
-.nanofat-section + .nanofat-section {
-  padding-top: 18px;
-  border-top: 0;
-}
-.nanofat-section h2 {
-  display: block;
-  margin: 0 0 32px;
-  color: #1b3c74;
-  font-family: "Outfit Semi Bold", Outfit, sans-serif;
-  font-size: clamp(32px, 3.1vw, 44px);
-  font-weight: 600;
-  letter-spacing: -.035em;
-  line-height: 1.3;
-}
-.nanofat-section h2::after {
-  display: inline;
-  margin-left: 14px;
-  color: #6999a1;
-  content: "→";
-  font-family: Satoshi, sans-serif;
-  font-size: .72em;
-  font-weight: 400;
-}
-.nanofat-section h3 {
-  margin: 28px 0 10px;
-  color: #396273;
-  font-family: "Outfit Semi Bold", Outfit, sans-serif;
-  font-size: 21px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-.nanofat-section p,
-.nanofat-section li {
-  max-width: 797px;
-  color: #41616b;
-  font-family: Satoshi, sans-serif;
-  font-size: 16px;
-  line-height: 1.7;
-}
-.nanofat-section p { margin: 0 0 17px; }
-.nanofat-section ul,
-.nanofat-section ol { margin: 0 0 22px; padding-left: 24px; }
-.nanofat-section li { margin-bottom: 7px; padding-left: 4px; }
-.nanofat-section a {
-  color: #00687b;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.nanofat-section a:hover,
-.nanofat-section a:focus-visible { color: #d15f43; }
-.nanofat-intro {
-  padding: 0 0 48px;
-  border-bottom: 1px solid #dbe8ea;
-  background: transparent;
-}
-.nanofat-intro .nanofat-kicker { visibility: hidden; }
-.nanofat-intro h2 { margin-bottom: 32px; }
-.nanofat-research {
-  padding-right: clamp(20px, 4vw, 60px);
-  padding-left: clamp(20px, 4vw, 60px);
-  border-radius: 18px;
-  background: #f6fafb;
-}
-.nanofat-references {
-  margin-top: 28px;
-  padding: 22px 24px 12px;
-  border: 1px solid #d8e8ea;
-  border-radius: 14px;
-  background: #fff;
-}
-.nanofat-references h3 { margin-top: 0; font-size: 20px; }
-.nanofat-references li { font-size: 15px; line-height: 1.6; }
-.nanofat-faq-section { padding-bottom: 12px; }
-.nanofat-faq-list { display: grid; gap: 10px; }
-.nanofat-faq-item {
-  overflow: hidden;
-  border: 1px solid #dcebed;
-  border-radius: 10px;
-  background: #fff;
-}
-.nanofat-faq-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  width: 100%;
-  padding: 18px 20px;
-  color: #174653;
-  cursor: pointer;
-  font-family: Generalsans, sans-serif;
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 1.4;
-  list-style: none;
-}
-.nanofat-faq-summary::-webkit-details-marker { display: none; }
-.nanofat-faq-summary::after {
-  flex: 0 0 auto;
-  color: #00687b;
-  content: "+";
-  font-size: 24px;
-  font-weight: 400;
-}
-.nanofat-faq-item[open] .nanofat-faq-summary::after { content: "−"; }
-.nanofat-faq-summary:focus-visible { outline: 3px solid #84d9de; outline-offset: -3px; }
-.nanofat-faq-answer {
-  display: block;
-  padding: 0 20px 18px;
-  background: #fff;
-}
-.nanofat-faq-answer .accordion-dropdown-text { margin: 0; font-size: 16px; }
-.nanofat-reference-sidebar {
-  position: sticky;
-  top: 32px;
-  margin-top: 44px;
-  overflow: hidden;
-  border: 1px solid #d9e6e8;
-  background: #fff;
-  box-shadow: 0 12px 28px rgba(33, 66, 76, .08);
-}
-.nanofat-reference-sidebar-heading {
-  padding: 25px 28px;
-  background: #396273;
-  color: #fff;
-  font-family: "Outfit Semi Bold", Outfit, sans-serif;
-  font-size: 25px;
-  font-weight: 600;
-  line-height: 1.25;
-  text-align: center;
-}
-.nanofat-sidebar-form-block {
-  padding: 26px 28px 22px;
-  background: #f7fbfb;
-}
-.nanofat-sidebar-form { display: grid; gap: 18px; margin: 0; }
-.nanofat-sidebar-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: #3d4657;
-  font-family: "Outfit Medium", Outfit, sans-serif;
-  font-size: 14px;
-  line-height: 1.35;
-}
-.nanofat-sidebar-form input {
-  width: 100%;
-  min-height: 49px;
-  margin: 0;
-  border: 1px solid #cbdde0;
-  border-radius: 3px;
-  background: #fff;
-  color: #263e4d;
-  font: inherit;
-  font-weight: 400;
-}
-.nanofat-sidebar-form button {
-  width: 100%;
-  margin: 2px 0 0;
-  border: 0;
-  border-radius: 3px;
-  background: #396273;
-  color: #fff;
-  cursor: pointer;
-  font-family: "Outfit Semi Bold", Outfit, sans-serif;
-  font-size: 15px;
-}
-.nanofat-sidebar-form button:hover,
-.nanofat-sidebar-form button:focus-visible { background: #1b3c74; }
-.nanofat-sidebar-form-block .w-form-done,
-.nanofat-sidebar-form-block .w-form-fail { margin-top: 16px; }
-.nanofat-sidebar-form-block .w-form-done .button { display: inline-flex; margin-top: 14px; }
-.nanofat-sidebar-contact {
-  display: grid;
-  gap: 8px;
-  padding: 22px 28px 26px;
-  border-top: 1px solid #d9e6e8;
-  background: #fff;
-}
-.nanofat-sidebar-contact p,
-.nanofat-sidebar-contact a {
-  margin: 0;
-  color: #54717a;
-  font-family: Satoshi, sans-serif;
-  font-size: 15px;
-  line-height: 1.55;
-}
-.nanofat-sidebar-contact a { color: #396273; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-.nanofat-appointment {
-  display: grid;
-  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-  gap: 30px;
-  margin-top: 32px;
-  padding: clamp(28px, 5vw, 56px);
-  border-radius: 24px;
-  background: #00687b;
-  box-shadow: 0 18px 48px rgba(0, 66, 80, .16);
-}
-.nanofat-appointment-intro h2,
-.nanofat-appointment-intro p { color: #fff; }
-.nanofat-appointment-intro h2 {
-  margin: 0 0 18px;
-  font-family: Generalsans, sans-serif;
-  font-size: clamp(30px, 3.3vw, 48px);
-  font-weight: 600;
-  letter-spacing: -.03em;
-  line-height: 1.12;
-}
-.nanofat-appointment-intro > p:not(.nanofat-kicker) {
-  margin: 0;
-  color: rgba(255, 255, 255, .86);
-  font-family: Satoshi, sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
-}
-.nanofat-quick-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 28px; }
-.nanofat-quick-actions .button { margin: 0; background: #fff; color: #00687b; }
-.nanofat-whatsapp { color: #fff; font-family: Satoshi, sans-serif; font-size: 15px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-.nanofat-locations { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; grid-column: 1 / -1; }
-.nanofat-location-card { padding: 22px; border: 1px solid rgba(255,255,255,.22); border-radius: 14px; background: rgba(255,255,255,.1); }
-.nanofat-location-card h3 { margin: 0 0 14px; color: #fff; font-family: Generalsans, sans-serif; font-size: 19px; line-height: 1.35; }
-.nanofat-location-card p,
-.nanofat-location-card a { display: block; margin: 0 0 9px; color: rgba(255,255,255,.86); font-family: Satoshi, sans-serif; font-size: 15px; line-height: 1.55; }
-.nanofat-location-card a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-.nanofat-form-block { grid-column: 1 / -1; margin-top: 4px; padding: 26px; border-radius: 14px; background: #fff; }
-.nanofat-appointment-form { margin: 0; }
-.nanofat-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.nanofat-form-grid label { display: flex; flex-direction: column; gap: 7px; color: #174653; font-family: Satoshi, sans-serif; font-size: 14px; font-weight: 600; line-height: 1.3; }
-.nanofat-form-grid input,
-.nanofat-form-grid select,
-.nanofat-form-grid textarea { width: 100%; min-height: 48px; margin: 0; border: 1px solid #c7dadd; border-radius: 6px; background: #fbfdfd; color: #173f4c; font: inherit; font-weight: 400; }
-.nanofat-form-grid textarea { min-height: 112px; resize: vertical; }
-.nanofat-form-wide { grid-column: 1 / -1; }
-.nanofat-appointment-form > button { margin-top: 18px; border: 0; background: #00687b; color: #fff; cursor: pointer; }
-.nanofat-appointment-form > button:hover,
-.nanofat-appointment-form > button:focus-visible { background: #004e5e; }
-.nanofat-form-block .w-form-done,
-.nanofat-form-block .w-form-fail { margin-top: 16px; }
-.nanofat-form-block .w-form-done .button { display: inline-flex; margin-top: 14px; }
-.nanofat-card-content { min-height: 100%; background: #00687b; }
-.nanofat-card-image { width: 92px; height: 72px; border-radius: 10px; object-fit: cover; }
-.nanofat-card-heading { color: #fff; }
-.nanofat-card-text { text-transform: none; }
-.nanofat-emergency {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, .65fr);
-  align-items: stretch;
-  gap: 30px;
-  margin-top: 68px;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 0;
-  background: #396273;
-}
-.nanofat-emergency-copy { padding: clamp(30px, 5vw, 58px); }
-.nanofat-emergency-copy h2 {
-  max-width: 580px;
-  margin: 0 0 18px;
-  color: #fff;
-  font-family: "Outfit Semi Bold", Outfit, sans-serif;
-  font-size: clamp(30px, 3.2vw, 47px);
-  font-weight: 600;
-  letter-spacing: -.035em;
-  line-height: 1.12;
-}
-.nanofat-emergency-copy > p:not(.nanofat-kicker) {
-  max-width: 600px;
-  margin: 0;
-  color: rgba(255,255,255,.86);
-  font-family: Satoshi, sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
-}
-.nanofat-emergency-copy .nanofat-kicker { color: #bfe1df; }
-.nanofat-emergency-copy .button { background: #fff; color: #396273; }
-.nanofat-emergency-media { min-height: 310px; }
-.nanofat-emergency-media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-
-@media screen and (max-width: 991px) {
-  .nanofat-hero { margin-top: 96px; }
-  .nanofat-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 380px; }
-  .nanofat-hero-copy { padding: 56px 42px; }
-  .nanofat-hero-media,
-  .nanofat-hero-media img { min-height: 380px; }
-  .nanofat-layout { grid-template-columns: 1fr; gap: 48px; }
-  .nanofat-reference-sidebar { position: static; order: -1; margin-top: 0; }
-  .nanofat-toc { display: none; }
-  .nanofat-appointment { grid-template-columns: 1fr; }
-  .nanofat-locations { grid-column: auto; }
-  .nanofat-form-block { grid-column: auto; }
-}
-@media screen and (max-width: 767px) {
-  .nanofat-hero { display: flex; flex-direction: column; }
-  .nanofat-hero { margin-top: 86px; }
-  .nanofat-hero-copy { min-height: 340px; padding: 52px 24px 42px; }
-  .nanofat-hero h1 { font-size: clamp(38px, 11vw, 56px); }
-  .nanofat-hero-media { min-height: 300px; border-radius: 0; clip-path: none; }
-  .nanofat-hero-media img { min-height: 300px; object-position: center; }
-  .nanofat-page-body { width: min(100% - 32px, 680px); padding-top: 30px; }
-  .nanofat-disclaimer--top { margin-bottom: 32px; }
-  .nanofat-section { padding-bottom: 38px; }
-  .nanofat-section + .nanofat-section { padding-top: 36px; }
-  .nanofat-section p,
-  .nanofat-section li { font-size: 16px; line-height: 1.68; }
-  .nanofat-intro { padding: 0 0 36px; }
-  .nanofat-research { padding-right: 20px; padding-left: 20px; }
-  .nanofat-locations { grid-template-columns: 1fr; }
-  .nanofat-form-grid { grid-template-columns: 1fr; }
-  .nanofat-form-wide { grid-column: auto; }
-  .nanofat-emergency { grid-template-columns: 1fr; gap: 0; margin-top: 48px; }
-  .nanofat-emergency-media { min-height: 220px; }
-}
-@media screen and (max-width: 479px) {
-  .nanofat-hero-copy { min-height: 360px; }
-  .nanofat-breadcrumb { gap: 6px; font-size: 13px; }
-  .nanofat-appointment { padding: 24px 18px; border-radius: 16px; }
-  .nanofat-form-block { padding: 18px; }
-  .nanofat-quick-actions { align-items: stretch; flex-direction: column; }
-  .nanofat-quick-actions .button { width: 100%; }
-  .nanofat-disclaimer--bottom { padding: 17px; }
-  .nanofat-reference-sidebar-heading { padding: 20px 18px; font-size: 22px; }
-  .nanofat-sidebar-form-block,
-  .nanofat-sidebar-contact { padding-right: 18px; padding-left: 18px; }
-  .nanofat-emergency-copy { padding: 28px 22px; }
 }
