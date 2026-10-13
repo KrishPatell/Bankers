@@ -409,14 +409,18 @@ PAGE_HTML = r'''
 
 
 def customise_shell(html):
-    """Replace the public contact-page main content with the NanoFat page."""
-    # The contact template keeps the shared navigation inside its old hero
-    # section. Preserve that header while replacing the page-specific content.
+    """Replace the department template's CMS content with the NanoFat page."""
+    # The department reference shell already places navigation directly inside
+    # the page wrapper. Keep a fallback for older shells that nest the header
+    # inside the page-specific content.
+    has_top_level_header = re.search(
+        r'<main class="page-wrapper">\s*<header\b', html, flags=re.S
+    )
     header_match = re.search(
         r'<header class="navbar-two section-4">.*?</header>',
         html,
         flags=re.S,
-    )
+    ) if not has_top_level_header else None
     header = header_match.group(0) if header_match else ""
     html = re.sub(r'\s*<h6>.*?</h6>', '', html, count=1, flags=re.S)
     html = re.sub(

@@ -15191,6 +15191,8 @@ figure {
   /* One readable card with the next one peeking, matching the team carousel. */
   .patient-videos-track { grid-auto-columns: min(84%, 340px); }
   .patient-video-title { font-size: 16px; }
+}
+
 /* NanoFat for Joint Pain standalone page. These scoped rules extend the
    existing Webflow system without changing the shared page templates. */
 .nanofat-page {
