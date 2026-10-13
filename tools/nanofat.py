@@ -65,7 +65,7 @@ FAQS = [
 
 
 PAGE_HTML = r'''
-<main class="main-wrapper">
+<main class="main-wrapper nanofat-page">
   <section data-mobile-hero="nanofat-for-joint-pain" style="background-image:url('/images/nanofat-joint-pain-hero.png');--responsive-hero-image:url('/images/nanofat-joint-pain-hero.png')" data-w-id="b59e7825-6e3e-075a-cb5c-f7ace6968ba9" class="new-combo responsive-treatment-hero">
     <div class="w-layout-blockcontainer container-departmen w-container">
       <div id="w-node-b59e7825-6e3e-075a-cb5c-f7ace6968bab-07308c02" class="about-hero-wrapper-2">

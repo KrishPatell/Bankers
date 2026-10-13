@@ -15190,3 +15190,63 @@ figure {
   .patient-videos-track { grid-auto-columns: min(84%, 340px); }
   .patient-video-title { font-size: 16px; }
 }
+
+/* NanoFat keeps the shared disease-page appointment component while giving
+   this longer article enough room for the requested desktop form width. */
+.nanofat-page .department-details-wrapper.sidebar {
+  align-items: flex-start;
+  column-gap: 32px;
+}
+
+.nanofat-page .department-details-block {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nanofat-page .sidebar-wrapper {
+  flex: 0 0 470px;
+  width: 470px;
+  max-width: 470px;
+}
+
+.nanofat-page .appointment-sidebar-form-block {
+  padding: 28px;
+}
+
+.nanofat-page .sidebar-input-field {
+  height: 66px;
+}
+
+.nanofat-page .primary-button.sidebar-submit-button {
+  min-height: 58px;
+}
+
+@media screen and (max-width: 991px) {
+  .nanofat-page .department-details-wrapper.sidebar {
+    column-gap: 24px;
+  }
+
+  .nanofat-page .sidebar-wrapper {
+    flex-basis: 400px;
+    width: 400px;
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .nanofat-page .department-details-wrapper.sidebar {
+    flex-direction: column;
+    row-gap: 36px;
+  }
+
+  .nanofat-page .sidebar-wrapper {
+    flex: 0 1 auto;
+    width: 100%;
+    max-width: none;
+    position: static;
+  }
+
+  .nanofat-page .appointment-sidebar-form-block {
+    padding: 24px;
+  }
+}
