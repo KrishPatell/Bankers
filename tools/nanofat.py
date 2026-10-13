@@ -88,19 +88,20 @@ PAGE_HTML = r'''
     </aside>
 
     <div class="nanofat-layout">
-      <aside class="nanofat-toc" aria-label="On this page">
-        <p class="nanofat-toc-title">On this page</p>
-        <a href="#what-is-nanofat">What is NanoFat?</a>
-        <a href="#understanding-osteoarthritis">Joint pain and osteoarthritis</a>
-        <a href="#how-nanofat-works">How it is being studied</a>
-        <a href="#potential-benefits">Potential benefits</a>
-        <a href="#who-may-be-considered">Who may be considered?</a>
-        <a href="#nanofat-procedure">Procedure overview</a>
-        <a href="#risks-limitations">Risks and limitations</a>
-        <a href="#nanofat-vs-prp">NanoFat vs PRP</a>
-        <a href="#clinical-research">Clinical research</a>
-        <a href="#nanofat-faq">FAQs</a>
-      </aside>
+      <div class="nanofat-article-column">
+        <aside class="nanofat-toc" aria-label="On this page">
+          <p class="nanofat-toc-title">On this page</p>
+          <a href="#what-is-nanofat">What is NanoFat?</a>
+          <a href="#understanding-osteoarthritis">Joint pain and osteoarthritis</a>
+          <a href="#how-nanofat-works">How it is being studied</a>
+          <a href="#potential-benefits">Potential benefits</a>
+          <a href="#who-may-be-considered">Who may be considered?</a>
+          <a href="#nanofat-procedure">Procedure overview</a>
+          <a href="#risks-limitations">Risks and limitations</a>
+          <a href="#nanofat-vs-prp">NanoFat vs PRP</a>
+          <a href="#clinical-research">Clinical research</a>
+          <a href="#nanofat-faq">FAQs</a>
+        </aside>
 
       <article class="nanofat-article">
         <section class="nanofat-section nanofat-intro" aria-labelledby="nanofat-overview-heading">
@@ -360,6 +361,25 @@ PAGE_HTML = r'''
           </div>
         </section>
       </article>
+      </div>
+
+      <aside class="nanofat-reference-sidebar" aria-labelledby="nanofat-sidebar-heading">
+        <div class="nanofat-reference-sidebar-heading" id="nanofat-sidebar-heading">Book An Appointment</div>
+        <div class="nanofat-sidebar-form-block w-form">
+          <form id="nanofat-sidebar-form" name="nanofat-sidebar-form" data-name="NanoFat Appointment" method="post" action="/api/contact" class="nanofat-sidebar-form">
+            <label>Patient Name<input class="input-field contact w-input" name="Name" type="text" placeholder="Your name" required></label>
+            <label>Mobile Number<input class="input-field contact w-input" name="Phone-Number" type="tel" placeholder="Your mobile number" required></label>
+            <button type="submit" class="outline-button w-button">Book Appointment Now</button>
+          </form>
+          <div class="success-message-2 w-form-done"><div class="text-block-37">Thank you! Your request has been received.</div><a href="https://wa.me/919909908428" target="_blank" rel="noopener noreferrer" class="button w-button">Talk on WhatsApp</a></div>
+          <div class="w-form-fail"><div>We could not send your request. Please call the hospital directly.</div></div>
+        </div>
+        <div class="nanofat-sidebar-contact">
+          <p>Call us for knee pain evaluation and treatment guidance.</p>
+          <a href="tel:+919909908428">+91 99099 08428</a>
+          <a href="https://wa.me/919909908428" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+        </div>
+      </aside>
     </div>
 
     <section class="nanofat-appointment" id="nanofat-appointment" aria-labelledby="nanofat-appointment-heading">
@@ -399,6 +419,21 @@ PAGE_HTML = r'''
         </form>
         <div class="success-message-2 w-form-done"><div class="text-block-37">Thank you! Your request has been received.</div><a href="https://wa.me/919909908428" target="_blank" rel="noopener noreferrer" class="button w-button">Talk on WhatsApp</a></div>
         <div class="w-form-fail"><div>We could not send your request. Please call the hospital directly.</div></div>
+      </div>
+    </section>
+
+    <section class="nanofat-emergency" aria-labelledby="nanofat-emergency-heading">
+      <div class="nanofat-emergency-copy">
+        <p class="nanofat-kicker">Need help with knee pain?</p>
+        <h2 id="nanofat-emergency-heading">Looking For The Best Medical Solutions?</h2>
+        <p>Speak with the Bankers Vascular Hospital team about persistent knee pain, mobility concerns and the right next step for your care.</p>
+        <div class="nanofat-quick-actions">
+          <a class="button w-button" href="https://wa.me/919909908428" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+          <a class="nanofat-whatsapp" href="tel:+919909908428">Call Our Helpline 24/7</a>
+        </div>
+      </div>
+      <div class="nanofat-emergency-media">
+        <img src="/images/nanofat-joint-pain-card.png" width="1200" height="800" loading="lazy" alt="Patient education illustration for joint pain care">
       </div>
     </section>
 
