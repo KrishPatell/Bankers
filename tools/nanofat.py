@@ -100,6 +100,7 @@ PAGE_HTML = r'''
           <p>Researchers are studying whether specially processed adipose tissue may influence joint inflammation and improve pain-related functional outcomes in selected patients.</p>
           <p>Although early research has reported encouraging results, NanoFat has not been established as a cure for osteoarthritis or a reliable method of regenerating damaged cartilage.</p>
           <p>At Bankers Vascular Hospital, patients can seek an evaluation for knee pain and discuss appropriate treatment options based on their individual clinical needs.</p>
+          <figure class="nanofat-content-figure"><img class="nanofat-content-image" src="/images/nanofat-patient-knee-consultation.png" width="1920" height="1080" loading="lazy" alt="Patient discussing knee pain and osteoarthritis evaluation with a clinician"></figure>
         </section>
 
         <section id="what-is-nanofat" aria-labelledby="what-is-nanofat-heading">
@@ -111,6 +112,7 @@ PAGE_HTML = r'''
           <p>However, NanoFat should not automatically be described as stem cell therapy. The cellular composition and biological properties can differ significantly depending on the preparation method.</p>
           <p>In joint-related research, NanoFat is most commonly discussed in connection with knee osteoarthritis, although other potential applications continue to be investigated.</p>
           <p>The effectiveness and safety of this approach have not been conclusively established through large, long-term clinical trials.</p>
+          <figure class="nanofat-content-figure"><img class="nanofat-content-image" src="/images/nanofat-fat-processing-consultation.png" width="1920" height="1080" loading="lazy" alt="Illustration of fat-derived tissue processing and knee injection research"></figure>
         </section>
 
         <section id="understanding-osteoarthritis" aria-labelledby="understanding-osteoarthritis-heading">
@@ -133,6 +135,7 @@ PAGE_HTML = r'''
           </ul>
           <p>Not all knee pain is caused by osteoarthritis. Ligament injuries, tendon problems, inflammatory conditions and other disorders may produce similar symptoms.</p>
           <p>An accurate diagnosis is essential before considering treatment.</p>
+          <figure class="nanofat-content-figure"><img class="nanofat-content-image" src="/images/nanofat-osteoarthritis-knee.png" width="1920" height="1080" loading="lazy" alt="Illustration of knee osteoarthritis and cartilage changes associated with joint pain"></figure>
         </section>
 
         <section id="how-nanofat-works" aria-labelledby="how-nanofat-works-heading">
@@ -196,6 +199,7 @@ PAGE_HTML = r'''
           <h2 id="nanofat-procedure-heading">Step-by-Step NanoFat Procedure</h2>
           <p>Different clinical studies use different collection, processing and administration methods.</p>
           <p>The following overview describes general steps reported in fat-derived joint treatment research.</p>
+          <figure class="nanofat-content-figure"><img class="nanofat-content-image" src="/images/nanofat-treatment-process.png" width="1920" height="1080" loading="lazy" alt="Illustration of the NanoFat research process from tissue collection and processing to knee administration"></figure>
           <h3>Step 1 — Clinical Assessment</h3>
           <p>The doctor reviews the patient's symptoms, medical history, previous treatment and functional limitations.</p>
           <p>An examination is performed, and imaging may be recommended where appropriate.</p>

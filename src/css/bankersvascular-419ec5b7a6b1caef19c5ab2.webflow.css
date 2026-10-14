@@ -15228,6 +15228,20 @@ figure {
   min-height: 58px;
 }
 
+.nanofat-page .nanofat-content-figure {
+  margin: 36px 0 44px;
+  width: 100%;
+}
+
+.nanofat-page .nanofat-content-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
 @media screen and (max-width: 991px) {
   .nanofat-page .department-details-wrapper.sidebar {
     grid-template-columns: minmax(0, 1fr) 400px;
@@ -15262,5 +15276,9 @@ figure {
 
   .nanofat-page .appointment-sidebar-form-block {
     padding: 24px;
+  }
+
+  .nanofat-page .nanofat-content-figure {
+    margin: 28px 0 36px;
   }
 }
