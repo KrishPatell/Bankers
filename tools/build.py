@@ -753,7 +753,29 @@ def apply_nav(html, cms, binder):
     for spec in CFG.NAV_LISTS:
         items = order_items(cms, spec)
         html = populate(html, spec, items, binder)
+    html = add_standalone_department_nav_link(html)
     return html
+
+
+def add_standalone_department_nav_link(html):
+    """Keep the standalone NanoFat page discoverable in the Diseases dropdown."""
+    list_block = W.block_by_class(html, "department-nav-list")
+    if not list_block:
+        return html
+    section = html[list_block[0]:list_block[1]]
+    if "/nanofat-for-joint-pain" in section:
+        return html
+    close = section.rfind("</div>")
+    if close < 0:
+        return html
+    link = (
+        '\n<div role="listitem" class="department-nav-item w-dyn-item">'
+        '<a href="/nanofat-for-joint-pain" '
+        'class="nav-dropdown-link w-dropdown-link">NanoFat for Joint Pain</a>'
+        '</div>'
+    )
+    insert_at = list_block[0] + close
+    return html[:insert_at] + link + html[insert_at:]
 
 
 # ------------------------------------------------------------------ pagination
