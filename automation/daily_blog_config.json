@@ -1,0 +1,11 @@
+{
+  "schedule_sheet_ids": [
+    "1iV5u_l-sziIOCAtduGdWItzKiudatHU0Bw1OOcRwUq0"
+  ],
+  "schedule_name_regex": "^(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[-_ ]20\\d{2}$",
+  "schedule_folder_id_env": "GOOGLE_DRIVE_SCHEDULE_FOLDER_ID",
+  "thumbnail_folder_id_env": "GOOGLE_DRIVE_THUMBNAIL_FOLDER_ID",
+  "author_aliases": {
+    "DR.TENSI": "Dr. Tensi Trivedi"
+  }
+}
