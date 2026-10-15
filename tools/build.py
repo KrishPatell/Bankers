@@ -1576,7 +1576,7 @@ def render_detail(base, spec, item, cms, binder, assets):
         full_title = "%s %s" % (title_txt, tpl_title)
     else:
         full_title = "%s %s" % (title_txt, CFG.BRAND_TITLE)
-    desc = item.get_text(*spec.get("desc", []))
+    desc = item.get_text("Meta Description", *spec.get("desc", []))
     desc = re.sub(r"<[^>]+>", " ", desc)
     desc = re.sub(r"\s+", " ", htmllib.unescape(desc)).strip()[:300]
     desc = DETAIL_META_OVERRIDES.get((spec["key"], item.slug), desc)
@@ -1836,7 +1836,7 @@ def add_article_schema(html, spec, item, assets):
         # Do not attribute another author's post to Dr. Mohal Banker.
         data["author"] = {"@type": "Person", "name": author.name,
                           "url": CFG.SITE_URL + author.url}
-    desc = re.sub(r"\s+", " ", item.get_text("Short Details"))[:300]
+    desc = re.sub(r"\s+", " ", item.get_text("Meta Description", "Short Details"))[:300]
     if desc:
         data["description"] = desc
     tag = ('  <script type="application/ld+json">%s</script>\n</head>'
