@@ -12,6 +12,8 @@
 # Build byproducts
 /tools/__pycache__/
 /tools/asset-report.txt
+/automation-report.json
+/live-report.json
 *.part
 
 .DS_Store
