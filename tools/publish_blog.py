@@ -423,7 +423,7 @@ def main():
         "Created On": now, "Updated On": now, "Published On": now, "time": now,
         # Listing/OG thumbnails are not repeated in the article body.
         "Blog Thumbnail": image_rel, "Main Image": "",
-        "Short Details": short_description(rich, title), "Main Details": rich,
+        "Short Details": args.meta_description or short_description(rich, title), "Main Details": rich,
         # The build appends the established brand suffix exactly once.
         "Author": author_slug, "Meta Title": args.meta_title or title,
         "Meta Description": args.meta_description or short_description(rich, title),
