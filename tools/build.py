@@ -170,6 +170,31 @@ CITY_LOCATION_DATA = {
 
 CITY_LOCATION_PHONES = ("9909908428", "9909903449")
 
+# These two city landing pages already contain the shared contact/map block in
+# their Webflow templates. Keep their branch details route-specific instead of
+# adding the generic SEO location module a second time.
+VADODARA_CITY_PAGE_URLS = frozenset((
+    "/varicose-veins/vadodara",
+    "/non-surgical-knee-pain/vadodara",
+))
+VADODARA_BRANCH_ADDRESS = (
+    "201, 2nd Floor, Ignite Complex, Above Meera Clinic and Eye Hospital, "
+    "Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, "
+    "Gujarat 390007"
+)
+VADODARA_MAP_QUERY = urllib.parse.quote_plus(
+    "Bankers Vascular Centre, " + VADODARA_BRANCH_ADDRESS
+)
+VADODARA_MAP_SRC = (
+    "https://maps.google.com/maps?width=600&amp;height=400&amp;hl=en&amp;q=%s"
+    "&amp;t=&amp;z=19&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+    % VADODARA_MAP_QUERY
+)
+VADODARA_DIRECTIONS_URL = (
+    "https://www.google.com/maps/dir/?api=1&amp;destination=%s"
+    % VADODARA_MAP_QUERY
+)
+
 
 # Shell pages copied through the shell-rewrite pass.
 def shell_pages():
@@ -1024,6 +1049,62 @@ def normalize_verified_branch_nap(html):
     return re.sub(legacy, verified, html)
 
 
+def apply_vadodara_landing_contact(html, url):
+    """Use the verified Vadodara branch in the two Vadodara landing contacts.
+
+    The exported templates are intentionally shared by every city page. These
+    replacements are limited to the two requested URLs so Ahmedabad and other
+    consultation pages retain their existing contact surfaces.
+    """
+    if url not in VADODARA_CITY_PAGE_URLS:
+        return html
+
+    # Keep the original map wrapper and dimensions, changing only the query so
+    # the marker resolves to the Vadodara branch.
+    html = re.sub(
+        r'(<iframe\b[^>]*class="gmap_iframe"[^>]*\bsrc=")[^"]+("[^>]*>)',
+        r'\1%s\2' % VADODARA_MAP_SRC,
+        html, count=1, flags=re.S | re.I)
+
+    address_html = (
+        "201, 2nd Floor, Ignite Complex,<br>"
+        "Above Meera Clinic and Eye Hospital,<br>"
+        "Opp. Agrawal Cars,<br>"
+        "Laxmi Colony, Anand Nagar, Akota,<br>"
+        "Vadodara, Gujarat 390007"
+    )
+
+    if url == "/varicose-veins/vadodara":
+        # Remove the Ahmedabad card from this template, then make the one
+        # remaining address card the verified Vadodara branch card.
+        html = re.sub(
+            r'\s*<a\b[^>]*class="link-block-18 w-inline-block"[^>]*>.*?</a>',
+            "", html, count=1, flags=re.S | re.I)
+        html = html.replace(
+            'href="https://share.google/RQ88L9YDJO6e20B2r"',
+            'href="%s"' % VADODARA_DIRECTIONS_URL,
+            1)
+        html = html.replace(
+            "Hospital Address Vadodara", "Hospital Address", 1)
+        html = re.sub(
+            r'(<h5\b[^>]*class="wbs-step-simple-title"[^>]*>\s*'
+            r'Hospital Address\s*</h5>\s*<p\b[^>]*class="paragraph-4"[^>]*>).*?(</p>)',
+            lambda match: match.group(1) + address_html + match.group(2),
+            html, count=1, flags=re.S | re.I)
+        return html
+
+    # The knee template has one address card, so replace only its address
+    # paragraph and retain the existing timings, email and phone blocks.
+    html = re.sub(
+        r'(<h5\b[^>]*class="wbs-step-simple-title"[^>]*>\s*'
+        r'Hospital Address\s*</h5>\s*<p\b[^>]*class="paragraph-4"[^>]*>).*?(</p>)',
+        lambda match: match.group(1) + address_html + "<br>"
+        '<a href="%s" target="_blank" rel="noopener">Get Directions</a>'
+        % VADODARA_DIRECTIONS_URL + match.group(2),
+        html, count=1, flags=re.S | re.I)
+    return html
+
+
 def confirmed_location_hours(url):
     """Return confirmed hours only for a supported city landing-page URL."""
     if not url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")):
@@ -1154,7 +1235,12 @@ def add_seo_internal_links(html, url):
     items = "".join('<li><a href="%s">%s</a></li>' % (href, htmllib.escape(label)) for label, href in links)
     location = ""
     city = url.rsplit("/", 1)[-1]
-    location_data = CITY_LOCATION_DATA.get(city) if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) else None
+    location_data = (
+        CITY_LOCATION_DATA.get(city)
+        if (url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/"))
+            and url not in VADODARA_CITY_PAGE_URLS)
+        else None
+    )
     if location_data:
         query = urllib.parse.quote_plus("%s, %s" % (location_data["name"], location_data["address"]))
         location = (
@@ -1569,6 +1655,7 @@ def render_detail(base, spec, item, cms, binder, assets):
     html = fill_blog_discovery_links(html, spec, item, cms)
     html = fill_detail_lists(html, spec, item, cms, binder)
     html = apply_city_opening_hours(html, item.url)
+    html = apply_vadodara_landing_contact(html, item.url)
 
     title_txt = item.get_text(*spec.get("title", ["Name"]))
     tpl_title = re.search(r"<title>(.*?)</title>", base, re.S).group(1).strip()
