@@ -182,12 +182,12 @@ VADODARA_BRANCH_ADDRESS = (
     "Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, "
     "Gujarat 390007"
 )
-VADODARA_MAP_QUERY = urllib.parse.quote_plus(
-    "Bankers Vascular Centre, " + VADODARA_BRANCH_ADDRESS
+VADODARA_MAP_QUERY = urllib.parse.quote(
+    "Bankers Vascular Centre, " + VADODARA_BRANCH_ADDRESS,
+    safe=""
 )
 VADODARA_MAP_SRC = (
-    "https://maps.google.com/maps?width=600&amp;height=400&amp;hl=en&amp;q=%s"
-    "&amp;t=&amp;z=19&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+    "https://maps.google.com/maps?output=embed&amp;q=%s"
     % VADODARA_MAP_QUERY
 )
 VADODARA_DIRECTIONS_URL = (
