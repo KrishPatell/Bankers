@@ -116,6 +116,11 @@ DETAIL_META_OVERRIDES = {
         "Understand piles (hemorrhoids), including common causes, symptoms, self-care measures and when to seek clinical advice for persistent symptoms.",
 }
 
+DETAIL_TITLE_OVERRIDES = {
+    ("treatment", "genicular-artery-embolization"):
+        "Genicular Artery Embolization | Bankers Vascular Centre",
+}
+
 # Verified consultation/branch locations used only on their matching city pages.
 CITY_LOCATION_DATA = {
     "ahmedabad": {
@@ -1684,6 +1689,7 @@ def render_detail(base, spec, item, cms, binder, assets):
         full_title = "%s %s" % (title_txt, tpl_title)
     else:
         full_title = "%s %s" % (title_txt, CFG.BRAND_TITLE)
+    full_title = DETAIL_TITLE_OVERRIDES.get((spec["key"], item.slug), full_title)
     desc = item.get_text("Meta Description", *spec.get("desc", []))
     desc = re.sub(r"<[^>]+>", " ", desc)
     desc = re.sub(r"\s+", " ", htmllib.unescape(desc)).strip()[:300]
