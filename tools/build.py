@@ -183,16 +183,21 @@ VADODARA_BRANCH_ADDRESS = (
     "Gujarat 390007"
 )
 VADODARA_MAP_QUERY = urllib.parse.quote(
-    "Bankers Vascular Centre, " + VADODARA_BRANCH_ADDRESS,
+    "Bankers Vascular Hospital, 201 Ignite, Dinesh Mill Road, Akota, Vadodara",
+    safe=""
+)
+VADODARA_DIRECTIONS_QUERY = urllib.parse.quote(
+    "Bankers Vascular Hospital, " + VADODARA_BRANCH_ADDRESS,
     safe=""
 )
 VADODARA_MAP_SRC = (
     "https://maps.google.com/maps?output=embed&amp;q=%s"
+    "&amp;ll=22.3022714%%2C73.174469&amp;z=17"
     % VADODARA_MAP_QUERY
 )
 VADODARA_DIRECTIONS_URL = (
     "https://www.google.com/maps/dir/?api=1&amp;destination=%s"
-    % VADODARA_MAP_QUERY
+    % VADODARA_DIRECTIONS_QUERY
 )
 
 
