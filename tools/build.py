@@ -182,22 +182,26 @@ VADODARA_BRANCH_ADDRESS = (
     "Opp. Agrawal Cars, Laxmi Colony, Anand Nagar, Akota, Vadodara, "
     "Gujarat 390007"
 )
+VADODARA_PLACE_ID = "ChIJM9CqmL7JXzkRe+r5XxlJjmo"
+VADODARA_PLACE_URL = (
+    "https://www.google.com/maps/place/?q=place_id:%s" % VADODARA_PLACE_ID
+)
 VADODARA_MAP_QUERY = urllib.parse.quote(
-    "Bankers Vascular Hospital, 201 Ignite, Dinesh Mill Road, Akota, Vadodara",
+    "place_id:" + VADODARA_PLACE_ID,
     safe=""
 )
 VADODARA_DIRECTIONS_QUERY = urllib.parse.quote(
-    "Bankers Vascular Hospital, " + VADODARA_BRANCH_ADDRESS,
+    "Bankers Vascular Hospital",
     safe=""
 )
 VADODARA_MAP_SRC = (
-    "https://maps.google.com/maps?output=embed&amp;q=%s"
-    "&amp;ll=22.3022714%%2C73.174469&amp;z=17"
+    "https://www.google.com/maps?output=embed&amp;q=%s"
     % VADODARA_MAP_QUERY
 )
 VADODARA_DIRECTIONS_URL = (
     "https://www.google.com/maps/dir/?api=1&amp;destination=%s"
-    % VADODARA_DIRECTIONS_QUERY
+    "&amp;destination_place_id=%s"
+    % (VADODARA_DIRECTIONS_QUERY, VADODARA_PLACE_ID)
 )
 
 
@@ -1064,11 +1068,23 @@ def apply_vadodara_landing_contact(html, url):
     if url not in VADODARA_CITY_PAGE_URLS:
         return html
 
+    # A generic city-location module is not needed here because these templates
+    # already contain the complete Webflow contact section. Remove it if an
+    # older template or build pass supplied the duplicate "Visit ..." block.
+    html = re.sub(
+        r'\s*<section\b[^>]*class="seo-location-section"[^>]*>.*?</section>',
+        "", html, flags=re.S | re.I)
+
     # Keep the original map wrapper and dimensions, changing only the query so
-    # the marker resolves to the Vadodara branch.
+    # Google resolves the official Vadodara place listing and its marker.
     html = re.sub(
         r'(<iframe\b[^>]*class="gmap_iframe"[^>]*\bsrc=")[^"]+("[^>]*>)',
         r'\1%s\2' % VADODARA_MAP_SRC,
+        html, count=1, flags=re.S | re.I)
+    html = re.sub(
+        r'<a\s+href="https://embed-googlemap\.com">embed-googlemap\.com</a>',
+        '<a href="%s" target="_blank" rel="noopener">Open in Maps ↗</a>'
+        % VADODARA_PLACE_URL,
         html, count=1, flags=re.S | re.I)
 
     address_html = (
@@ -1087,7 +1103,7 @@ def apply_vadodara_landing_contact(html, url):
             "", html, count=1, flags=re.S | re.I)
         html = html.replace(
             'href="https://share.google/RQ88L9YDJO6e20B2r"',
-            'href="%s"' % VADODARA_DIRECTIONS_URL,
+            'href="%s"' % VADODARA_PLACE_URL,
             1)
         html = html.replace(
             "Hospital Address Vadodara", "Hospital Address", 1)
