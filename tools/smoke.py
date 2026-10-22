@@ -137,7 +137,7 @@ def check_blog_pagination(base):
     if "/blog/page/2" not in html:
         fail("/blog has no link to page 2")
     for path, want in (("/blog/page/2", 100), ("/blog/page/3", 100),
-                       ("/blog/page/4", 31)):
+                       ("/blog/page/4", 61)):
         st, body, _ = get(base, path)
         if st != 200:
             fail("%s returned %s" % (path, st))
@@ -145,7 +145,7 @@ def check_blog_pagination(base):
             fail("%s shows %d cards, expected %d"
                  % (path, body.count("blog-archive-item"), want))
     if not any("blog" in f for f in failures):
-        note("/blog paginates correctly: 100 + 100 + 100 + 31 = 331 posts")
+        note("/blog paginates correctly: 100 + 100 + 100 + 61 = 361 posts")
 
 
 def check_redirects(base):
