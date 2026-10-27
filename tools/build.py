@@ -192,7 +192,7 @@ VADODARA_PLACE_URL = (
     "https://www.google.com/maps/place/?q=place_id:%s" % VADODARA_PLACE_ID
 )
 VADODARA_MAP_QUERY = urllib.parse.quote(
-    "place_id:" + VADODARA_PLACE_ID,
+    "Bankers Vascular Hospital, 201 Ignite, Dinesh Mill Road, Akota, Vadodara",
     safe=""
 )
 VADODARA_DIRECTIONS_QUERY = urllib.parse.quote(
@@ -200,7 +200,11 @@ VADODARA_DIRECTIONS_QUERY = urllib.parse.quote(
     safe=""
 )
 VADODARA_MAP_SRC = (
-    "https://www.google.com/maps?output=embed&amp;q=%s"
+    # Google’s no-key iframe reliably centers and renders the marker from the
+    # address/coordinates query. The official Place ID remains on the visible
+    # Open in Maps link above, where Google can show the listing popup/details.
+    "https://maps.google.com/maps?output=embed&amp;q=%s"
+    "&amp;ll=22.3022714%%2C73.174469&amp;z=17&amp;iwloc=B"
     % VADODARA_MAP_QUERY
 )
 VADODARA_DIRECTIONS_URL = (
