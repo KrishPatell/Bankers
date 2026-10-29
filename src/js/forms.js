@@ -6,6 +6,9 @@
  * shows success unless the server actually accepted the submission. */
 (function () {
   "use strict";
+  if (window.bankersLeadFormsInitialized) return;
+  window.bankersLeadFormsInitialized = true;
+  var inFlight = new WeakSet();
 
   function siblings(form) {
     var wrap = form.closest(".w-form") || form.parentNode;
@@ -47,6 +50,9 @@
 
     event.preventDefault();
     event.stopPropagation();
+    if (inFlight.has(form)) return;
+    inFlight.add(form);
+    var submission = {};
 
     var s = siblings(form);
     hide(s.done);
@@ -69,6 +75,7 @@
     });
 
     function restore() {
+      inFlight.delete(form);
       buttons.forEach(function (b) {
         var original = b.dataset.originalValue;
         if (original !== undefined) {
@@ -88,7 +95,7 @@
         return res
           .json()
           .catch(function () {
-            return { ok: res.ok };
+            return { ok: false };
           })
           .then(function (data) {
             return { res: res, data: data };
@@ -96,10 +103,20 @@
       })
       .then(function (out) {
         restore();
-        if (out.res.ok && out.data && out.data.ok) {
+        if (out.res.ok && out.data && out.data.ok === true) {
           form.style.display = "none";
           show(siblings(form).done);
           form.reset();
+          // Honeypot acknowledgements are not genuine patient enquiries.
+          if (!String(payload._gotcha || "").trim()) {
+            try {
+              if (window.BankersEnquiryTracking) {
+                window.BankersEnquiryTracking.formSuccess(form, submission);
+              }
+            } catch (_) {
+              // A tracking failure must not affect an accepted enquiry.
+            }
+          }
         } else {
           failWith(
             form,

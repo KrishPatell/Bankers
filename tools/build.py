@@ -1325,6 +1325,10 @@ def prepare_shell(html, cms, binder, page_label):
     html = normalize_verified_branch_nap(html)
     html = fix_obvious_typos(html)
     html = ensure_direct_ga4(html)
+    # One shared enquiry helper, loaded before wire_forms appends forms.js.
+    if "/js/enquiry-tracking.js" not in html:
+        html = html.replace("</head>",
+                            '  <script src="/js/enquiry-tracking.js" defer></script>\n</head>', 1)
     if page_label in ("products.html", "services-gujarat.html"):
         # The exported map cards reproduce Google Business Profile chrome and
         # include unverified ratings, review counts, status, hours, and travel

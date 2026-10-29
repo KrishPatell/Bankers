@@ -3,6 +3,12 @@
 
     python tools/smoke.py https://bankersvascular.com
 
+For tools/serve.py (which does not execute Worker or Cloudflare asset routing):
+    python tools/smoke.py http://127.0.0.1:3111 --static --edge-base https://bankersvascular.com
+
+Static mode runs the actual Worker redirect code locally and checks Cloudflare's
+two HTML-alias redirects against the supplied edge. It never skips those checks.
+
 tools/verify.py checks dist/ on disk and cannot catch a deployment that
 publishes the wrong directory. The Cloudflare Worker must serve the generated dist/,
 so production showed empty doctor/blog sections and "No items found." on every
@@ -17,7 +23,12 @@ and the ~334 CMS item pages, which do not exist in the export at all - so a
 single 200 from /departments/piles proves the built site is live.
 """
 
+import argparse
+import json
+import os
 import re
+import shutil
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -137,7 +148,7 @@ def check_blog_pagination(base):
     if "/blog/page/2" not in html:
         fail("/blog has no link to page 2")
     for path, want in (("/blog/page/2", 100), ("/blog/page/3", 100),
-                       ("/blog/page/4", 61)):
+                       ("/blog/page/4", 67)):
         st, body, _ = get(base, path)
         if st != 200:
             fail("%s returned %s" % (path, st))
@@ -145,10 +156,30 @@ def check_blog_pagination(base):
             fail("%s shows %d cards, expected %d"
                  % (path, body.count("blog-archive-item"), want))
     if not any("blog" in f for f in failures):
-        note("/blog paginates correctly: 100 + 100 + 100 + 61 = 361 posts")
+        note("/blog paginates correctly: 100 + 100 + 100 + 67 = 367 posts")
 
 
-def check_redirects(base):
+def check_worker_redirects_locally():
+    """Exercise worker.js itself; a static HTTP server cannot run these rules."""
+    node = shutil.which("node")
+    if not node:
+        return fail("static smoke requires Node.js to validate Worker redirects")
+    test = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "test_smoke_redirects.mjs")
+    try:
+        result = subprocess.run([node, test], capture_output=True, text=True,
+                                timeout=30, check=True)
+        report = json.loads(result.stdout)
+        if report.get("worker_redirects") != 2 or report.get("asset_delegations") != 2:
+            return fail("Worker redirect test returned incomplete coverage")
+    except (subprocess.SubprocessError, ValueError, OSError) as exc:
+        detail = getattr(exc, "stderr", "") or str(exc)
+        return fail("Worker redirect verification failed: %s" % detail[-2000:])
+    note("2 Worker redirects pass locally: exact 301 destination, one hop, existing 200 target; "
+         "2 HTML aliases delegate to configured Cloudflare assets")
+
+
+def check_redirects(base, static=False, edge_base=None):
     expect = {
         "/blog.html": "/blog",
         "/index.html": "/",
@@ -156,18 +187,32 @@ def check_redirects(base):
         "/departments/platelet-rich-plasma": "/treatment/platelet-rich-plasma",
         "/departments/varicose-vein": "/departments/varicose-veins",
     }
+    if static:
+        check_worker_redirects_locally()
     ok = 0
     for path, dest in expect.items():
-        status, _body, loc = get(base, path)
-        if status not in (301, 302, 307, 308):
-            fail("%s returned %s, expected a redirect to %s"
-                 % (path, status, dest))
-        elif loc and not loc.rstrip("/").endswith(dest.rstrip("/")):
+        asset_alias = path in ("/blog.html", "/index.html")
+        if static and not asset_alias:
+            # Tested by executing worker.js above, including a one-hop target.
+            continue
+        route_base = edge_base if static else base
+        status, _body, loc = get(route_base, path)
+        want_status = 307 if asset_alias else 301
+        if status != want_status:
+            fail("%s returned %s, expected %d to %s"
+                 % (path, status, want_status, dest))
+        elif not loc or urllib.parse.urljoin(route_base + path, loc) != route_base + dest:
             fail("%s redirects to %s, expected %s" % (path, loc, dest))
         else:
+            target_status, _body, target_loc = get(route_base, dest)
+            if target_status != 200 or target_loc:
+                fail("%s target %s returned %s, expected direct 200 (no chain/loop)"
+                     % (path, dest, target_status))
+                continue
             ok += 1
-    if ok == len(expect):
-        note("all %d checked redirects resolve correctly" % ok)
+    if ok == (2 if static else len(expect)):
+        note("all %d HTTP-checked redirects resolve in one hop%s" %
+             (ok, " at the Cloudflare edge" if static else ""))
 
     # Raw CMS templates are intentionally excluded from publishing; redirecting
     # this placeholder to a listing would disguise a genuinely missing page.
@@ -218,18 +263,28 @@ def check_form_endpoint(base):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print(__doc__)
-        return 2
-    base = sys.argv[1].rstrip("/")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("base", help="URL of the site to check")
+    parser.add_argument("--static", action="store_true",
+                        help="check tools/serve.py; validate Worker rules directly")
+    parser.add_argument("--edge-base", help="Cloudflare edge for HTML-alias checks in static mode")
+    args = parser.parse_args()
+    if args.static and not args.edge_base:
+        parser.error("--static requires --edge-base; Cloudflare asset redirects must still be tested")
+    if args.edge_base and not args.static:
+        parser.error("--edge-base is only valid with --static")
+    base = args.base.rstrip("/")
     if not base.startswith("http"):
         base = "https://" + base
+    edge_base = args.edge_base.rstrip("/") if args.edge_base else None
+    if edge_base and edge_base != "https://bankersvascular.com":
+        parser.error("--edge-base must be the canonical https://bankersvascular.com origin")
     print("smoke-testing %s\n" % base)
 
     html = check_home_is_built(base)
     check_cms_pages(base)
     check_blog_pagination(base)
-    check_redirects(base)
+    check_redirects(base, static=args.static, edge_base=edge_base)
     check_form_endpoint(base)
     check_home_assets(base, html)
 
