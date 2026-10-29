@@ -235,7 +235,7 @@ await test("all source templates have no legacy page-load conversion dispatches"
 // The default command always checks the complete generated output too.
 if (!process.argv.includes("--runtime-only")) await test("every generated page keeps standard tags and executes zero inline enquiry events", () => {
   const pages = files(path.join(root, "dist")).filter((f) => f.endsWith(".html"));
-  assert.equal(pages.length, 440);
+  assert.equal(pages.length, 441);
   for (const file of pages) {
     const html = fs.readFileSync(file, "utf8");
     assert.equal((html.match(/src="\/js\/enquiry-tracking\.js"/g) || []).length, 1, file);
