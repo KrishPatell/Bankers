@@ -2,8 +2,8 @@ name: Daily blog publishing
 
 on:
   schedule:
-    # GitHub Actions cron is UTC. 01:30 UTC is 07:00 Asia/Kolkata.
-    - cron: "30 1 * * *"
+    # GitHub Actions cron is UTC. 00:30 UTC is 06:00 Asia/Kolkata.
+    - cron: "30 0 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
