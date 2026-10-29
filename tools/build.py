@@ -18,6 +18,7 @@ import sys
 import unicodedata
 import urllib.parse
 from datetime import datetime, timezone
+from functools import lru_cache
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -653,9 +654,14 @@ def blog_topics(item):
     content = " ".join(str(item.get(field) or "") for field in (
         "Name", "Short Details", "Main Details",
     ))
+    return list(_blog_topics_for_content(content))
+
+
+@lru_cache(maxsize=None)
+def _blog_topics_for_content(content):
     content = htmllib.unescape(re.sub(r"<[^>]+>", " ", content)).lower()
-    return [topic for topic, patterns in BLOG_TOPIC_PATTERNS.items()
-            if any(re.search(pattern, content) for pattern in patterns)]
+    return tuple(topic for topic, patterns in BLOG_TOPIC_PATTERNS.items()
+                 if any(re.search(pattern, content) for pattern in patterns))
 
 def find_list(html, spec):
     """Locate (dyn_list_block, items_block) for a list spec."""
