@@ -120,6 +120,8 @@ DETAIL_META_OVERRIDES = {
 DETAIL_TITLE_OVERRIDES = {
     ("treatment", "genicular-artery-embolization"):
         "Genicular Artery Embolization | Bankers Vascular Centre",
+    ("departments", "bariatric-artery-embolization-for-obesity"):
+        "Bariatric Artery Embolization for Obesity | Bankers Vascular Centre",
 }
 
 # Verified consultation/branch locations used only on their matching city pages.
