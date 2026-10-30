@@ -2008,6 +2008,15 @@ def add_page_schema(html, url, spec=None, item=None):
         # There is no published /our-doctors archive; do not manufacture one.
         crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
                               "name": item.name, "item": CFG.SITE_URL + url}]
+    elif spec and spec.get("key") == "treatment" and item:
+        # The treatment collection has no published index page.
+        crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
+                              "name": item.name, "item": CFG.SITE_URL + url}]
+    elif spec and spec.get("key") == "non-surgical-knee-pain" and item:
+        crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
+                              "name": "Knee Pain", "item": CFG.SITE_URL + "/departments/knee-pain"},
+                  {"@type": "ListItem", "position": 3,
+                   "name": item.name, "item": CFG.SITE_URL + url}]
     canonical_url = CFG.SITE_URL + url
     graph = [{
         "@type": "BreadcrumbList", "@id": CFG.SITE_URL + url + "#breadcrumb",
