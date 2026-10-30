@@ -1618,6 +1618,18 @@ def build_shells(pages, cms, binder, assets):
 
 # ------------------------------------------------------------------ detail pass
 
+# These URLs match the active mobile CSS backgrounds, including the GAE
+# stylesheet override. Restrict preloads to the pages verified against CSS.
+MOBILE_HERO_PRELOADS = {
+    ("departments", "knee-pain"): "mobile-departments-knee-pain.webp",
+    ("departments", "varicose-veins"): "mobile-departments-varicose-veins.webp",
+    ("departments", "piles"): "mobile-departments-piles.webp",
+    ("departments", "prostate"): "mobile-departments-prostate.webp",
+    ("departments", "breast-fibroadenoma"): "mobile-departments-breast-fibroadenoma.webp",
+    ("treatment", "genicular-artery-embolization"): "treatment-mobile-genicular-artery-embolization.webp",
+    ("varicose-veins", "ahmedabad"): "mobile-varicose-veins-ahmedabad.webp",
+}
+
 def build_details(cms, binder, assets):
     written = []
     for spec in CFG.COLLECTIONS:
@@ -1688,6 +1700,14 @@ def render_detail(base, spec, item, cms, binder, assets):
                     "style", (W.get_attr(t, "style") or "") +
                     ";--responsive-hero-image:url('%s')" % mobile_asset),
             )
+            preload = MOBILE_HERO_PRELOADS.get((spec["key"], item.slug))
+            if preload and os.path.isfile(os.path.join(SRC, "images", preload)):
+                # The viewport must be parsed before evaluating this media query.
+                html = re.sub(
+                    r'<meta\b[^>]*\bname="viewport"[^>]*>',
+                    lambda m: m.group(0) + '\n  <link rel="preload" as="image" '
+                    'href="/images/%s" media="(max-width: 767px)">' % preload,
+                    html, count=1, flags=re.I)
 
     html = fill_repeated_richtext(html, spec, item, assets)
     html = fill_author_block(html, spec, item, assets)
