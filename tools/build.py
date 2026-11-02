@@ -1628,7 +1628,6 @@ MOBILE_HERO_PRELOADS = {
     ("departments", "piles"): "mobile-departments-piles.webp",
     ("departments", "prostate"): "mobile-departments-prostate.webp",
     ("departments", "breast-fibroadenoma"): "mobile-departments-breast-fibroadenoma.webp",
-    ("treatment", "genicular-artery-embolization"): "treatment-mobile-genicular-artery-embolization.webp",
     ("varicose-veins", "ahmedabad"): "mobile-varicose-veins-ahmedabad.webp",
 }
 
@@ -1702,6 +1701,15 @@ def render_detail(base, spec, item, cms, binder, assets):
                     "style", (W.get_attr(t, "style") or "") +
                     ";--responsive-hero-image:url('%s')" % mobile_asset),
             )
+            if (spec["key"] == "treatment" and
+                    item.get("background", "").startswith("/images/treatment-hero-")):
+                hero = W.find_by_class(html, hero_class)
+                html = W.edit_open_tag(
+                    html, hero, lambda t: W.set_attr(
+                        W.add_class(t, "updated-treatment-hero"), "style",
+                        (W.get_attr(t, "style") or "") +
+                        ";--updated-treatment-image:url('%s')" %
+                        item.get("background")))
             preload = MOBILE_HERO_PRELOADS.get((spec["key"], item.slug))
             if preload and os.path.isfile(os.path.join(SRC, "images", preload)):
                 # The viewport must be parsed before evaluating this media query.

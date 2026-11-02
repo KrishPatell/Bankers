@@ -14479,14 +14479,6 @@ figure {
    widths while using the common automatic responsive layout. */
 @media screen and (max-width: 991px) {
   .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="absolute-ethanol-embolization-for-vascular-malformations"] { background-image: url('../images/treatment-mobile-absolute-ethanol-embolization-for-vascular-malformations.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="foam-sclerotherap"] { background-image: url('../images/treatment-mobile-foam-sclerotherap.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="genicular-artery-embolization"] { background-image: url('../images/treatment-mobile-genicular-artery-embolization.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="hemorrhoids"] { background-image: url('../images/treatment-mobile-hemorrhoids.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="msk-embolization"] { background-image: url('../images/treatment-mobile-msk-embolization.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="platelet-rich-plasma"] { background-image: url('../images/treatment-mobile-platelet-rich-plasma.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="prostate-artery-embolization"] { background-image: url('../images/treatment-mobile-prostate-artery-embolization.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="radiofrequency-ablation"] { background-image: url('../images/treatment-mobile-radiofrequency-ablation.webp') !important; }
-  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="venaseal-glue-embolization"] { background-image: url('../images/treatment-mobile-venaseal-glue-embolization.webp') !important; }
 }
 
 /* Homepage recognition: a compact image-led award banner. */
@@ -15280,5 +15272,80 @@ figure {
 
   .nanofat-page .nanofat-content-figure {
     margin: 28px 0 36px;
+  }
+}
+
+/* The new treatment artwork is a complete 1600:394 banner. Keep its native
+   proportions on larger screens; on phones show the full clinical illustration
+   below the title instead of cropping it behind the text. */
+.about-hero-section.frozen.sizedown.updated-treatment-hero {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1600 / 394;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #38697b;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.about-hero-section.frozen.sizedown.updated-treatment-hero .main-container {
+  position: relative;
+  z-index: 1;
+}
+
+.about-hero-section.frozen.sizedown.updated-treatment-hero .breadcrumb-heading-3--white {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media screen and (min-width: 992px) {
+  .about-hero-section.frozen.sizedown.updated-treatment-hero {
+    margin-top: 132px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero {
+    aspect-ratio: 1600 / 394 !important;
+    background-image: var(--updated-treatment-image) !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    height: auto !important;
+    min-height: 390px !important;
+    aspect-ratio: auto !important;
+    padding: 24px 0 210px;
+    background-image: none !important;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero::after {
+    display: block;
+    position: absolute;
+    inset: auto 0 0;
+    width: 100%;
+    height: 210px;
+    background-color: #fbfcf4;
+    background-image: var(--updated-treatment-image);
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: auto 210px;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero .main-container,
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero .about-hero-wrapper-2 {
+    width: calc(100% - 32px);
+    max-width: none;
   }
 }
