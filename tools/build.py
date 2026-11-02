@@ -2019,6 +2019,22 @@ def add_page_schema(html, url, spec=None, item=None):
                               "name": "Knee Pain", "item": CFG.SITE_URL + "/departments/knee-pain"},
                   {"@type": "ListItem", "position": 3,
                    "name": item.name, "item": CFG.SITE_URL + url}]
+    elif spec and spec.get("key") == "varicose-veins" and item:
+        crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
+                              "name": "Varicose Veins", "item": CFG.SITE_URL + "/departments/varicose-veins"},
+                  {"@type": "ListItem", "position": 3,
+                   "name": item.name, "item": CFG.SITE_URL + url}]
+    elif spec and spec.get("key") in ("blog-author", "blog-category") and item:
+        # These collections do not have public index pages.
+        crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
+                              "name": "Blog", "item": CFG.SITE_URL + "/blog"},
+                  {"@type": "ListItem", "position": 3,
+                   "name": item.name, "item": CFG.SITE_URL + url}]
+    elif re.fullmatch(r"/blog/page/[1-9][0-9]*", url):
+        crumbs = [crumbs[0], {"@type": "ListItem", "position": 2,
+                              "name": "Blog", "item": CFG.SITE_URL + "/blog"},
+                  {"@type": "ListItem", "position": 3,
+                   "name": "Page " + url.rsplit("/", 1)[-1], "item": CFG.SITE_URL + url}]
     canonical_url = CFG.SITE_URL + url
     graph = [{
         "@type": "BreadcrumbList", "@id": CFG.SITE_URL + url + "#breadcrumb",
