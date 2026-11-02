@@ -1710,7 +1710,20 @@ def render_detail(base, spec, item, cms, binder, assets):
                         (W.get_attr(t, "style") or "") +
                         ";--updated-treatment-image:url('%s')" %
                         item.get("background")))
+            updated_disease = (spec["key"] in (
+                "departments", "varicose-veins", "non-surgical-knee-pain") and
+                item.get("background", "").startswith("/images/disease-hero-"))
+            if updated_disease:
+                hero = W.find_by_class(html, hero_class)
+                html = W.edit_open_tag(
+                    html, hero, lambda t: W.set_attr(
+                        W.add_class(t, "updated-disease-hero"), "style",
+                        (W.get_attr(t, "style") or "") +
+                        ";--updated-disease-image:url('%s')" %
+                        item.get("background")))
             preload = MOBILE_HERO_PRELOADS.get((spec["key"], item.slug))
+            if updated_disease:
+                preload = None
             if preload and os.path.isfile(os.path.join(SRC, "images", preload)):
                 # The viewport must be parsed before evaluating this media query.
                 html = re.sub(
