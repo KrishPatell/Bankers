@@ -15485,3 +15485,9 @@ figure {
     background-size: auto 30%, 130% !important;
   }
 }
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  .blog-detail-hero {
+    background-size: auto 45%, 110% !important;
+  }
+}
