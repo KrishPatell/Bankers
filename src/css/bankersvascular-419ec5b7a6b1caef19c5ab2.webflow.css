@@ -15469,3 +15469,19 @@ figure {
     background-size: auto 100%;
   }
 }
+
+/* Webflow scroll reveals can retain their hidden and shifted initial state
+   on mobile when the interaction does not initialise at narrow widths. */
+@media screen and (max-width: 767px) {
+  .blog-detail-hero .breadcrumb-heading-3.blog,
+  .blog-detail-hero .blog-breadcrumb-trail {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .blog-detail-hero {
+    background-size: auto 30%, 130% !important;
+  }
+}
