@@ -15335,16 +15335,17 @@ figure {
     position: absolute;
     inset: 0 0 0 auto;
     z-index: 0;
-    width: 52%;
+    width: 48%;
     height: 100%;
     background-color: #fbfcf4;
     background-image: var(--updated-treatment-image);
     background-repeat: no-repeat;
     background-position: right center;
-    background-size: auto 65%;
+    background-size: auto 33vw;
   }
 
   .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero::after {
+    content: "";
     display: block;
     position: absolute;
     inset: 0 auto 0 0;
@@ -15368,6 +15369,40 @@ figure {
 
   .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero .breadcrumb-heading-3--white {
     font-size: clamp(18px, 5.5vw, 24px);
+  }
+
+  /* PRP's source wave reaches a little farther right; align its cream edge
+     with the shared curved panel without exposing a second teal edge. */
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero.updated-treatment-hero[data-mobile-hero="platelet-rich-plasma"]::before {
+    background-size: auto 32.6vw;
+  }
+}
+
+/* Keep the legacy 3:2 artwork and its own teal curve in one mobile banner. */
+.about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="absolute-ethanol-embolization-for-vascular-malformations"] .breadcrumb-heading-3--white {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media screen and (max-width: 767px) {
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="absolute-ethanol-embolization-for-vascular-malformations"] {
+    display: flex;
+    aspect-ratio: 3 / 2;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden;
+    background-image: url('../images/treatment-mobile-absolute-ethanol-embolization-for-vascular-malformations.webp') !important;
+    background-position: center;
+    background-size: contain;
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="absolute-ethanol-embolization-for-vascular-malformations"] .main-container {
+    width: calc(100% - 32px);
+  }
+
+  .about-hero-section.frozen.sizedown.responsive-treatment-hero[data-mobile-hero="absolute-ethanol-embolization-for-vascular-malformations"] .about-hero-wrapper-2 {
+    width: 55%;
+    max-width: none;
   }
 }
 
