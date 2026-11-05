@@ -1257,23 +1257,57 @@ document.addEventListener("submit", async function (e) {
   }
 });
 </script>
-  <aside class="home-offer-modal" data-home-offer-modal role="dialog" aria-modal="true" aria-label="Knee pain special offer" hidden>
+  <aside class="home-offer-modal" data-home-offer-modal role="dialog" aria-modal="true" aria-label="Bankers Vascular Centre special offers" hidden>
     <div class="home-offer-modal-backdrop" data-home-offer-close></div>
     <div class="home-offer-dialog">
       <button class="home-offer-close" type="button" data-home-offer-close aria-label="Close special offer">×</button>
-      <a class="home-offer-link" href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the knee pain special offer">
-        <img src="images/knee-pain-special-offer-nov-2026-1600.webp" srcset="images/knee-pain-special-offer-nov-2026-768.webp 768w, images/knee-pain-special-offer-nov-2026-1600.webp 1600w" sizes="(max-width: 767px) 96vw, (max-width: 1042px) 94vw, 980px" width="1600" height="900" style="height:auto" alt="Special offer for knee pain treatment: consultation charge reduced to 500 rupees and X-ray charge reduced to 200 rupees, valid 16 November to 21 November 2026" loading="eager" fetchpriority="high" decoding="async">
+      <a class="home-offer-link" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the varicose veins special offer">
+        <img src="images/varicose-veins-laser-offer-nov-2026.webp" width="1733" height="907" style="height:auto" alt="Varicose veins laser treatment offer: 40 percent discount, consultation for 500 rupees instead of 1500 rupees and Doppler test free, valid 16 to 21 November 2026 in Ahmedabad" loading="eager" fetchpriority="high" decoding="async">
       </a>
+      <a class="home-offer-link" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the knee pain special offer" hidden>
+        <img src="images/knee-pain-special-offer-nov-2026-1600.webp" srcset="images/knee-pain-special-offer-nov-2026-768.webp 768w, images/knee-pain-special-offer-nov-2026-1600.webp 1600w" sizes="(max-width: 767px) 96vw, (max-width: 1042px) 94vw, 980px" width="1600" height="900" style="height:auto" alt="Special offer for knee pain treatment: consultation charge reduced to 500 rupees and X-ray charge reduced to 200 rupees, valid 16 November to 21 November 2026" loading="eager" decoding="async">
+      </a>
+      <div class="home-offer-controls" role="group" aria-label="Choose a special offer">
+        <button class="home-offer-nav" type="button" data-home-offer-prev aria-label="Previous offer">&#8249;</button>
+        <span class="home-offer-count" data-home-offer-count aria-live="polite">1 of 2</span>
+        <button class="home-offer-nav" type="button" data-home-offer-next aria-label="Next offer">&#8250;</button>
+      </div>
     </div>
   </aside>
   <script>
     (function () {
       var modal = document.querySelector('[data-home-offer-modal]');
       if (!modal) return;
+      var slides = Array.prototype.slice.call(modal.querySelectorAll('[data-home-offer-slide]'));
+      var count = modal.querySelector('[data-home-offer-count]');
+      var active = 0;
+      var rotation;
+      function showSlide(index) {
+        active = (index + slides.length) % slides.length;
+        slides.forEach(function (slide, slideIndex) {
+          slide.hidden = slideIndex !== active;
+        });
+        count.textContent = (active + 1) + ' of ' + slides.length;
+      }
+      function stopRotation() {
+        if (rotation) window.clearInterval(rotation);
+        rotation = null;
+      }
       function close() {
+        stopRotation();
         modal.hidden = true;
         document.body.classList.remove('home-offer-open');
       }
+      modal.querySelector('[data-home-offer-prev]').addEventListener('click', function () {
+        stopRotation();
+        showSlide(active - 1);
+      });
+      modal.querySelector('[data-home-offer-next]').addEventListener('click', function () {
+        stopRotation();
+        showSlide(active + 1);
+      });
+      modal.querySelector('.home-offer-dialog').addEventListener('mouseenter', stopRotation);
+      modal.addEventListener('focusin', stopRotation);
       modal.querySelectorAll('[data-home-offer-close]').forEach(function (button) {
         button.addEventListener('click', close);
       });
@@ -1281,8 +1315,12 @@ document.addEventListener("submit", async function (e) {
         if (event.key === 'Escape' && !modal.hidden) close();
       });
       window.setTimeout(function () {
+        showSlide(0);
         modal.hidden = false;
         document.body.classList.add('home-offer-open');
+        if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          rotation = window.setInterval(function () { showSlide(active + 1); }, 18000);
+        }
       }, 700);
     }());
   </script>
