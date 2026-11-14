@@ -1692,6 +1692,10 @@ def render_detail(base, spec, item, cms, binder, assets):
         hero = W.find_by_class(html, hero_class)
         if hero >= 0:
             mobile_asset = "../images/mobile-%s-%s.webp" % (spec["key"], item.slug)
+            if spec["key"] == "non-surgical-knee-pain":
+                # All six Knee Pain location pages use the same artwork as
+                # the main Knee Pain Treatment page at every breakpoint.
+                mobile_asset = "../images/mobile-departments-knee-pain.webp"
             html = W.edit_open_tag(
                 html, hero,
                 lambda t: W.set_attr(
