@@ -2641,11 +2641,16 @@ figure {
 }
 
 .about-faq-image.animation-image {
-  background-image: linear-gradient(to bottom, var(--green), var(--green));
+  background-image: none;
+  background-color: transparent;
   object-fit: fill;
   object-position: 50% 100%;
   border-color: #f2f6f9;
   width: 100%;
+}
+
+.about-faq-image-wrapper .image-animation-wrapper {
+  background-color: transparent;
 }
 
 .about-faq-stats-block {
