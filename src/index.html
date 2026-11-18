@@ -1261,15 +1261,20 @@ document.addEventListener("submit", async function (e) {
     <div class="home-offer-modal-backdrop" data-home-offer-close></div>
     <div class="home-offer-dialog">
       <button class="home-offer-close" type="button" data-home-offer-close aria-label="Close special offer">×</button>
-      <a class="home-offer-link" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the varicose veins special offer">
-        <img src="images/varicose-veins-laser-offer-nov-2026.webp" width="1733" height="907" style="height:auto" alt="Varicose veins laser treatment offer: 40 percent discount, consultation for 500 rupees instead of 1500 rupees and Doppler test free, valid 16 to 21 November 2026 in Ahmedabad" loading="eager" fetchpriority="high" decoding="async">
-      </a>
-      <a class="home-offer-link" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the knee pain special offer" hidden>
-        <img src="images/knee-pain-special-offer-nov-2026-1600.webp" srcset="images/knee-pain-special-offer-nov-2026-768.webp 768w, images/knee-pain-special-offer-nov-2026-1600.webp 1600w" sizes="(max-width: 767px) 96vw, (max-width: 1042px) 94vw, 980px" width="1600" height="900" style="height:auto" alt="Special offer for knee pain treatment: consultation charge reduced to 500 rupees and X-ray charge reduced to 200 rupees, valid 16 November to 21 November 2026" loading="eager" decoding="async">
-      </a>
+      <div class="home-offer-stage">
+        <a class="home-offer-link is-active" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the varicose veins special offer" aria-hidden="false">
+          <img src="images/varicose-veins-laser-offer-nov-2026.webp" width="1733" height="907" style="height:auto" alt="Varicose veins laser treatment offer: 40 percent discount, consultation for 500 rupees instead of 1500 rupees and Doppler test free, valid 16 to 21 November 2026 in Ahmedabad" loading="eager" fetchpriority="high" decoding="async">
+        </a>
+        <a class="home-offer-link" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the knee pain special offer" aria-hidden="true" tabindex="-1">
+          <img src="images/knee-pain-special-offer-nov-2026-1600.webp" srcset="images/knee-pain-special-offer-nov-2026-768.webp 768w, images/knee-pain-special-offer-nov-2026-1600.webp 1600w" sizes="(max-width: 767px) 96vw, (max-width: 1042px) 94vw, 980px" width="1600" height="900" style="height:auto" alt="Special offer for knee pain treatment: consultation charge reduced to 500 rupees and X-ray charge reduced to 200 rupees, valid 16 November to 21 November 2026" loading="eager" decoding="async">
+        </a>
+        <a class="home-offer-link" data-home-offer-slide href="tel:+919909908428" aria-label="Call Bankers Vascular Centre about the breast fibroadenoma special offer" aria-hidden="true" tabindex="-1">
+          <img src="images/breast-fibroadenoma-treatment-offer-dec-2026.png" width="1734" height="907" style="height:auto" alt="Breast fibroadenoma treatment offer with consultation and colour Doppler services at Bankers Vascular Centre Vadodara, dated 2 December 2026" loading="eager" decoding="async">
+        </a>
+      </div>
       <div class="home-offer-controls" role="group" aria-label="Choose a special offer">
         <button class="home-offer-nav" type="button" data-home-offer-prev aria-label="Previous offer">&#8249;</button>
-        <span class="home-offer-count" data-home-offer-count aria-live="polite">1 of 2</span>
+        <span class="home-offer-count" data-home-offer-count aria-live="polite">1 of 3</span>
         <button class="home-offer-nav" type="button" data-home-offer-next aria-label="Next offer">&#8250;</button>
       </div>
     </div>
@@ -1278,49 +1283,125 @@ document.addEventListener("submit", async function (e) {
     (function () {
       var modal = document.querySelector('[data-home-offer-modal]');
       if (!modal) return;
+      var dialog = modal.querySelector('.home-offer-dialog');
       var slides = Array.prototype.slice.call(modal.querySelectorAll('[data-home-offer-slide]'));
       var count = modal.querySelector('[data-home-offer-count]');
+      var previous = modal.querySelector('[data-home-offer-prev]');
+      var next = modal.querySelector('[data-home-offer-next]');
       var active = 0;
       var rotation;
+      var opening;
+      var paused = false;
+      var closed = false;
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var listeners = [];
+      var observer;
+      function listen(target, type, handler) {
+        target.addEventListener(type, handler);
+        listeners.push(function () { target.removeEventListener(type, handler); });
+      }
       function showSlide(index) {
         active = (index + slides.length) % slides.length;
         slides.forEach(function (slide, slideIndex) {
-          slide.hidden = slideIndex !== active;
+          var isActive = slideIndex === active;
+          slide.classList.toggle('is-active', isActive);
+          slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+          if (isActive) slide.removeAttribute('tabindex');
+          else slide.setAttribute('tabindex', '-1');
         });
         count.textContent = (active + 1) + ' of ' + slides.length;
       }
       function stopRotation() {
-        if (rotation) window.clearInterval(rotation);
+        if (rotation) window.clearTimeout(rotation);
         rotation = null;
       }
-      function close() {
+      function stopTimers() {
         stopRotation();
+        if (opening) window.clearTimeout(opening);
+        opening = null;
+      }
+      function canRotate() {
+        return !closed && modal.isConnected && !modal.hidden && !paused && !document.hidden && !reduceMotion.matches && slides.length > 1;
+      }
+      function scheduleRotation() {
+        stopRotation();
+        if (!canRotate()) return;
+        rotation = window.setTimeout(function () {
+          rotation = null;
+          if (!canRotate()) return;
+          showSlide(active + 1);
+          scheduleRotation();
+        }, 4000);
+      }
+      function setPaused(value) {
+        paused = value;
+        if (paused) stopRotation();
+        else scheduleRotation();
+      }
+      function changeSlide(index) {
+        showSlide(index);
+        scheduleRotation();
+      }
+      function cleanup() {
+        stopTimers();
+        listeners.forEach(function (remove) { remove(); });
+        listeners = [];
+        if (observer) observer.disconnect();
+        observer = null;
+      }
+      function close() {
+        if (closed) return;
+        closed = true;
+        cleanup();
         modal.hidden = true;
         document.body.classList.remove('home-offer-open');
       }
-      modal.querySelector('[data-home-offer-prev]').addEventListener('click', function () {
-        stopRotation();
-        showSlide(active - 1);
+      listen(previous, 'click', function () {
+        changeSlide(active - 1);
       });
-      modal.querySelector('[data-home-offer-next]').addEventListener('click', function () {
-        stopRotation();
-        showSlide(active + 1);
+      listen(next, 'click', function () {
+        changeSlide(active + 1);
       });
-      modal.querySelector('.home-offer-dialog').addEventListener('mouseenter', stopRotation);
-      modal.addEventListener('focusin', stopRotation);
+      listen(dialog, 'mouseenter', function () { setPaused(true); });
+      listen(dialog, 'mouseleave', function () { setPaused(false); });
       modal.querySelectorAll('[data-home-offer-close]').forEach(function (button) {
-        button.addEventListener('click', close);
+        listen(button, 'click', close);
       });
-      document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && !modal.hidden) close();
+      listen(document, 'visibilitychange', function () {
+        if (document.hidden) stopRotation();
+        else scheduleRotation();
       });
-      window.setTimeout(function () {
+      listen(document, 'keydown', function (event) {
+        if (closed || modal.hidden) return;
+        if (event.key === 'Escape') {
+          close();
+        } else if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          changeSlide(active - 1);
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          changeSlide(active + 1);
+        }
+      });
+      if (reduceMotion.addEventListener) {
+        listen(reduceMotion, 'change', function () {
+          if (reduceMotion.matches) stopRotation();
+          else scheduleRotation();
+        });
+      }
+      if (window.MutationObserver) {
+        observer = new MutationObserver(function () {
+          if (!modal.isConnected) close();
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      }
+      opening = window.setTimeout(function () {
+        opening = null;
+        if (closed || !modal.isConnected) return;
         showSlide(0);
         modal.hidden = false;
         document.body.classList.add('home-offer-open');
-        if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          rotation = window.setInterval(function () { showSlide(active + 1); }, 18000);
-        }
+        scheduleRotation();
       }, 700);
     }());
   </script>

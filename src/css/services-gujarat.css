@@ -350,13 +350,15 @@
   .services-reel-play { right: 12px; bottom: 12px; padding: 10px 12px; font-size: 12px; }
 }
 
-/* Homepage special offers: two image slides replace the old video popups. */
+/* Homepage special offers: image slides replace the old video popups. */
 .home-offer-open { overflow: hidden; }
 .home-offer-modal[hidden] { display: none; }
 .home-offer-modal { position: fixed; z-index: 9999; inset: 0; display: grid; place-items: center; padding: 24px; }
 .home-offer-modal-backdrop { position: absolute; inset: 0; background: rgba(4, 34, 43, .72); backdrop-filter: blur(3px); }
 .home-offer-dialog { position: relative; z-index: 1; width: min(980px, 94vw); overflow: hidden; border: 4px solid rgba(255, 255, 255, .94); border-radius: 18px; background: #063d51; box-shadow: 0 24px 70px rgba(0, 0, 0, .46); }
-.home-offer-link { display: block; line-height: 0; }
+.home-offer-stage { display: grid; line-height: 0; }
+.home-offer-link { grid-area: 1 / 1; display: block; line-height: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 400ms ease; }
+.home-offer-link.is-active { opacity: 1; visibility: visible; pointer-events: auto; }
 .home-offer-link[hidden] { display: none; }
 .home-offer-link img { display: block; width: 100%; max-height: min(72vh, 670px); object-fit: contain; }
 .home-offer-controls { display: flex; align-items: center; justify-content: center; gap: 18px; min-height: 44px; color: #fff; font: 600 14px/1.2 Arial, sans-serif; }
@@ -369,4 +371,7 @@
   .home-offer-dialog { width: 96vw; border-width: 3px; border-radius: 13px; }
   .home-offer-link img { max-height: 66vh; }
   .home-offer-close { top: 7px; right: 7px; width: 34px; height: 34px; font-size: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-offer-link { transition: none; }
 }
