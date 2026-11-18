@@ -364,6 +364,14 @@ EXTRA_SHELL_PAGES = {
         "desc": "Learn about NanoFat for joint pain and knee osteoarthritis, including how it works, potential benefits, procedure, risks and current research.",
         "keywords": "NanoFat for joint pain, NanoFat treatment for joint pain, NanoFat knee osteoarthritis, NanoFat knee pain treatment, fat-derived joint therapy, joint pain treatment Ahmedabad, knee osteoarthritis treatment Vadodara, NanoFat vs PRP, joint rejuvenation treatment",
     },
+    "dr-mohal-banker-award.html": {
+        "source": "detail_blog.html",
+        "output": "blog/dr-mohal-banker-recognized-for-excellence-in-varicose-veins-treatment/index.html",
+        "url": "/blog/dr-mohal-banker-recognized-for-excellence-in-varicose-veins-treatment",
+        "title": "Dr. Mohal Banker Recognized for Excellence in Varicose Veins Treatment | Bankers Vascular Centre",
+        "desc": "Read about Dr. Mohal Banker’s National Achievers Award recognition and Bankers Vascular Centre’s approach to responsible, minimally invasive varicose veins care.",
+        "keywords": "Dr. Mohal Banker award, National Achievers Award, Mid-Day Mirchi recognition, varicose veins treatment, Bankers Vascular Centre",
+    },
     "bankers-notes.html": {
         "source": "blog.html",
         "output": "bankers-notes/index.html",

@@ -86,6 +86,14 @@ STATIC_META = {
 MOHAL_DOCTOR_SLUG = "dr-mohal-banker"
 MOHAL_PROFILE_URL = "/our-doctors/" + MOHAL_DOCTOR_SLUG
 MOHAL_BLOG_AUTHOR_SLUG = "dr-mohal"
+AWARD_ARTICLE_SLUG = "dr-mohal-banker-recognized-for-excellence-in-varicose-veins-treatment"
+AWARD_ARTICLE_URL = "/blog/" + AWARD_ARTICLE_SLUG
+AWARD_ARTICLE_CONTENT = os.path.join(SRC, "content", "dr-mohal-banker-award.html")
+AWARD_ARTICLE_TITLE = "Dr. Mohal Banker Recognized for Excellence in Varicose Veins Treatment"
+AWARD_ARTICLE_EXCERPT = (
+    "National Achievers Award recognition associated with Mid-Day and Mirchi, "
+    "and a look at responsible, minimally invasive varicose veins care."
+)
 
 # These overrides correct known metadata defects using only the corresponding
 # page's visible subject matter or profile identity.  They intentionally do
@@ -1356,6 +1364,46 @@ def prepare_shell(html, cms, binder, page_label):
     return html
 
 
+def award_article_item(cms):
+    """Build the private, direct-linked award article without adding a CMS row.
+
+    The article is intentionally not part of the Blogs collection, so it is
+    absent from the public Blog archive, home cards, author lists and category
+    lists. It still uses the shared blog detail template and can be opened from
+    the homepage recognition card.
+    """
+    author = cms.by_slug.get("blog-author", {}).get(MOHAL_BLOG_AUTHOR_SLUG)
+    return cmsdata.Item({
+        "Name": AWARD_ARTICLE_TITLE,
+        "Slug": AWARD_ARTICLE_SLUG,
+        "Short Details": AWARD_ARTICLE_EXCERPT,
+        "Meta Description": (
+            "Read about Dr. Mohal Banker’s National Achievers Award recognition "
+            "and Bankers Vascular Centre’s approach to responsible, minimally "
+            "invasive varicose veins care."
+        ),
+        "Main Image": "/images/midday-mirchi-recognition.webp",
+        "Main Details": read(AWARD_ARTICLE_CONTENT),
+        "_collection": "blog",
+        "_url": AWARD_ARTICLE_URL,
+        "_date": None,
+        "_author": author,
+    })
+
+
+def customise_award_article(html, cms, binder, assets):
+    """Fill the shared blog detail shell with the supplied award article."""
+    spec = next(s for s in CFG.COLLECTIONS if s["key"] == "blog")
+    item = award_article_item(cms)
+    for binding in spec.get("bind", []):
+        if binding["kind"] != "link":
+            html = binder._one(html, item, binding, item.url)
+    html = fill_author_block(html, spec, item, assets)
+    html = fill_blog_discovery_links(html, spec, item, cms)
+    html = fill_detail_lists(html, spec, item, cms, binder)
+    return add_article_schema(html, spec, item, assets)
+
+
 def add_bankers_notes_nav(html, current=False):
     """Add the personal-notes link beside Blog on every site header."""
     # A few body sections link to this archive too; only skip injection when
@@ -1561,6 +1609,8 @@ def build_shells(pages, cms, binder, assets):
             html = wire_forms(html, page)
         if page == "bankers-notes.html":
             html = customise_bankers_notes(html, cms)
+        if page == "dr-mohal-banker-award.html":
+            html = customise_award_article(html, cms, binder, assets)
         html = add_bankers_notes_nav(html, current=(page == "bankers-notes.html"))
         out_rel = extra.get("output", CFG.DIRECTORY_PAGES.get(page, page))
         url = page_url(page)
