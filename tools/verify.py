@@ -164,6 +164,16 @@ def check_publish_rules(pages):
         folder = cms.specs[key]["folder"]
         actual = len([f for f in os.listdir(os.path.join(DIST, folder))
                       if f.endswith(".html") and f != "index.html"])
+        # A directly linked editorial shell may intentionally live under a
+        # CMS folder without being a CMS collection item. It is omitted from
+        # the archive by design, so do not count it as a publish-rule leak.
+        extra = sum(
+            1 for page in CFG.EXTRA_SHELL_PAGES.values()
+            if page.get("output", "").startswith(folder + "/")
+            and page.get("output", "").endswith(".html")
+            and not page.get("output", "").endswith("/index.html")
+        )
+        actual -= extra
         if actual != count:
             fail("%s: %d pages on disk, %d published items" % (key, actual, count))
     if not leaked:

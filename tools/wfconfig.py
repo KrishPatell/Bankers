@@ -366,7 +366,7 @@ EXTRA_SHELL_PAGES = {
     },
     "dr-mohal-banker-award.html": {
         "source": "detail_blog.html",
-        "output": "blog/dr-mohal-banker-recognized-for-excellence-in-varicose-veins-treatment/index.html",
+        "output": "blog/dr-mohal-banker-recognized-for-excellence-in-varicose-veins-treatment.html",
         "url": "/blog/dr-mohal-banker-recognized-for-excellence-in-varicose-veins-treatment",
         "title": "Dr. Mohal Banker Recognized for Excellence in Varicose Veins Treatment | Bankers Vascular Centre",
         "desc": "Read about Dr. Mohal Banker’s National Achievers Award recognition and Bankers Vascular Centre’s approach to responsible, minimally invasive varicose veins care.",
