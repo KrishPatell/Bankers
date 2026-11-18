@@ -1326,6 +1326,11 @@ def add_seo_internal_links(html, url):
 
 def prepare_shell(html, cms, binder, page_label):
     """Transforms every page gets, CMS shells and detail templates alike."""
+    # Keep the shared desktop and mobile header branding on the current teal
+    # Bankers logo. The footer deliberately continues using the white logo for
+    # contrast against its dark background.
+    html = html.replace('src="images/Link.svg"',
+                        'src="/images/bankers-logo-new.png"')
     # The exported blog template carries one generic FAQPage JSON-LD block on
     # every article, irrespective of visible FAQ content. Remove it; FAQ schema
     # should only be emitted for pages with matching visible questions/answers.
