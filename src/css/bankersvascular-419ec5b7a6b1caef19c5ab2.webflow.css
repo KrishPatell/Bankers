@@ -15535,9 +15535,10 @@ figure {
 /* Training page only: use the supplied education artwork and keep the
    certification banner compact on desktop. */
 .about-hero-section.about.frozen.training-hero-compact {
-  background-image: url('../images/training-doctors-knee-education.png?v=training-hero-wide-v3-20261118');
+  background-image: url('../images/training-doctors-knee-education-final.jpeg?v=training-hero-final-20261118');
   background-position: center center;
-  background-size: cover;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 @media screen and (min-width: 992px) {
