@@ -15531,3 +15531,24 @@ figure {
     background-size: auto 45%, 110% !important;
   }
 }
+
+/* Training page only: keep the certification banner compact on desktop. */
+@media screen and (min-width: 992px) {
+  .about-hero-section.training-hero-compact {
+    box-sizing: border-box;
+    height: 520px;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .about-hero-section.training-hero-compact > .main-container {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
