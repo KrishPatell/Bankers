@@ -15549,5 +15549,7 @@ figure {
     padding-bottom: 0;
     display: block;
     overflow: hidden;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
   }
 }
