@@ -1289,6 +1289,7 @@ document.addEventListener("submit", async function (e) {
       var previous = modal.querySelector('[data-home-offer-prev]');
       var next = modal.querySelector('[data-home-offer-next]');
       var active = 0;
+      var autoplayDelay = 3000;
       var rotation;
       var opening;
       var paused = false;
@@ -1331,7 +1332,7 @@ document.addEventListener("submit", async function (e) {
           if (!canRotate()) return;
           showSlide(active + 1);
           scheduleRotation();
-        }, 4000);
+        }, autoplayDelay);
       }
       function setPaused(value) {
         paused = value;
