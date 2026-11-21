@@ -1686,6 +1686,19 @@ MOBILE_HERO_PRELOADS = {
     ("varicose-veins", "ahmedabad"): "mobile-varicose-veins-ahmedabad.webp",
 }
 
+# The Absolute Ethanol treatment has a dedicated vascular-malformation hero
+# already used by the matching disease artwork. Keep this override route-local
+# so other treatment pages continue using their CMS background images.
+TREATMENT_HERO_OVERRIDES = {
+    "absolute-ethanol-embolization-for-vascular-malformations":
+        "/images/disease-hero-vascular-malformation.png",
+}
+
+TREATMENT_MOBILE_HERO_OVERRIDES = {
+    "absolute-ethanol-embolization-for-vascular-malformations":
+        "../images/mobile-departments-vascular-malformation.webp",
+}
+
 def build_details(cms, binder, assets):
     written = []
     for spec in CFG.COLLECTIONS:
@@ -1709,6 +1722,14 @@ def build_details(cms, binder, assets):
 
 def render_detail(base, spec, item, cms, binder, assets):
     html = base
+
+    treatment_hero = (TREATMENT_HERO_OVERRIDES.get(item.slug)
+                      if spec["key"] == "treatment" else None)
+    if treatment_hero:
+        # Work on a copy so the CMS item remains the source-of-truth record for
+        # related-content rendering elsewhere in the same build.
+        item = cmsdata.Item(item)
+        item["background"] = treatment_hero
 
     if (spec["key"] == "blog"
             and str(item.get("Bankers Notes", "")).lower() == "true"):
@@ -1747,6 +1768,9 @@ def render_detail(base, spec, item, cms, binder, assets):
         hero = W.find_by_class(html, hero_class)
         if hero >= 0:
             mobile_asset = "../images/mobile-%s-%s.webp" % (spec["key"], item.slug)
+            if spec["key"] == "treatment":
+                mobile_asset = TREATMENT_MOBILE_HERO_OVERRIDES.get(
+                    item.slug, mobile_asset)
             if spec["key"] == "non-surgical-knee-pain":
                 # All six Knee Pain location pages use the same artwork as
                 # the main Knee Pain Treatment page at every breakpoint.
