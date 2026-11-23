@@ -15558,7 +15558,7 @@ figure {
 /* Doctor-focused /training page. All rules are scoped so the shared Webflow
    header, footer and other public pages keep their existing design. */
 body.training-page-body > .page-wrapper > .navbar-two {
-  border-bottom: 2px solid #7e9fa3;
+  border-bottom: 2px solid #ffffff;
 }
 
 .training-page {
