@@ -1589,18 +1589,23 @@ def bankers_notes_destination_directory(cms):
 def customise_training(html):
     """Replace the exported training body with the doctor-focused page copy.
 
-    The header, footer and existing floating contact widget remain sourced from
-    the Webflow export. The page body lives in a small source partial so the
-    long medical-education layout stays readable and can only affect /training.
+    The exported shared header, standard Training banner, footer and existing
+    floating contact widget remain sourced from the Webflow export. The page
+    body lives in a small source partial so the long medical-education layout
+    stays readable and can only affect /training.
     """
     fragment = read(os.path.join(SRC, "training-content.partial"))
     chat = W.block_by_class(html, "div-block-32")
     chat_markup = html[chat[0]:chat[1]] if chat else ""
+    hero = W.block_by_class(html, "training-hero-compact")
+    hero_markup = html[hero[0]:hero[1]] if hero else ""
+    if chat_markup and hero_markup:
+        hero_markup = hero_markup.replace(chat_markup, "")
     fragment = fragment.replace("<!-- TRAINING_FLOATING_CHAT -->", chat_markup)
-    html = html.replace("<body>", '<body class="training-page">', 1)
+    html = html.replace("<body>", '<body class="training-page-body">', 1)
     return re.sub(
         r'<main\b[^>]*class="main-wrapper"[^>]*>.*?</main>',
-        lambda _match: '<main class="main-wrapper">\n%s\n    </main>' % fragment,
+        lambda _match: '<main class="main-wrapper">\n%s\n%s\n    </main>' % (hero_markup, fragment),
         html, count=1, flags=re.S | re.I)
 
 
