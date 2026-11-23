@@ -15,7 +15,32 @@
         <p class="training-hero-disclaimer">Programme duration, eligibility, schedules and practical arrangements are confirmed with the training team.</p>
       </div>
       <div class="training-hero-media">
-        <img src="/images/training-doctors-knee-education-final.jpeg" alt="Doctors learning image-guided knee and vascular procedures during clinical training" width="1200" height="650" fetchpriority="high">
+        <div class="training-hero-gallery" role="group" aria-label="Doctors learning at Bankers Vascular Centre">
+          <figure class="training-gallery-item training-gallery-item--featured">
+            <img src="/images/training-gallery/training-knee-vascular-classroom.png" loading="lazy" width="1536" height="1024" alt="Doctor teaching image-guided knee and vascular procedures to medical trainees">
+            <figcaption>Image-guided knee and vascular learning</figcaption>
+          </figure>
+          <figure class="training-gallery-item">
+            <img src="/images/training-gallery/training-knee-model.png" loading="lazy" width="1536" height="1024" alt="Doctors discussing knee anatomy during practical training">
+            <figcaption>Knee anatomy demonstration</figcaption>
+          </figure>
+          <figure class="training-gallery-item">
+            <img src="/images/training-gallery/training-live-procedure.png" loading="lazy" width="1536" height="1024" alt="Medical team observing an image-guided procedure during training">
+            <figcaption>Live procedure teaching</figcaption>
+          </figure>
+          <figure class="training-gallery-item">
+            <img src="/images/training-gallery/training-varicose-classroom.png" loading="lazy" width="1536" height="1024" alt="Doctor teaching varicose vein imaging to medical trainees">
+            <figcaption>Varicose vein training</figcaption>
+          </figure>
+          <figure class="training-gallery-item">
+            <img src="/images/training-gallery/training-ultrasound-training.png" loading="lazy" width="1536" height="1024" alt="Doctors learning ultrasound assessment during vascular training">
+            <figcaption>Ultrasound learning</figcaption>
+          </figure>
+          <figure class="training-gallery-item">
+            <img src="/images/training-gallery/training-procedure-training.png" loading="lazy" width="1536" height="1024" alt="Medical trainees observing an image-guided vascular procedure">
+            <figcaption>Image-guided intervention training</figcaption>
+          </figure>
+        </div>
       </div>
     </div>
   </section>
