@@ -16140,6 +16140,32 @@ figure {
   margin-bottom: 0;
 }
 
+.training-page .training-doctors-visit-card {
+  max-width: 1100px;
+  margin: 42px auto 0;
+  overflow: hidden;
+  border: 1px solid var(--training-line);
+  border-radius: 18px;
+  background: var(--training-white);
+  box-shadow: 0 12px 30px rgba(18, 52, 59, .08);
+}
+
+.training-page .training-doctors-visit-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.training-page .training-doctors-visit-card figcaption {
+  margin: 0;
+  padding: 13px 18px 15px;
+  color: var(--training-muted);
+  background: var(--training-white);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .training-page .training-step-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
