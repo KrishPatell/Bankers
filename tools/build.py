@@ -1284,7 +1284,8 @@ def add_seo_internal_links(html, url):
     location_data = (
         CITY_LOCATION_DATA.get(city)
         if (url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/"))
-            and url not in VADODARA_CITY_PAGE_URLS)
+            and url not in VADODARA_CITY_PAGE_URLS
+            and url != "/varicose-veins/ahmedabad")
         else None
     )
     if location_data:
