@@ -15566,7 +15566,7 @@ figure {
   --training-white: #ffffff;
   color: var(--training-ink);
   background: var(--training-white);
-  overflow: hidden;
+  overflow-x: clip;
 }
 
 .training-page,
@@ -16054,6 +16054,48 @@ figure {
   text-align: center;
 }
 
+.training-page .training-video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.training-page .training-video-card {
+  overflow: hidden;
+  border: 1px solid var(--training-line);
+  border-radius: 18px;
+  background: var(--training-white);
+  box-shadow: 0 12px 30px rgba(18, 52, 59, .08);
+}
+
+.training-page .training-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #d7ecee;
+}
+
+.training-page .training-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.training-page .training-video-card-copy {
+  padding: 22px 22px 25px;
+}
+
+.training-page .training-video-card-copy h3 {
+  margin-bottom: 9px;
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+.training-page .training-video-card-copy p {
+  margin-bottom: 0;
+}
+
 .training-page .training-step-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -16307,6 +16349,10 @@ figure {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .training-page .training-video-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .training-page .training-faq-grid .training-section-heading {
     max-width: 700px;
   }
@@ -16332,7 +16378,8 @@ figure {
   }
 
   .training-page .training-program-card,
-  .training-page .training-faculty-grid {
+  .training-page .training-faculty-grid,
+  .training-page .training-video-grid {
     grid-template-columns: 1fr;
   }
 

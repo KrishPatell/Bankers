@@ -189,6 +189,45 @@
     </div>
   </section>
 
+  <section class="training-section training-video-section training-section--aqua" aria-labelledby="training-video-title">
+    <div class="training-shell">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">Training experiences</p>
+        <h2 id="training-video-title">Doctors Learning at Bankers Vascular Hospital</h2>
+        <p>Explore published training and doctor interview videos showing clinical learning experiences at Bankers Vascular Hospital.</p>
+      </div>
+      <div class="training-video-grid">
+        <article class="training-video-card">
+          <div class="training-video-frame">
+            <iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/n9zQdRvAv-A?rel=0&amp;controls=1" title="Varicose Vein Personalised Training Programme at Bankers Vascular Hospital" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="training-video-card-copy">
+            <h3>Varicose Vein Personalised Training Programme</h3>
+            <p>See the published training programme and learning approach for doctors.</p>
+          </div>
+        </article>
+        <article class="training-video-card">
+          <div class="training-video-frame">
+            <iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/xyqri0RvYa8?rel=0&amp;controls=1" title="Dr. Johan at Bankers Vascular Hospital" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="training-video-card-copy">
+            <h3>Dr. Johan at Bankers Vascular Hospital</h3>
+            <p>A published doctor experience connected with Bankers Vascular Hospital.</p>
+          </div>
+        </article>
+        <article class="training-video-card">
+          <div class="training-video-frame">
+            <iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/JHeJm3GdvhA?rel=0&amp;controls=1" title="Varicose Vein Training Programme at Bankers Vascular Hospital" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="training-video-card-copy">
+            <h3>Varicose Vein Training Programme</h3>
+            <p>Watch another published training video for doctors interested in venous interventions.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <section class="training-section training-section--aqua" aria-labelledby="training-steps-title">
     <div class="training-shell">
       <div class="training-section-heading">
