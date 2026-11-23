@@ -260,6 +260,10 @@
         <h2 id="training-video-title">Doctors Learning at Bankers Vascular Hospital</h2>
         <p>Explore published training and doctor interview videos showing clinical learning experiences at Bankers Vascular Hospital.</p>
       </div>
+      <figure class="training-doctors-visit-card">
+        <img src="/images/training-gallery/doctors-trained-at-bankers.jpg" loading="lazy" width="1598" height="539" alt="Doctors who attended Varicose Veins training at Bankers Vascular Centre">
+        <figcaption>Doctors who have visited Bankers Vascular Centre for professional Varicose Veins training.</figcaption>
+      </figure>
       <div class="training-video-grid">
         <article class="training-video-card">
           <div class="training-video-frame">
@@ -289,10 +293,6 @@
           </div>
         </article>
       </div>
-      <figure class="training-doctors-visit-card">
-        <img src="/images/training-gallery/doctors-trained-at-bankers.jpg" loading="lazy" width="1598" height="539" alt="Doctors who attended Varicose Veins training at Bankers Vascular Centre">
-        <figcaption>Doctors who have visited Bankers Vascular Centre for professional Varicose Veins training.</figcaption>
-      </figure>
     </div>
   </section>
 
