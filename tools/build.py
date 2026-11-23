@@ -58,8 +58,16 @@ STATIC_META = {
         "desc": "Browse treatment information for vascular, joint and other conditions managed at Bankers Vascular Centre, including varicose veins, knee pain and enlarged prostate.",
     },
     "training.html": {
-        "title": "Interventional Radiology Training | Bankers Vascular Centre",
-        "desc": "Explore interventional radiology training information and educational opportunities from Bankers Vascular Centre.",
+        "title": "GAE & Varicose Veins Training for Doctors | Bankers Vascular",
+        "desc": "Hands-on GAE and Varicose Veins training for doctors in India. Learn with Dr. Mohal Banker and Dr. Rozil Gandhi. Explore course fees and clinical training.",
+        "og_title": "Hands-On GAE & Varicose Veins Training for Doctors in India",
+        "og_desc": "Explore professional Genicular Artery Embolization and Varicose Veins Treatment Training at Bankers Vascular Centre. View course fees, training features and enquiry options.",
+        "image": "/images/training-doctors-knee-education-final.jpeg",
+        "keywords": ("Genicular Artery Embolization Training in India, GAE Training for Doctors, "
+                     "Genicular Artery Embolization Course, Varicose Veins Treatment Training in India, "
+                     "Varicose Veins Training for Doctors, Interventional Radiology Training in India, "
+                     "Hands-On Interventional Radiology Training, Hands-On Vascular Training for Doctors, "
+                     "Medical Training in Ahmedabad, Interventional Radiology Training in Gujarat"),
     },
     "interview-of-patients-after-g-a-e-procedure.html": {
         "title": "Patient Experiences After GAE | Bankers Vascular Centre",
@@ -339,7 +347,7 @@ def _esc_attr(s):
 
 
 def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
-                  noindex=False, keywords=None):
+                  noindex=False, keywords=None, og_title=None, og_desc=None):
     # Social crawlers need an absolute image URL.  Page content itself keeps
     # root-relative assets, but Open Graph/Twitter metadata must not.
     if image and image.startswith("/"):
@@ -364,11 +372,11 @@ def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
 
     meta('name="description"', desc)
     meta('name="keywords"', keywords)
-    meta('property="og:title"', title)
-    meta('property="og:description"', desc)
+    meta('property="og:title"', og_title if og_title is not None else title)
+    meta('property="og:description"', og_desc if og_desc is not None else desc)
     meta('property="og:image"', image)
-    meta('name="twitter:title"', title)
-    meta('name="twitter:description"', desc)
+    meta('name="twitter:title"', og_title if og_title is not None else title)
+    meta('name="twitter:description"', og_desc if og_desc is not None else desc)
     meta('name="twitter:image"', image)
     if canonical is not None:
         meta('property="og:url"', canonical)
@@ -1578,6 +1586,73 @@ def bankers_notes_destination_directory(cms):
             '<div class="travel-destination-grid">%s</div></section>') % destinations
 
 
+def customise_training(html):
+    """Replace the exported training body with the doctor-focused page copy.
+
+    The header, footer and existing floating contact widget remain sourced from
+    the Webflow export. The page body lives in a small source partial so the
+    long medical-education layout stays readable and can only affect /training.
+    """
+    fragment = read(os.path.join(SRC, "training-content.partial"))
+    chat = W.block_by_class(html, "div-block-32")
+    chat_markup = html[chat[0]:chat[1]] if chat else ""
+    fragment = fragment.replace("<!-- TRAINING_FLOATING_CHAT -->", chat_markup)
+    html = html.replace("<body>", '<body class="training-page">', 1)
+    return re.sub(
+        r'<main\b[^>]*class="main-wrapper"[^>]*>.*?</main>',
+        lambda _match: '<main class="main-wrapper">\n%s\n    </main>' % fragment,
+        html, count=1, flags=re.S | re.I)
+
+
+def add_training_schema(html):
+    """Add only verified Course JSON-LD for the two published programmes."""
+    graph = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Course",
+                "@id": "https://bankersvascular.com/training#gae-course",
+                "name": "Genicular Artery Embolization (GAE) Training",
+                "description": ("Professional GAE training for doctors with theoretical learning, "
+                                "10+ live training cases and hands-on experience."),
+                "provider": {
+                    "@type": "Organization",
+                    "name": "Bankers Vascular Centre",
+                    "url": "https://bankersvascular.com",
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "price": "400000",
+                    "priceCurrency": "INR",
+                    "description": "Published one-time programme fee",
+                },
+            },
+            {
+                "@type": "Course",
+                "@id": "https://bankersvascular.com/training#varicose-course",
+                "name": "Varicose Veins Treatment Training",
+                "description": ("Professional Varicose Veins Treatment Training for doctors with "
+                                "five theoretical modules, an online course option, hands-on experience "
+                                "and personalized training."),
+                "provider": {
+                    "@type": "Organization",
+                    "name": "Bankers Vascular Centre",
+                    "url": "https://bankersvascular.com",
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "price": "200000",
+                    "priceCurrency": "INR",
+                    "description": "Published programme fee starting from INR 200000",
+                },
+            },
+        ],
+    }
+    tag = '  <script type="application/ld+json">%s</script>\n</head>' % json.dumps(
+        graph, ensure_ascii=False)
+    return html.replace("</head>", tag, 1)
+
+
 def customise_bankers_notes(html, cms):
     """Turn the cloned blog archive into Dr. Mohal Banker's personal page."""
     html = html.replace("Our Blog", "Bankers Notes")
@@ -1607,7 +1682,10 @@ def build_shells(pages, cms, binder, assets):
     for page in pages:
         extra = CFG.EXTRA_SHELL_PAGES.get(page, {})
         source = extra.get("source", page)
-        html = prepare_shell(read(os.path.join(SRC, source)), cms, binder, page)
+        source_html = read(os.path.join(SRC, source))
+        if page == "training.html":
+            source_html = customise_training(source_html)
+        html = prepare_shell(source_html, cms, binder, page)
         if page == "nanofat-for-joint-pain.html":
             html = nanofat.customise_shell(html)
             # The standalone form is injected after the shared shell pass, so
@@ -1631,13 +1709,20 @@ def build_shells(pages, cms, binder, assets):
             metadata = {**extra, **STATIC_META.get(page, {})}
             html = set_head_meta(html, title=metadata.get("title"),
                                  desc=metadata.get("desc"), canonical=CFG.SITE_URL + url,
+                                 image=metadata.get("image"),
                                  keywords=metadata.get("keywords"),
+                                 og_title=metadata.get("og_title"),
+                                 og_desc=metadata.get("og_desc"),
                                  noindex=page in CFG.NOINDEX_PAGES)
             if page not in CFG.NOINDEX_PAGES:
-                html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(html)), url)
+                html = ensure_meta_description(enforce_single_h1(html))
+                if page != "training.html":
+                    html = add_seo_internal_links(html, url)
                 html = add_page_schema(html, url)
                 if page == "nanofat-for-joint-pain.html":
                     html = nanofat.add_schema(html, CFG.SITE_URL)
+                if page == "training.html":
+                    html = add_training_schema(html)
             write(out_rel, html)
             written.append((out_rel, url, page not in CFG.NOINDEX_PAGES))
             continue

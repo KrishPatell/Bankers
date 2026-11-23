@@ -78,6 +78,9 @@ export default async function handler(req, res) {
   const city = String(body.City || body.city || "").trim();
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
+  const qualification = String(body["Medical-Qualification"] || body.qualification || "").trim();
+  const specialization = String(body.Specialization || body.specialization || "").trim();
+  const trainingProgramme = String(body["Training-Programme"] || body.programme || "").trim();
   const preferredDate = String(body.Date || "").trim();
   const formName = String(body._form || "Website form").trim();
   const pageName = String(body._page || "").trim();
@@ -117,6 +120,9 @@ export default async function handler(req, res) {
     ["Name", name],
     ...(phone ? [["Phone", phone]] : []),
     ...(email ? [["Email", email]] : []),
+    ...(qualification ? [["Medical qualification", qualification]] : []),
+    ...(specialization ? [["Specialization", specialization]] : []),
+    ...(trainingProgramme ? [["Training programme", trainingProgramme]] : []),
     ...(city ? [["City", city]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),
     ...(message ? [["Message", message]] : []),

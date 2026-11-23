@@ -1,0 +1,271 @@
+<div class="training-page" id="training-page">
+  <section class="training-hero" aria-labelledby="training-hero-title">
+    <div class="training-shell training-hero-grid">
+      <div class="training-hero-copy">
+        <p class="training-eyebrow">Certificate Programme · For qualified medical professionals</p>
+        <h1 id="training-hero-title">Hands-On Interventional Radiology Training for Doctors in India</h1>
+        <p class="training-hero-subtitle">Advanced Genicular Artery Embolization (GAE) &amp; Varicose Veins Treatment Training at Bankers Vascular Centre.</p>
+        <p>Advance your clinical knowledge and explore specialized training opportunities in minimally invasive vascular and image-guided procedures.</p>
+        <p>Bankers Vascular Centre offers professional medical training programmes in Genicular Artery Embolization and Varicose Veins Treatment, combining structured theoretical education, clinical learning opportunities and hands-on experience.</p>
+        <p>Learn from interventional radiologists <strong>Dr. Mohal Banker</strong> and <strong>Dr. Rozil Gandhi</strong> through personalized guidance and case-based learning.</p>
+        <div class="training-actions">
+          <a class="training-button training-button--light" href="#training-programmes">Explore Training Programmes</a>
+          <a class="training-button training-button--outline" href="#training-enquiry">Enquire About Training</a>
+        </div>
+        <p class="training-hero-disclaimer">Programme duration, eligibility, schedules and practical arrangements are confirmed with the training team.</p>
+      </div>
+      <div class="training-hero-media">
+        <img src="/images/training-doctors-knee-education-final.jpeg" alt="Doctors learning image-guided knee and vascular procedures during clinical training" width="1200" height="650" fetchpriority="high">
+      </div>
+    </div>
+  </section>
+
+  <section class="training-section training-intro" aria-labelledby="training-intro-title">
+    <div class="training-shell training-intro-grid">
+      <div>
+        <p class="training-eyebrow training-eyebrow--dark">Professional medical education</p>
+        <h2 id="training-intro-title">Specialized Interventional Radiology Training Programmes</h2>
+      </div>
+      <div class="training-copy">
+        <p>Bankers Vascular Centre provides specialized medical training opportunities for doctors interested in contemporary minimally invasive vascular interventions and image-guided procedures.</p>
+        <p>Our programmes focus on two clinical areas:</p>
+        <p><strong>Genicular Artery Embolization (GAE):</strong> A minimally invasive, image-guided intervention that may be considered for selected patients with knee osteoarthritis-related pain.</p>
+        <p><strong>Varicose Veins Treatment:</strong> Contemporary management of venous disorders using appropriate minimally invasive approaches.</p>
+        <p>The programmes aim to connect medical theory with practical clinical experience while emphasizing responsible patient selection, procedural understanding and patient safety. Participating doctors can explore structured learning, interact with experienced specialists and discuss the clinical considerations involved in these procedures.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="training-section training-section--aqua" aria-labelledby="training-why-title">
+    <div class="training-shell">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">Why train with us?</p>
+        <h2 id="training-why-title">Why Choose Bankers Vascular Centre for Medical Training?</h2>
+        <p>Build practical understanding through structured education, supervised clinical learning and discussions with experienced interventional radiologists.</p>
+      </div>
+      <div class="training-benefit-grid">
+        <article class="training-benefit-card"><span class="training-icon" aria-hidden="true">✦</span><h3>Experienced Medical Faculty</h3><p>Learn from Dr. Mohal Banker and Dr. Rozil Gandhi, interventional radiologists involved in specialized image-guided vascular and musculoskeletal interventions.</p></article>
+        <article class="training-benefit-card"><span class="training-icon" aria-hidden="true">▦</span><h3>Structured Clinical Education</h3><p>Build your understanding through educational modules, clinical discussions and procedure-related learning.</p></article>
+        <article class="training-benefit-card"><span class="training-icon" aria-hidden="true">◉</span><h3>Hands-On Learning Opportunities</h3><p>Explore practical learning experiences under appropriate supervision, subject to professional eligibility and clinical requirements.</p></article>
+        <article class="training-benefit-card"><span class="training-icon" aria-hidden="true">◌</span><h3>Live Case Exposure</h3><p>The GAE training programme includes exposure to more than 10 live training cases.</p></article>
+        <article class="training-benefit-card"><span class="training-icon" aria-hidden="true">↗</span><h3>Personalized Training</h3><p>The Varicose Veins Training Programme includes personalized training opportunities and an online course option.</p></article>
+        <article class="training-benefit-card"><span class="training-icon" aria-hidden="true">✓</span><h3>Focus on Patient Safety</h3><p>Understand the importance of patient evaluation, appropriate clinical decision-making and procedural safety.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="training-section" id="training-programmes" aria-labelledby="training-programmes-title">
+    <div class="training-shell">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">Certificate Programme</p>
+        <h2 id="training-programmes-title">Advanced Vascular Intervention Training</h2>
+        <p>Explore the two paid professional medical education programmes currently presented by Bankers Vascular Centre.</p>
+      </div>
+
+      <article class="training-program-card training-program-card--dark" id="gae-training" aria-labelledby="gae-training-title">
+        <div class="training-program-copy">
+          <p class="training-card-label">Programme 01</p>
+          <h2 id="gae-training-title">Genicular Artery Embolization (GAE) Training for Doctors in India</h2>
+          <h3>Advanced GAE Training with Live Clinical Case Exposure</h3>
+          <p class="training-price">₹4,00,000 <span>— One-Time</span></p>
+          <p>Genicular Artery Embolization (GAE) is a minimally invasive, image-guided technique involving selective embolization of abnormal vascularity associated with symptomatic knee osteoarthritis in appropriately selected patients.</p>
+          <p>Doctors interested in developing their understanding of GAE can explore a structured training programme at Bankers Vascular Centre. Led by Dr. Mohal Banker and Dr. Rozil Gandhi, the programme combines theoretical education with practical learning and exposure to live clinical cases.</p>
+          <a class="training-button training-button--light" href="#training-enquiry">Enquire About GAE Training</a>
+        </div>
+        <div class="training-program-details">
+          <h3>GAE Training Programme Features</h3>
+          <ul class="training-check-list">
+            <li>Two training modules</li>
+            <li>Theoretical learning</li>
+            <li>10+ live training cases</li>
+            <li>Hands-on experience</li>
+            <li>Training by Dr. Mohal Banker and Dr. Rozil Gandhi</li>
+          </ul>
+          <div class="training-detail-block">
+            <h3>Clinical Learning Focus</h3>
+            <p>Relevant educational topics may include knee vascular anatomy, clinical indications, patient selection, diagnostic imaging, procedural planning, treatment principles and post-procedure assessment.</p>
+            <p>The exact course curriculum and level of practical involvement must be confirmed with the training team.</p>
+          </div>
+          <div class="training-detail-block">
+            <h3>Who May Be Interested?</h3>
+            <ul>
+              <li>Interventional radiologists</li>
+              <li>Radiologists pursuing interventional training</li>
+              <li>Appropriately qualified specialists interested in image-guided embolization</li>
+              <li>Medical professionals with relevant prior training seeking further clinical exposure</li>
+            </ul>
+            <p>Enrollment and participation in hands-on clinical activities depend on professional qualifications and applicable institutional requirements.</p>
+          </div>
+          <p class="training-supporting-text">Contact the training team to confirm programme duration, batch availability, eligibility, detailed syllabus and fee inclusions.</p>
+        </div>
+      </article>
+
+      <article class="training-program-card training-program-card--light" id="varicose-training" aria-labelledby="varicose-training-title">
+        <div class="training-program-copy">
+          <p class="training-card-label">Programme 02</p>
+          <h2 id="varicose-training-title">Varicose Veins Treatment Training for Doctors in India</h2>
+          <h3>Learn Contemporary Minimally Invasive Varicose Vein Management</h3>
+          <p class="training-price">Starting From ₹2,00,000</p>
+          <p>Varicose veins and chronic venous insufficiency are common vascular conditions requiring appropriate clinical evaluation and individualized treatment planning.</p>
+          <p>Modern treatment approaches for eligible patients may include endovenous laser therapy, radiofrequency ablation, medical adhesive closure and other vein-directed interventions.</p>
+          <p>Bankers Vascular Centre offers a professional Varicose Veins Treatment Training Programme for doctors interested in developing their knowledge of contemporary venous disease management.</p>
+          <a class="training-button training-button--solid" href="#training-enquiry">Enquire About Varicose Veins Training</a>
+        </div>
+        <div class="training-program-details">
+          <h3>Programme Highlights</h3>
+          <ul class="training-check-list">
+            <li>Five theoretical training modules</li>
+            <li>Online course option available</li>
+            <li>Hands-on experience</li>
+            <li>Personalized training</li>
+            <li>Learning with Dr. Mohal Banker and Dr. Rozil Gandhi</li>
+          </ul>
+          <div class="training-detail-block">
+            <h3>Clinical Learning Focus</h3>
+            <ul>
+              <li>Understanding varicose vein disease and chronic venous insufficiency</li>
+              <li>Patient assessment and Duplex Doppler ultrasound evaluation</li>
+              <li>Principles of minimally invasive venous treatment</li>
+              <li>Endovenous treatment approaches</li>
+              <li>Patient selection, treatment planning, safety and follow-up</li>
+            </ul>
+            <p>These are suggested learning areas, not a confirmed list of course modules. Only label them as included curriculum after verification.</p>
+          </div>
+          <div class="training-detail-block">
+            <h3>Personalized Learning Approach</h3>
+            <p>Doctors enter training with different levels of experience in vascular imaging and interventional procedures. Our personalized training approach allows participants to discuss their learning requirements and explore suitable educational opportunities.</p>
+            <p>An online course option is available for the Varicose Veins Training Programme. Contact the team for the exact division between theoretical and practical training.</p>
+          </div>
+          <p class="training-supporting-text">Request information about admission, course structure, hands-on training, online learning and available schedules.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="training-section training-section--aqua" aria-labelledby="training-comparison-title">
+    <div class="training-shell">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">At a glance</p>
+        <h2 id="training-comparison-title">Compare Our Medical Training Programmes</h2>
+      </div>
+      <div class="training-table-wrap">
+        <table class="training-comparison-table">
+          <caption>Comparison of GAE Training and Varicose Veins Training</caption>
+          <thead><tr><th scope="col">Feature</th><th scope="col">GAE Training</th><th scope="col">Varicose Veins Training</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Focus</th><td>Genicular Artery Embolization</td><td>Varicose Veins Treatment</td></tr>
+            <tr><th scope="row">Fee</th><td>₹4,00,000 one-time</td><td>₹2,00,000 onwards</td></tr>
+            <tr><th scope="row">Modules</th><td>2</td><td>5 theoretical modules</td></tr>
+            <tr><th scope="row">Theory</th><td>Included</td><td>Included</td></tr>
+            <tr><th scope="row">Hands-on experience</th><td>Yes</td><td>Yes</td></tr>
+            <tr><th scope="row">Live cases</th><td>10+ listed</td><td>Contact team</td></tr>
+            <tr><th scope="row">Online course</th><td>Contact team</td><td>Option available</td></tr>
+            <tr><th scope="row">Trainers</th><td>Dr. Mohal Banker and Dr. Rozil Gandhi</td><td>Dr. Mohal Banker and Dr. Rozil Gandhi</td></tr>
+            <tr><th scope="row">Duration</th><td>Enquire</td><td>Enquire</td></tr>
+            <tr><th scope="row">Admission eligibility</th><td>Confirm with team</td><td>Confirm with team</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="training-section" aria-labelledby="training-faculty-title">
+    <div class="training-shell">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">Meet the faculty</p>
+        <h2 id="training-faculty-title">Learn from Experienced Interventional Radiologists</h2>
+      </div>
+      <div class="training-faculty-grid">
+        <article class="training-faculty-card">
+          <a href="/our-doctors/dr-mohal-banker" class="training-faculty-photo-link"><img src="/images/doctor-card-mohal-banker.png" loading="lazy" width="600" height="700" alt="Dr. Mohal Banker, Director and Interventional Radiologist"></a>
+          <div><h3>Dr. Mohal Banker</h3><p class="training-role">Director | Interventional Radiologist</p><p>Dr. Mohal Banker is an interventional radiologist associated with Bankers Vascular Centre, with experience in minimally invasive vascular and musculoskeletal interventions.</p><p>His professional work includes varicose vein treatment, genicular artery embolization and other image-guided procedures.</p><a class="training-text-link" href="/our-doctors/dr-mohal-banker">View Dr. Mohal Banker's profile</a></div>
+        </article>
+        <article class="training-faculty-card">
+          <a href="/our-doctors/dr-rozil-gandhi" class="training-faculty-photo-link"><img src="/images/doctor-card-rozil-gandhi.png" loading="lazy" width="600" height="700" alt="Dr. Rozil Gandhi, Joint Director and Interventional Radiologist"></a>
+          <div><h3>Dr. Rozil Gandhi</h3><p class="training-role">Joint Director | Interventional Radiologist</p><p>Dr. Rozil Gandhi is a consultant interventional radiologist associated with Bankers Vascular Centre.</p><p>His clinical interests include minimally invasive interventions and image-guided procedures.</p><a class="training-text-link" href="/our-doctors/dr-rozil-gandhi">View Dr. Rozil Gandhi's profile</a></div>
+        </article>
+      </div>
+      <p class="training-faculty-note">Together, both specialists contribute to the training programmes offered at Bankers Vascular Centre.</p>
+    </div>
+  </section>
+
+  <section class="training-section training-section--aqua" aria-labelledby="training-steps-title">
+    <div class="training-shell">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">How to enquire</p>
+        <h2 id="training-steps-title">How to Apply for Medical Training</h2>
+        <p>Use the enquiry process to confirm programme details before registration. No online payment or guaranteed admission is implied.</p>
+      </div>
+      <ol class="training-step-grid">
+        <li><span class="training-step-number">1</span><h3>Choose Your Training Programme</h3><p>Select GAE Training or Varicose Veins Treatment Training based on your professional learning interests.</p></li>
+        <li><span class="training-step-number">2</span><h3>Contact the Training Team</h3><p>Submit an enquiry or contact Bankers Vascular Centre to request programme details.</p></li>
+        <li><span class="training-step-number">3</span><h3>Confirm Course Information</h3><p>Discuss qualifications, training duration, schedule, fees, curriculum and hands-on learning arrangements.</p></li>
+        <li><span class="training-step-number">4</span><h3>Complete Registration</h3><p>Follow the enrollment process communicated by the training coordinator.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="training-section training-faq-section" aria-labelledby="training-faq-title">
+    <div class="training-shell training-faq-grid">
+      <div class="training-section-heading">
+        <p class="training-eyebrow training-eyebrow--dark">Doctor-specific FAQ</p>
+        <h2 id="training-faq-title">Frequently Asked Questions About GAE and Varicose Veins Training</h2>
+        <p>These answers summarise currently published programme information. Confirm the latest arrangements with the training team.</p>
+      </div>
+      <div class="training-faq-list">
+        <details><summary>Where can doctors learn Genicular Artery Embolization in India?</summary><p>Bankers Vascular Centre offers a Genicular Artery Embolization training programme led by Dr. Mohal Banker and Dr. Rozil Gandhi. The programme includes theoretical learning, 10+ live training cases and hands-on experience.</p></details>
+        <details><summary>What is the fee for Genicular Artery Embolization training?</summary><p>The published GAE training fee is ₹4,00,000 as a one-time payment. Contact the training team for fee inclusions and enrollment details.</p></details>
+        <details><summary>Is hands-on GAE training available?</summary><p>Yes. Hands-on experience is included in the published programme features. Actual clinical participation depends on qualifications, supervision, patient consent and institutional requirements.</p></details>
+        <details><summary>What is the fee for Varicose Veins Treatment Training?</summary><p>The Varicose Veins Treatment Training Programme starts from ₹2,00,000. Contact the team to confirm available training options and pricing.</p></details>
+        <details><summary>Is online Varicose Veins Training available?</summary><p>Yes. An online course option is available. Doctors can enquire about the programme structure and practical learning arrangements.</p></details>
+        <details><summary>Who conducts the training programmes?</summary><p>The listed trainers are Dr. Mohal Banker and Dr. Rozil Gandhi, interventional radiologists associated with Bankers Vascular Centre.</p></details>
+        <details><summary>How many live cases are included in GAE training?</summary><p>The programme lists exposure to 10+ live training cases. Case availability and participation arrangements should be confirmed before enrolling.</p></details>
+        <details><summary>How long does the GAE or Varicose Veins Training Programme take?</summary><p>The exact duration is not currently published. Contact the training coordinator for the latest schedule and programme duration.</p></details>
+        <details><summary>Who is eligible for these medical training programmes?</summary><p>These programmes are intended for appropriately qualified medical professionals. Eligibility and permitted hands-on participation depend on prior training, clinical competence and institutional requirements.</p></details>
+        <details><summary>Is a training certificate provided?</summary><p>The programmes are advertised under a Certificate Programme section. Participants should confirm certificate details, completion requirements and any applicable recognition with the training team.</p></details>
+        <details><summary>How can doctors register for training?</summary><p>Doctors can contact Bankers Vascular Centre using the enquiry options on this training page or the published contact details.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="training-section training-contact-section" id="training-enquiry" aria-labelledby="training-contact-title">
+    <div class="training-shell training-contact-grid">
+      <div class="training-contact-copy">
+        <p class="training-eyebrow">Start a conversation</p>
+        <h2 id="training-contact-title">Advance Your Skills in Interventional Radiology</h2>
+        <p>Explore professional training opportunities in Genicular Artery Embolization and Varicose Veins Treatment with Bankers Vascular Centre.</p>
+        <p>Connect with our medical training team to understand the programme structure, admission requirements, hands-on learning opportunities and upcoming availability.</p>
+        <div class="training-contact-details">
+          <strong>Bankers Vascular Centre</strong>
+          <span>Ahmedabad | Vadodara, Gujarat, India</span>
+          <a href="tel:+919909908428">+91 99099 08428</a>
+          <a href="tel:+919909903449">+91 99099 03449</a>
+          <a href="mailto:admin@bankersvascular.com">admin@bankersvascular.com</a>
+        </div>
+        <a class="training-button training-button--light" href="tel:+919909908428">Call Training Coordinator</a>
+      </div>
+      <div class="training-form-shell w-form">
+        <form class="training-enquiry-form" name="training-enquiry" data-name="Training Enquiry" method="post" action="/api/contact">
+          <h3>Enquire About Training</h3>
+          <p>Share your details and the training team will respond with the information currently available.</p>
+          <div class="training-form-grid">
+            <label>Full Name<input type="text" name="Name" autocomplete="name" required></label>
+            <label>Contact Number<input type="tel" name="Phone-Number" autocomplete="tel" required></label>
+            <label>Email<input type="email" name="Email" autocomplete="email"></label>
+            <label>Medical Qualification<input type="text" name="Medical-Qualification"></label>
+            <label>Specialization<input type="text" name="Specialization"></label>
+            <label>City / State<input type="text" name="City" autocomplete="address-level2"></label>
+            <label class="training-form-full">Interested Training Programme<select name="Training-Programme"><option value="">Select a programme</option><option value="Genicular Artery Embolization (GAE) Training">Genicular Artery Embolization (GAE) Training</option><option value="Varicose Veins Treatment Training">Varicose Veins Treatment Training</option></select></label>
+            <label class="training-form-full">Message / Questions<textarea name="Message" rows="5"></textarea></label>
+          </div>
+          <button class="training-button training-button--solid" type="submit" data-wait="Sending enquiry...">Submit Training Enquiry</button>
+          <p class="training-form-note">Programme duration, eligibility, schedules, fee inclusions and certificate details are confirmed by the training team.</p>
+        </form>
+        <div class="w-form-done" role="status"><div>Thank you. Your training enquiry has been sent.</div></div>
+        <div class="w-form-fail" role="alert"><div>Something went wrong. Please call us or message on WhatsApp.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAINING_FLOATING_CHAT -->
+</div>
