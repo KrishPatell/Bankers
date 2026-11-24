@@ -28,8 +28,8 @@ LOCATION_HOURS = {
         "closes": "19:00",
     },
     "vadodara": {
-        "display": "09:00 AM - 07:00 PM",
-        "opens": "09:00",
+        "display": "08:00 AM - 07:00 PM",
+        "opens": "08:00",
         "closes": "19:00",
     },
     "rajkot": {

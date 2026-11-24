@@ -40,7 +40,16 @@ SITEMAP_LASTMOD = {
     "nanofat-for-joint-pain.html": "2026-10-13",
     "dr-mohal-banker-award.html": "2026-11-18",
     "bankers-notes.html": "2026-08-13",
-    "services-gujarat.html": "2026-08-22",
+    # This shell reuses products.html, whose November 2026 OPD plan is the
+    # latest meaningful content dependency as of the production parent.
+    "services-gujarat.html": "2026-11-02",
+}
+
+# Routes whose rendered output intentionally reuses another source page.
+# Verification resolves the dependency's latest Git source date rather than
+# validating the sitemap date against this map alone.
+SITEMAP_SOURCE_DEPENDENCIES = {
+    "services-gujarat.html": ("products.html",),
 }
 
 

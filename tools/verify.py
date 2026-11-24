@@ -7,6 +7,7 @@
 import json
 import os
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 import sys
 import urllib.parse
@@ -55,6 +56,24 @@ def clean_url_for_file(relative_path):
     if relative_path.endswith(".html"):
         return "/" + relative_path[:-len(".html")]
     return "/" + relative_path
+
+
+def git_source_lastmod(relative_path):
+    """Return the latest committed date for a source dependency."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "-1", "--format=%cs", "HEAD", "--", relative_path],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+    except OSError:
+        return None
+    value = result.stdout.strip()
+    if result.returncode or not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
 
 
 # --------------------------------------------------------------------- checks
@@ -341,6 +360,24 @@ def check_jsonld(pages):
                          for node in locations):
                     fail("%s: location schema has no primary organization relationship"
                          % relative)
+                else:
+                    expected_hours = location_by_city[city]["opening_hours"]
+                    valid_hours = any(
+                        node.get("openingHoursSpecification")
+                        and any(
+                            spec.get("opens") == expected_hours["opens"]
+                            and spec.get("closes") == expected_hours["closes"]
+                            and set(spec.get("dayOfWeek", [])) == {
+                                "Monday", "Tuesday", "Wednesday", "Thursday",
+                                "Friday", "Saturday",
+                            }
+                            for spec in node["openingHoursSpecification"]
+                        )
+                        for node in locations
+                    )
+                    if not valid_hours:
+                        fail("%s: location schema has incorrect confirmed hospital hours"
+                             % relative)
 
         if parts and parts[0] == "treatment" and len(parts) == 2:
             procedures = [node for node in nodes if "MedicalProcedure" in types(node)]
@@ -432,6 +469,40 @@ def check_forms(pages):
             fail("%s: forms present but forms.js not loaded" % rel(path))
     note("%d lead forms POST to /api/contact with honeypot + submit control"
          % total)
+
+
+def check_hospital_hours(pages):
+    """Keep rendered hospital timing blocks aligned with confirmed hours."""
+    targets = {
+        "/varicose-veins/ahmedabad": ENTITY_SCHEMA.LOCATION_HOURS["ahmedabad"],
+        "/varicose-veins/vadodara": ENTITY_SCHEMA.LOCATION_HOURS["vadodara"],
+        "/contact-us": ENTITY_SCHEMA.LOCATION_HOURS["ahmedabad"],
+    }
+    seen = set()
+    for path, html in pages.items():
+        route = clean_url_for_file(rel(path))
+        if route not in targets:
+            continue
+        seen.add(route)
+        timing = re.search(
+            r"<h5\b[^>]*>\s*Hospital Timings\s*</h5>\s*"
+            r"<p\b[^>]*>(.*?)</p>", html, re.S | re.I)
+        if not timing:
+            fail("%s: missing Hospital Timings block" % route)
+            continue
+        text = re.sub(r"<[^>]+>", " ", timing.group(1))
+        if (not re.search(r"Monday\s*-\s*Saturday", text, re.I)
+                or not re.search(r"8\s*:\s*00.*7\s*:\s*00", text, re.S | re.I)
+                or not re.search(r"Sunday\s*\(Closed\)", text, re.I)):
+            fail("%s: Hospital Timings block is not Monday-Saturday 08:00-19:00"
+                 % route)
+        if route != "/contact-us":
+            display = targets[route]["display"]
+            if html.count(display) < 2:
+                fail("%s: confirmed hours are not present in both public timing surfaces"
+                     % route)
+    if seen == set(targets) and not failures:
+        note("confirmed 08:00-19:00 hospital timing blocks pass for both branches and contact page")
 
 
 def check_submit_controls(pages):
@@ -604,6 +675,28 @@ def check_sitemap(pages, cms):
             fail("static sitemap lastmod mismatch for %s: expected %s, found %s"
                  % (loc, expected, sitemap_dates[loc]))
 
+    for page, dependencies in CFG.SITEMAP_SOURCE_DEPENDENCIES.items():
+        extra = CFG.EXTRA_SHELL_PAGES.get(page)
+        if not extra:
+            fail("sitemap dependency has no configured shell page: %s" % page)
+            continue
+        loc = CFG.SITE_URL + extra["url"]
+        actual = sitemap_dates.get(loc)
+        if not actual:
+            fail("sitemap dependency route is missing: %s" % loc)
+            continue
+        for dependency in dependencies:
+            source_date = git_source_lastmod(os.path.join("src", dependency))
+            if not source_date:
+                fail("could not resolve Git lastmod for sitemap dependency src/%s"
+                     % dependency)
+            elif actual < source_date:
+                fail("sitemap lastmod for %s (%s) predates source dependency src/%s (%s)"
+                     % (loc, actual, dependency, source_date))
+        if not failures:
+            note("sitemap source dependency passes: %s includes %s through %s"
+                 % (loc, ", ".join(dependencies), actual))
+
     if len(set(sitemap_dates.values())) > 1:
         note("sitemap.xml lists %d URLs with CMS/static lastmod dates" % len(locs))
     else:
@@ -674,6 +767,7 @@ def main():
     check_meta(pages)
     check_jsonld(pages)
     check_entity_schema(pages)
+    check_hospital_hours(pages)
     check_blog_featured_image_policy(pages, cms)
     check_forms(pages)
     check_submit_controls(pages)
