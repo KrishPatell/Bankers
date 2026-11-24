@@ -16551,6 +16551,301 @@ body.training-page-body .about-hero-section.about.frozen.training-hero-compact {
   }
 }
 
+/* Dedicated public appointment page. It reuses the shared Webflow header,
+   footer and form controls while keeping the booking flow compact for mobile
+   visitors arriving from Google Business Profile. */
+.booking-page {
+  background: #f0f8fa;
+  color: #1f2937;
+}
+
+.booking-page .main-wrapper {
+  background: #f0f8fa;
+}
+
+.booking-page-hero {
+  padding: 48px 24px 46px;
+  color: #ffffff;
+  text-align: center;
+  background: #00687b;
+}
+
+.booking-page-hero-icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 50%;
+  color: #ffffff;
+}
+
+.booking-page-hero-icon svg {
+  width: 35px;
+  height: 35px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.booking-page-eyebrow {
+  margin: 0 0 7px;
+  color: #c8f1ef;
+  font-family: Satoshi, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.booking-page-hero h1 {
+  margin: 0;
+  color: #ffffff;
+  font-family: Satoshi, sans-serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.booking-page-gujarati {
+  margin: 10px 0 0;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.booking-page-main {
+  padding: 48px 20px 64px;
+}
+
+.booking-page-container {
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.booking-page .appointment-form-block {
+  padding: 36px;
+  border-color: #d6e7ea;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgba(0, 55, 67, .12);
+}
+
+.booking-page .appointment-form-block::before {
+  height: 5px;
+  background: #00687b;
+}
+
+.booking-form-card-title {
+  margin: 0;
+  color: #00687b;
+  font-family: Satoshi, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.booking-form-card-intro {
+  margin: 9px 0 0;
+  color: #526775;
+  font-family: Satoshi, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.booking-page .appointment-booking-form {
+  margin-top: 25px;
+}
+
+.booking-page .appointment-form-grid {
+  gap: 18px 16px;
+}
+
+.booking-page .appointment-form-grid .appointment-field-wrap {
+  font-size: 15px;
+}
+
+.booking-page .appointment-other-city-wrap[hidden] {
+  display: none;
+}
+
+.booking-page .appointment-search-input {
+  padding-right: 18px;
+}
+
+.booking-page .appointment-submit-wrapper {
+  width: 100%;
+  margin-top: 23px;
+}
+
+.booking-page .appointment-submit-button {
+  display: inline-flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #00687b;
+  color: #ffffff;
+  font-family: Satoshi, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 9px 20px rgba(0, 104, 123, .18);
+}
+
+.booking-page .appointment-submit-button:hover:not(:disabled),
+.booking-page .appointment-submit-button:focus-visible {
+  background: #00566a;
+  box-shadow: 0 11px 24px rgba(0, 104, 123, .25);
+}
+
+.booking-button-icon {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+
+.booking-button-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.booking-contact-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  padding-top: 19px;
+  border-top: 1px solid #e0eef0;
+  color: #526775;
+  font-family: Satoshi, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.booking-contact-numbers {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.booking-contact-numbers a {
+  color: #00687b;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.booking-contact-numbers a:hover,
+.booking-contact-numbers a:focus-visible {
+  text-decoration: underline;
+}
+
+.booking-page .appointment-form-block .w-form-done {
+  padding: 24px;
+  border: 1px solid #b9e1de;
+  border-radius: 10px;
+  background: #eefaf9;
+  color: #1f2937;
+  font-family: Satoshi, sans-serif;
+  line-height: 1.6;
+}
+
+.booking-success-title {
+  margin-bottom: 8px;
+  color: #00687b;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.booking-page .appointment-form-block .w-form-done p {
+  margin: 0;
+  font-size: 16px;
+}
+
+@media screen and (max-width: 767px) {
+  .booking-page-hero {
+    padding: 38px 20px 36px;
+  }
+
+  .booking-page-main {
+    padding: 30px 14px 44px;
+  }
+
+  .booking-page .appointment-form-block {
+    padding: 28px 20px;
+  }
+
+  .booking-form-card-title {
+    font-size: 24px;
+  }
+
+  .booking-contact-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .booking-contact-numbers {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .booking-page-hero-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 13px;
+  }
+
+  .booking-page-hero-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .booking-page-eyebrow {
+    font-size: 12px;
+  }
+
+  .booking-page-gujarati {
+    font-size: 16px;
+  }
+
+  .booking-page .appointment-form-block {
+    padding: 24px 16px;
+  }
+
+  .booking-page .appointment-form-grid {
+    gap: 15px;
+  }
+
+  .booking-page .appointment-form-status,
+  .booking-page .appointment-choice {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-page .appointment-submit-button,
+  .booking-page .input-field {
+    transition: none;
+  }
+}
+
 /* Appointment booking form. The contact page keeps its existing map, branch
    cards and two-column shell; these rules only give the upgraded form a clear,
    accessible booking layout. */
@@ -16837,5 +17132,389 @@ body.training-page-body .about-hero-section.about.frozen.training-hero-compact {
 
   .appointment-submit-button:hover:not(:disabled) {
     transform: none;
+  }
+}
+
+/* Reference-inspired appointment layout. The booking routes use the same
+   form and backend, but present the form as a focused visual panel plus a
+   dark branded contact card. */
+.booking-page {
+  background: #5d8aa5;
+}
+
+.booking-page .main-wrapper {
+  background: #5d8aa5;
+}
+
+.booking-page-hero {
+  display: none;
+}
+
+.booking-page-main {
+  min-height: 760px;
+  padding: 56px 24px 76px;
+  background: #5d8aa5;
+}
+
+.booking-page-container {
+  width: min(100%, 1180px);
+}
+
+.booking-page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #5d8aa5;
+  box-shadow: 0 24px 60px rgba(15, 47, 65, .22);
+}
+
+.booking-visual-panel {
+  position: relative;
+  display: flex;
+  min-height: 700px;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: clamp(34px, 5vw, 66px) clamp(28px, 5vw, 64px) 0;
+  background: #5d8aa5;
+  color: #ffffff;
+}
+
+.booking-visual-panel::before,
+.booking-visual-panel::after {
+  position: absolute;
+  border: 1px solid rgba(199, 239, 239, .25);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.booking-visual-panel::before {
+  width: 390px;
+  height: 390px;
+  right: -210px;
+  top: 130px;
+}
+
+.booking-visual-panel::after {
+  width: 520px;
+  height: 520px;
+  right: -280px;
+  top: 70px;
+}
+
+.booking-visual-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 390px;
+}
+
+.booking-visual-kicker,
+.booking-form-card-kicker {
+  margin: 0 0 12px;
+  color: #c9f1ef;
+  font-family: Satoshi, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.booking-visual-copy h2 {
+  margin: 0;
+  color: #ffffff;
+  font-family: Satoshi, sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.08;
+}
+
+.booking-visual-copy > p:not(.booking-visual-kicker) {
+  max-width: 360px;
+  margin: 20px 0 0;
+  color: rgba(255, 255, 255, .9);
+  font-family: Satoshi, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.booking-visual-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 999px;
+  background: rgba(13, 63, 88, .2);
+  color: #ffffff;
+  font-family: Satoshi, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.booking-visual-note-icon {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #00687b;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.booking-visual-art {
+  position: relative;
+  z-index: 1;
+  min-height: 330px;
+  margin: 20px -12% 0 -10%;
+}
+
+.booking-visual-art img {
+  position: absolute;
+  right: -10%;
+  bottom: 0;
+  width: 125%;
+  max-width: none;
+  height: auto;
+  filter: drop-shadow(0 16px 18px rgba(15, 47, 65, .18));
+}
+
+.booking-visual-orbit {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(201, 241, 239, .52);
+  border-radius: 50%;
+}
+
+.booking-visual-orbit-one {
+  width: 270px;
+  height: 270px;
+  right: 5%;
+  bottom: 80px;
+}
+
+.booking-visual-orbit-two {
+  width: 360px;
+  height: 360px;
+  right: -12%;
+  bottom: 30px;
+  opacity: .55;
+}
+
+.booking-form-panel {
+  min-width: 0;
+  padding: 22px;
+  background: #184e6c;
+}
+
+.booking-form-panel .appointment-form-block {
+  min-height: 100%;
+  padding: 34px 32px 30px;
+  border: 0;
+  border-radius: 14px;
+  background: #184e6c;
+  box-shadow: none;
+}
+
+.booking-form-panel .appointment-form-block::before {
+  display: none;
+}
+
+.booking-form-panel .booking-form-card-kicker {
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  letter-spacing: .04em;
+  text-transform: none;
+}
+
+.booking-form-panel .booking-form-card-title {
+  color: #ffffff;
+  font-size: 30px;
+}
+
+.booking-form-panel .booking-form-card-intro {
+  color: rgba(255, 255, 255, .78);
+}
+
+.booking-form-panel .appointment-field-wrap {
+  color: #ffffff;
+}
+
+.booking-form-panel .appointment-booking-form .input-field {
+  border-color: rgba(255, 255, 255, .18);
+  background: #f5fbfc;
+  color: #17384b;
+}
+
+.booking-form-panel .appointment-booking-form .input-field::placeholder {
+  color: #7a929c;
+}
+
+.booking-form-panel .appointment-booking-form .input-field:focus,
+.booking-form-panel .appointment-booking-form .appointment-choice input:focus-visible {
+  outline-color: rgba(201, 241, 239, .4);
+  border-color: #8ed9d6;
+}
+
+.booking-form-panel .appointment-form-status {
+  border-color: rgba(255, 255, 255, .18);
+  border-left-color: #8ed9d6;
+  background: rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .86);
+}
+
+.booking-form-panel .appointment-choice {
+  border-color: rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .86);
+}
+
+.booking-form-panel .appointment-submit-button {
+  background: #e84d60;
+  box-shadow: 0 10px 22px rgba(7, 27, 42, .22);
+}
+
+.booking-form-panel .appointment-submit-button:hover:not(:disabled),
+.booking-form-panel .appointment-submit-button:focus-visible {
+  background: #d83c51;
+  box-shadow: 0 12px 26px rgba(7, 27, 42, .3);
+}
+
+.booking-form-panel .booking-contact-strip {
+  border-top-color: rgba(255, 255, 255, .18);
+  color: rgba(255, 255, 255, .78);
+}
+
+.booking-form-panel .booking-contact-numbers a {
+  color: #ffffff;
+}
+
+.booking-form-panel .appointment-form-block .w-form-done {
+  border-color: rgba(201, 241, 239, .5);
+  background: #f4fbfb;
+  color: #17384b;
+}
+
+@media screen and (max-width: 991px) {
+  .booking-page-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-visual-panel {
+    min-height: 420px;
+    padding-bottom: 0;
+  }
+
+  .booking-visual-copy {
+    max-width: 560px;
+  }
+
+  .booking-visual-art {
+    min-height: 220px;
+    margin-top: 10px;
+  }
+
+  .booking-visual-art img {
+    right: -4%;
+    width: min(76%, 510px);
+  }
+
+  .booking-form-panel {
+    padding: 16px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .booking-page-main {
+    min-height: 0;
+    padding: 24px 12px 46px;
+  }
+
+  .booking-visual-panel {
+    min-height: 385px;
+    padding: 32px 24px 0;
+  }
+
+  .booking-visual-copy h2 {
+    font-size: 34px;
+  }
+
+  .booking-visual-copy > p:not(.booking-visual-kicker) {
+    font-size: 15px;
+  }
+
+  .booking-visual-note {
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .booking-visual-art {
+    min-height: 190px;
+    margin-right: -18%;
+    margin-left: 8%;
+  }
+
+  .booking-visual-art img {
+    right: -2%;
+    width: 92%;
+  }
+
+  .booking-form-panel {
+    padding: 6px;
+  }
+
+  .booking-form-panel .appointment-form-block {
+    padding: 28px 18px 24px;
+  }
+
+  .booking-form-panel .booking-form-card-title {
+    font-size: 27px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .booking-page-layout {
+    border-radius: 14px;
+  }
+
+  .booking-visual-panel {
+    min-height: 355px;
+    padding: 27px 20px 0;
+  }
+
+  .booking-visual-kicker,
+  .booking-form-card-kicker {
+    font-size: 11px;
+  }
+
+  .booking-visual-copy h2 {
+    font-size: 30px;
+  }
+
+  .booking-visual-note {
+    margin-top: 18px;
+  }
+
+  .booking-visual-art {
+    min-height: 150px;
+  }
+
+  .booking-form-panel .appointment-form-block {
+    padding: 24px 14px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-visual-art img,
+  .booking-form-panel .appointment-submit-button {
+    transition: none;
   }
 }

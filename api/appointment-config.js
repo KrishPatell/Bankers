@@ -59,7 +59,16 @@ export function isFutureOrToday(value) {
   const [year, month, day] = text.split("-").map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
   if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return false;
-  return text >= new Date().toISOString().slice(0, 10);
+  const todayParts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date()).reduce((result, part) => {
+    if (part.type !== "literal") result[part.type] = part.value;
+    return result;
+  }, {});
+  return text >= `${todayParts.year}-${todayParts.month}-${todayParts.day}`;
 }
 
 export function claimRequest(requests, id, now = Date.now(), windowMs = 600000) {

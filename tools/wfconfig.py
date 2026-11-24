@@ -341,6 +341,9 @@ PAGE_LISTS = {
          "order": ("Order", "numeric"), "bindings": "doctor-card",
          "field_overrides": DOCTOR_CARD_IMAGE_OVERRIDES},
     ],
+    "book-appointment.html": [],
+    "book-appointment-ahmedabad.html": [],
+    "book-appointment-vadodara.html": [],
     "bng-conference-november-2024.html": [
         {"items_cls": "doctor-archive-list", "collection": "our-doctors",
          "order": ("Order", "numeric"), "bindings": "doctor-card",
@@ -356,6 +359,17 @@ PAGE_LISTS = {
 # Bankers Notes reuses the blog archive but is intentionally limited to the
 # lead doctor's authored articles.
 EXTRA_SHELL_PAGES = {
+    # The compact public booking page reuses the existing contact/form shell
+    # but receives a dedicated page composition in tools/build.py. Keeping the
+    # form on the same source and /api/contact path prevents duplicate booking
+    # logic while giving Google Business Profile a clean landing URL.
+    "book-appointment.html": {
+        "source": "contact-us.html",
+        "output": "book-appointment/index.html",
+        "url": "/book-appointment",
+        "title": "Book Appointment | Bankers Vascular Hospital",
+        "desc": "Book an appointment at Bankers Vascular Hospital in Ahmedabad or Vadodara. Select your condition, preferred city and appointment date online.",
+    },
     # Public Google Business Profile booking links reuse the Contact page
     # template and the same /api/contact submission path. They are noindex
     # utility URLs so the appointment flow is discoverable without creating
@@ -461,5 +475,6 @@ DEAD_LISTS = ["fancy-columns-wrap-copy", "staff-collection"]
 # Pages excluded from sitemap.xml (utility pages).
 NOINDEX_PAGES = {
     "401.html", "404.html",
+    "book-appointment.html",
     "book-appointment-ahmedabad.html", "book-appointment-vadodara.html",
 }

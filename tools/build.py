@@ -1004,6 +1004,7 @@ def wire_forms(html, page_label):
     # labels instead of Webflow's export names such as "Email Form 2".
     page_display = {
         "contact-us.html": "Contact page",
+        "book-appointment.html": "Public appointment booking page",
         "book-appointment-ahmedabad.html": "Ahmedabad appointment booking page",
         "book-appointment-vadodara.html": "Vadodara appointment booking page",
     }.get(page_label, page_label.removesuffix(".html").replace("-", " ").title() + " page")
@@ -1382,6 +1383,172 @@ def prepare_shell(html, cms, binder, page_label):
     return html
 
 
+def customise_booking_page(html):
+    """Compose the compact public appointment page from the shared shell.
+
+    The contact page remains the source of truth for the Webflow header,
+    footer, form classes and submission markup. This page only keeps those
+    shared pieces and adds the focused booking hero/card required by Google
+    Business Profile visitors.
+    """
+    header_block = W.block_by_class(html, "navbar-two")
+    footer_block = W.block_by_class(html, "footer-two")
+    form_block = W.block_by_class(html, "appointment-form-block")
+    if not header_block or not footer_block or not form_block:
+        warn("booking page could not isolate shared header, footer, or form")
+        return html
+
+    header = html[header_block[0]:header_block[1]]
+    footer = html[footer_block[0]:footer_block[1]]
+    form = html[form_block[0]:form_block[1]]
+
+    # Keep the familiar form card styling while making the dedicated page
+    # shorter and clearer than the full Contact Us page.
+    form = re.sub(
+        r'<p class="appointment-form-kicker">.*?</p>',
+        '', form, count=1, flags=re.S)
+    form = re.sub(
+        r'<h2 class="appointment-form-heading">.*?</h2>',
+        '<p class="booking-form-card-kicker">Contact Us</p>'
+        '<h2 class="booking-form-card-title">Book Your Appointment</h2>',
+        form, count=1, flags=re.S)
+    form = re.sub(
+        r'<p class="appointment-form-intro">.*?</p>',
+        '<p class="booking-form-card-intro">Share a few details and our hospital team will contact you to confirm the appointment.</p>',
+        form, count=1, flags=re.S)
+
+    # The dedicated GBP form only exposes the two primary branches plus a
+    # safe fallback. The full contact form continues to use the configurable
+    # city list for broader OPD enquiries.
+    form = re.sub(
+        r'(<form\b[^>]*data-appointment-form="true")',
+        r'\1 data-appointment-scope="primary" '
+        r'data-appointment-city-scope="Ahmedabad|Vadodara|Other City"',
+        form, count=1)
+    form = re.sub(
+        r'(<select\b[^>]*data-appointment-city[^>]*>).*?</select>',
+        r'\1<option value="" selected disabled>Select your city</option>'
+        '<option value="Ahmedabad">Ahmedabad</option>'
+        '<option value="Vadodara">Vadodara</option>'
+        '<option value="Other City">Other City</option></select>',
+        form, count=1, flags=re.S)
+
+    # Add an accessible city-name field for the Other City branch. It remains
+    # hidden until the visitor selects that option, and the client/server both
+    # validate it before sending the request.
+    if "data-appointment-other-city" not in form:
+        city_field = re.search(
+            r'<label class="appointment-field-wrap"><span>Select City.*?</label>',
+            form, flags=re.S)
+        if city_field:
+            other_city = (
+                '<label class="appointment-field-wrap appointment-other-city-wrap" '
+                'data-other-city-wrap hidden><span>City Name <b aria-hidden="true">*</b></span>'
+                '<input class="input-field contact" maxlength="100" name="Other-City" '
+                'data-name="Other City" data-appointment-other-city '
+                'placeholder="Enter your city name" autocomplete="address-level2" type="text"></label>'
+            )
+            form = form[:city_field.end()] + other_city + form[city_field.end():]
+
+    # A datalist provides a native, keyboard-friendly searchable condition
+    # picker without introducing a third-party widget or network dependency.
+    disease_label = re.search(
+        r'<label class="appointment-field-wrap"><span>Select Disease.*?</label>',
+        form, flags=re.S)
+    if disease_label:
+        searchable_disease = (
+            '<label class="appointment-field-wrap"><span>Select Disease / Condition '
+            '<b aria-hidden="true">*</b></span>'
+            '<input class="input-field contact appointment-search-input" name="Disease" '
+            'data-name="Select Disease / Condition" data-appointment-disease '
+            'list="appointment-disease-options" placeholder="Search or select a condition" '
+            'autocomplete="off" required>'
+            '<datalist id="appointment-disease-options">'
+            '<option value="Knee Pain"><option value="Varicose Veins">'
+            '<option value="Prostate Enlargement"><option value="Piles">'
+            '<option value="Breast Fibroadenoma"><option value="Heel Pain">'
+            '<option value="Frozen Shoulder"><option value="Hair Fall">'
+            '<option value="Obesity"><option value="Lymphedema">'
+            '<option value="Tennis Elbow / Golfer’s Elbow">'
+            '<option value="Vascular Malformation"><option value="Carpal Tunnel Syndrome">'
+            '<option value="Other Health Condition"></datalist></label>'
+        )
+        form = form[:disease_label.start()] + searchable_disease + form[disease_label.end():]
+
+    form = re.sub(
+        r'<button type="submit"([^>]*appointment-submit-button[^>]*)>.*?</button>',
+        r'<button type="submit"\1><span>Book Appointment</span>'
+        '<span class="booking-button-icon" aria-hidden="true">'
+        '<svg viewBox="0 0 24 24" focusable="false"><path d="M7 3v3m10-3v3M4.5 9.5h15M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm3 9 2 2 4-4"/></svg>'
+        '</span></button>', form, count=1, flags=re.S)
+
+    done_block = W.block_by_class(form, "w-form-done")
+    if done_block:
+        success = (
+            '<div class="success-message-2 w-form-done">'
+            '<div class="booking-success-title">Appointment Request Submitted Successfully!</div>'
+            '<p>Thank you! Your appointment request has been received. Our hospital team will contact you shortly to confirm your appointment.</p>'
+            '</div>'
+        )
+        form = form[:done_block[0]] + success + form[done_block[1]:]
+
+    contact_strip = (
+        '<div class="booking-contact-strip" aria-label="Appointment phone numbers">'
+        '<span>Our hospital team will contact you to confirm your appointment.</span>'
+        '<span class="booking-contact-numbers">'
+        '<a href="tel:+919909908428">+91 99099 08428</a>'
+        '<span aria-hidden="true">|</span>'
+        '<a href="tel:+919909903449">+91 99099 03449</a>'
+        '</span></div>'
+    )
+    form = form.replace('</form>', contact_strip + '</form>', 1)
+
+    hero = '''<section class="booking-page-hero" aria-labelledby="booking-page-title">
+      <div class="booking-page-hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" focusable="false"><path d="M14 7v7m20-7v7M9 19h30M12 11h24a3 3 0 0 1 3 3v23a3 3 0 0 1-3 3H12a3 3 0 0 1-3-3V14a3 3 0 0 1 3-3Zm7 17 5 5 9-10"/></svg>
+      </div>
+      <p class="booking-page-eyebrow">Bankers Vascular Hospital</p>
+      <h1 id="booking-page-title">Book Your Appointment</h1>
+      <p class="booking-page-gujarati" lang="gu">તમારી અપોઇન્ટમેન્ટ બુક કરો</p>
+    </section>'''
+
+    visual_panel = '''<aside class="booking-visual-panel" aria-label="Bankers Vascular Hospital appointment support">
+      <div class="booking-visual-copy">
+        <p class="booking-visual-kicker">A simpler way to reach our team</p>
+        <h2>Let’s plan your consultation.</h2>
+        <p>Tell us where you would like to visit and what you need help with. Our hospital team will contact you to confirm the appointment.</p>
+        <div class="booking-visual-note">
+          <span class="booking-visual-note-icon" aria-hidden="true">✓</span>
+          <span>Guided appointment requests with human support</span>
+        </div>
+      </div>
+      <div class="booking-visual-art" aria-hidden="true">
+        <span class="booking-visual-orbit booking-visual-orbit-one"></span>
+        <span class="booking-visual-orbit booking-visual-orbit-two"></span>
+        <img src="/images/doctors-group-photo-transparent-v2.png" alt="" loading="lazy">
+      </div>
+    </aside>'''
+
+    head_end = html.lower().find('</head>')
+    body_end = html.lower().rfind('</body>')
+    script_start = html.rfind('<script src="https://d3e54')
+    if head_end < 0 or body_end < 0 or script_start < 0:
+        warn("booking page could not isolate document head or scripts")
+        return html
+    head = html[:head_end + len('</head>')]
+    scripts = html[script_start:body_end]
+    body = (
+        '<body class="body-2 booking-page">'
+        '<main class="page-wrapper booking-page-wrapper">'
+        '<main class="main-wrapper">' + header + hero +
+        '<section class="booking-page-main" aria-label="Appointment booking">'
+        '<div class="booking-page-container booking-page-layout">' + visual_panel +
+        '<div class="booking-form-panel">' + form + '</div></div></section>'
+        '</main>' + footer + '</main>' + scripts + '</body></html>'
+    )
+    return head + body
+
+
 def award_article_item(cms):
     """Build the private, direct-linked award article without adding a CMS row.
 
@@ -1695,6 +1862,9 @@ def build_shells(pages, cms, binder, assets):
         if page == "training.html":
             source_html = customise_training(source_html)
         html = prepare_shell(source_html, cms, binder, page)
+        if page in ("book-appointment.html", "book-appointment-ahmedabad.html",
+                    "book-appointment-vadodara.html"):
+            html = customise_booking_page(html)
         if page == "nanofat-for-joint-pain.html":
             html = nanofat.customise_shell(html)
             # The standalone form is injected after the shared shell pass, so

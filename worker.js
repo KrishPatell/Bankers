@@ -82,6 +82,21 @@ async function parseBody(request) {
   return Object.fromEntries(await request.formData());
 }
 
+async function appointmentConfig(request, env) {
+  if (!env.ASSETS) return null;
+  try {
+    const url = new URL("/data/appointment-config.json", request.url);
+    const response = await env.ASSETS.fetch(new Request(url, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    }));
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 async function contact(request, env) {
   if (request.method !== "POST") return json({ ok: false, error: "Method not allowed" }, 405, { Allow: "POST" });
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
@@ -94,6 +109,7 @@ async function contact(request, env) {
   const name = String(body.Name || body.name || "").trim();
   const phone = String(body["Phone-Number"] || body.phone || body.mobile || "").trim();
   const city = String(body.City || body.city || "").trim();
+  const otherCity = String(body["Other-City"] || body.otherCity || "").trim();
   const disease = String(body.Disease || body.disease || "").trim();
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
@@ -102,6 +118,7 @@ async function contact(request, env) {
   const requestCallback = isChecked(body["Request-Callback"] || body.requestCallback);
   const consent = isChecked(body.Consent || body.consent);
   const isAppointment = isAppointmentPayload(body);
+  const configuredAppointments = isAppointment ? await appointmentConfig(request, env) : null;
   const requestId = String(body._request_id || request.headers.get("Idempotency-Key") || "").trim();
   const formName = String(body._form || "Website form").trim();
   const pageName = String(body._page || "").trim();
@@ -117,8 +134,17 @@ async function contact(request, env) {
   if (!isAppointment && !phone && !email) return json({ ok: false, error: "Please enter a phone number or email address." }, 400);
   if (isAppointment) {
     if (!APPOINTMENT_CITIES.includes(city)) return json({ ok: false, error: "Please select a valid city." }, 400);
+    if (city === "Other City" && (otherCity.length < 2 || otherCity.length > 100)) {
+      return json({ ok: false, error: "Please enter the city you would like to visit." }, 400);
+    }
     if (!APPOINTMENT_DISEASES.includes(disease)) return json({ ok: false, error: "Please select a valid health condition." }, 400);
     if (preferredDate && !isFutureOrToday(preferredDate)) return json({ ok: false, error: "Please choose today or a future appointment date." }, 400);
+    if (preferredDate && configuredAppointments) {
+      const dates = configuredAppointments.schedules?.[city]?.dates || [];
+      if (!dates.includes(preferredDate)) {
+        return json({ ok: false, error: "Please choose a published OPD date for the selected city." }, 400);
+      }
+    }
     if (!preferredDate && !requestCallback) return json({ ok: false, error: "Please select an appointment date or request a callback." }, 400);
     if (!consent) return json({ ok: false, error: "Please accept the contact consent to continue." }, 400);
     if (preferredTime.length > 100 || message.length > 5000) return json({ ok: false, error: "Please shorten the appointment details and try again." }, 400);
@@ -133,6 +159,7 @@ async function contact(request, env) {
     ["Name", name],
     ...(phone ? [["Phone", phone]] : []),
     ...(city ? [["City", city]] : []),
+    ...(otherCity ? [["Other city", otherCity]] : []),
     ...(disease ? [["Disease / Treatment", disease]] : []),
     ...(email ? [["Email", email]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),

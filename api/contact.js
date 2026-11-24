@@ -88,6 +88,7 @@ export default async function handler(req, res) {
   const name = String(body.Name || body.name || "").trim();
   const phone = String(body["Phone-Number"] || body.phone || body.mobile || "").trim();
   const city = String(body.City || body.city || "").trim();
+  const otherCity = String(body["Other-City"] || body.otherCity || "").trim();
   const disease = String(body.Disease || body.disease || "").trim();
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
@@ -133,6 +134,9 @@ export default async function handler(req, res) {
     if (!APPOINTMENT_CITIES.includes(city)) {
       return res.status(400).json({ ok: false, error: "Please select a valid city." });
     }
+    if (city === "Other City" && (otherCity.length < 2 || otherCity.length > 100)) {
+      return res.status(400).json({ ok: false, error: "Please enter the city you would like to visit." });
+    }
     if (!APPOINTMENT_DISEASES.includes(disease)) {
       return res.status(400).json({ ok: false, error: "Please select a valid health condition." });
     }
@@ -172,6 +176,7 @@ export default async function handler(req, res) {
     ...(specialization ? [["Specialization", specialization]] : []),
     ...(trainingProgramme ? [["Training programme", trainingProgramme]] : []),
     ...(city ? [["City", city]] : []),
+    ...(otherCity ? [["Other city", otherCity]] : []),
     ...(disease ? [["Disease / Treatment", disease]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),
     ...(preferredTime ? [["Preferred time", preferredTime]] : []),

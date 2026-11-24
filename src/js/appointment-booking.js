@@ -14,26 +14,36 @@
   var timeSelect = form.querySelector("[data-appointment-time]");
   var callbackInput = form.querySelector("[data-appointment-callback]");
   var consentInput = form.querySelector("[data-appointment-consent]");
+  var otherCityWrap = form.querySelector("[data-other-city-wrap]");
+  var otherCityInput = form.querySelector("[data-appointment-other-city]");
   var status = form.querySelector("[data-appointment-status]");
   if (!citySelect || !diseaseSelect || !dateInput || !timeSelect || !callbackInput || !consentInput) return;
 
   var availableDates = [];
-  var today = localDateString(new Date());
+  var diseaseValues = [];
+  var today = indiaDateString(new Date());
   var routeCity = cityFromUrl();
   var fallbackConfig = {
     cities: Array.prototype.map.call(citySelect.options, function (option) {
       return { name: option.value, active: Boolean(option.value) };
     }).filter(function (item) { return item.name; }),
-    diseases: Array.prototype.map.call(diseaseSelect.options, function (option) {
-      return option.value;
-    }).filter(Boolean),
+    diseases: initialDiseaseValues(),
     schedules: {}
   };
 
-  function localDateString(date) {
-    var year = date.getFullYear();
-    var month = String(date.getMonth() + 1).padStart(2, "0");
-    var day = String(date.getDate()).padStart(2, "0");
+  function indiaDateString(date) {
+    var parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(date).reduce(function (result, part) {
+      if (part.type !== "literal") result[part.type] = part.value;
+      return result;
+    }, {});
+    var year = parts.year;
+    var month = parts.month;
+    var day = parts.day;
     return year + "-" + month + "-" + day;
   }
 
@@ -65,12 +75,31 @@
     select.appendChild(item);
   }
 
-  function renderCities(items, selected) {
-    var active = (items || []).filter(function (item) {
+  function initialDiseaseValues() {
+    var source = diseaseSelect;
+    if (diseaseSelect.tagName.toLowerCase() === "input") {
+      var listId = diseaseSelect.getAttribute("list");
+      source = listId ? document.getElementById(listId) : null;
+    }
+    return source ? Array.prototype.map.call(source.options || [], function (item) {
+      return item.value;
+    }).filter(Boolean) : [];
+  }
+
+  function scopedCityNames(items) {
+    var scope = String(form.getAttribute("data-appointment-city-scope") || "").trim();
+    var allowed = scope ? scope.split("|").map(normalize) : null;
+    return (items || []).filter(function (item) {
       return typeof item === "string" || item.active !== false;
     }).map(function (item) {
       return typeof item === "string" ? item : item.name;
-    }).filter(Boolean);
+    }).filter(function (city) {
+      return city && (!allowed || allowed.indexOf(normalize(city)) >= 0);
+    });
+  }
+
+  function renderCities(items, selected) {
+    var active = scopedCityNames(items);
     if (!active.length) return;
     citySelect.innerHTML = "";
     option(citySelect, "", "Select your city", true);
@@ -81,6 +110,17 @@
   function renderDiseases(items, selected) {
     var diseases = (items || []).filter(Boolean);
     if (!diseases.length) return;
+    diseaseValues = diseases;
+    if (diseaseSelect.tagName.toLowerCase() === "input") {
+      var listId = diseaseSelect.getAttribute("list");
+      var list = listId ? document.getElementById(listId) : null;
+      if (list) {
+        list.innerHTML = "";
+        diseases.forEach(function (disease) { option(list, disease, disease, false); });
+      }
+      diseaseSelect.value = diseases.indexOf(selected) >= 0 ? selected : "";
+      return;
+    }
     diseaseSelect.innerHTML = "";
     option(diseaseSelect, "", "Select a disease or condition", true);
     diseases.forEach(function (disease) { option(diseaseSelect, disease, disease, false); });
@@ -115,6 +155,30 @@
 
   function setStatus(message) {
     if (status) status.textContent = message;
+  }
+
+  function updateOtherCity() {
+    var isOther = normalize(citySelect.value) === "other city";
+    if (otherCityWrap) otherCityWrap.hidden = !isOther;
+    if (otherCityInput) {
+      otherCityInput.disabled = !isOther;
+      otherCityInput.required = isOther;
+      if (!isOther) {
+        otherCityInput.value = "";
+        otherCityInput.setCustomValidity("");
+      }
+    }
+  }
+
+  function validateDisease() {
+    if (diseaseSelect.tagName.toLowerCase() !== "input") return;
+    var value = String(diseaseSelect.value || "").trim();
+    var valid = diseaseValues.some(function (disease) {
+      return normalize(disease) === normalize(value);
+    });
+    diseaseSelect.setCustomValidity(value && !valid
+      ? "Please select a condition from the list."
+      : "");
   }
 
   function updateSchedule(config) {
@@ -165,6 +229,8 @@
 
   function validateAppointment() {
     validateDate();
+    validateDisease();
+    updateOtherCity();
     if (dateInput.disabled && !callbackInput.checked) {
       callbackInput.setCustomValidity("Please request a callback because no consultation date is currently published.");
     } else {
@@ -184,11 +250,18 @@
   dateInput.required = false;
 
   citySelect.addEventListener("change", function () { updateSchedule(form.__appointmentConfig); });
+  citySelect.addEventListener("change", updateOtherCity);
   dateInput.addEventListener("change", validateDate);
+  diseaseSelect.addEventListener("change", validateDisease);
+  diseaseSelect.addEventListener("input", validateDisease);
   callbackInput.addEventListener("change", function () { callbackInput.setCustomValidity(""); });
+  if (otherCityInput) otherCityInput.addEventListener("input", function () {
+    otherCityInput.setCustomValidity("");
+  });
 
   renderCities(fallbackConfig.cities, routeCity);
   renderDiseases(fallbackConfig.diseases, diseaseSelect.value);
+  updateOtherCity();
   updateSchedule(fallbackConfig);
 
   fetch("/data/appointment-config.json", { cache: "no-store" })
@@ -202,6 +275,7 @@
       form.__appointmentConfig = config;
       renderCities(config.cities, selectedCity);
       renderDiseases(config.diseases, selectedDisease);
+      updateOtherCity();
       updateSchedule(config);
     })
     .catch(function () {
