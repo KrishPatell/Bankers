@@ -369,9 +369,9 @@ EXTRA_SHELL_PAGES = {
         "desc": "Book an appointment at Bankers Vascular Hospital in Ahmedabad or Vadodara. Select your condition, preferred city and appointment date online.",
     },
     # Public Google Business Profile booking links reuse the Contact page
-    # template and the same /api/contact submission path. They are noindex
-    # utility URLs so the appointment flow is discoverable without creating
-    # duplicate SEO copies of the contact page.
+    # template and the same /api/contact submission path. The main booking
+    # page is indexable; the city aliases remain noindex utility URLs so the
+    # appointment flow does not create duplicate SEO copies of the contact page.
     "book-appointment-ahmedabad.html": {
         "source": "contact-us.html",
         "output": "book-appointment/ahmedabad.html",
@@ -473,6 +473,5 @@ DEAD_LISTS = ["fancy-columns-wrap-copy", "staff-collection"]
 # Pages excluded from sitemap.xml (utility pages).
 NOINDEX_PAGES = {
     "401.html", "404.html",
-    "book-appointment.html",
     "book-appointment-ahmedabad.html", "book-appointment-vadodara.html",
 }

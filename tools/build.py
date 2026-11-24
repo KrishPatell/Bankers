@@ -347,7 +347,8 @@ def _esc_attr(s):
 
 
 def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
-                  noindex=False, keywords=None, og_title=None, og_desc=None):
+                  noindex=False, keywords=None, og_title=None, og_desc=None,
+                  robots=None):
     # Social crawlers need an absolute image URL.  Page content itself keeps
     # root-relative assets, but Open Graph/Twitter metadata must not.
     if image and image.startswith("/"):
@@ -378,6 +379,7 @@ def set_head_meta(html, title=None, desc=None, image=None, canonical=None,
     meta('name="twitter:title"', og_title if og_title is not None else title)
     meta('name="twitter:description"', og_desc if og_desc is not None else desc)
     meta('name="twitter:image"', image)
+    meta('name="robots"', robots)
     if canonical is not None:
         meta('property="og:url"', canonical)
         meta('name="twitter:card"', "summary_large_image")
@@ -1875,7 +1877,9 @@ def build_shells(pages, cms, binder, assets):
                                  keywords=metadata.get("keywords"),
                                  og_title=metadata.get("og_title"),
                                  og_desc=metadata.get("og_desc"),
-                                 noindex=page in CFG.NOINDEX_PAGES)
+                                 noindex=page in CFG.NOINDEX_PAGES,
+                                 robots=("index, follow"
+                                         if page == "book-appointment.html" else None))
             if page not in CFG.NOINDEX_PAGES:
                 html = ensure_meta_description(enforce_single_h1(html))
                 if page != "training.html":
