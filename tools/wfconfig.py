@@ -356,6 +356,24 @@ PAGE_LISTS = {
 # Bankers Notes reuses the blog archive but is intentionally limited to the
 # lead doctor's authored articles.
 EXTRA_SHELL_PAGES = {
+    # Public Google Business Profile booking links reuse the Contact page
+    # template and the same /api/contact submission path. They are noindex
+    # utility URLs so the appointment flow is discoverable without creating
+    # duplicate SEO copies of the contact page.
+    "book-appointment-ahmedabad.html": {
+        "source": "contact-us.html",
+        "output": "book-appointment/ahmedabad.html",
+        "url": "/book-appointment/ahmedabad",
+        "title": "Book an Appointment in Ahmedabad | Bankers Vascular Centre",
+        "desc": "Request an appointment with Bankers Vascular Centre in Ahmedabad. Choose your condition and preferred date; our hospital team will confirm the consultation.",
+    },
+    "book-appointment-vadodara.html": {
+        "source": "contact-us.html",
+        "output": "book-appointment/vadodara.html",
+        "url": "/book-appointment/vadodara",
+        "title": "Book an Appointment in Vadodara | Bankers Vascular Centre",
+        "desc": "Request an appointment with Bankers Vascular Centre in Vadodara. Choose your condition and preferred date; our hospital team will confirm the consultation.",
+    },
     "nanofat-for-joint-pain.html": {
         "source": "detail_varicose-veins.html",
         "output": "nanofat-for-joint-pain/index.html",
@@ -441,4 +459,7 @@ EXCLUDE_PAGES = {
 DEAD_LISTS = ["fancy-columns-wrap-copy", "staff-collection"]
 
 # Pages excluded from sitemap.xml (utility pages).
-NOINDEX_PAGES = {"401.html", "404.html"}
+NOINDEX_PAGES = {
+    "401.html", "404.html",
+    "book-appointment-ahmedabad.html", "book-appointment-vadodara.html",
+}

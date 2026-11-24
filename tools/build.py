@@ -38,7 +38,7 @@ DIST = os.path.join(ROOT, "dist")
 # successful. With the export under src/ that misconfiguration 404s instead.
 SRC = os.path.join(ROOT, "src")
 
-STATIC_DIRS = ["css", "js", "images", "fonts", "documents"]
+STATIC_DIRS = ["css", "js", "images", "fonts", "documents", "data"]
 
 STATIC_META = {
     "index.html": {
@@ -1004,6 +1004,8 @@ def wire_forms(html, page_label):
     # labels instead of Webflow's export names such as "Email Form 2".
     page_display = {
         "contact-us.html": "Contact page",
+        "book-appointment-ahmedabad.html": "Ahmedabad appointment booking page",
+        "book-appointment-vadodara.html": "Vadodara appointment booking page",
     }.get(page_label, page_label.removesuffix(".html").replace("-", " ").title() + " page")
     out, pos = [], 0
     for m in re.finditer(r"<form\s[^>]*>", html):
@@ -1016,7 +1018,9 @@ def wire_forms(html, page_label):
         fstart, fend = W.find_block(html, m.start())
         seg = html[fstart:fend]
         name = W.get_attr(tag, "data-name") or W.get_attr(tag, "name") or "Form"
-        if page_label == "contact-us.html":
+        if "data-appointment-form" in tag:
+            name = "Appointment booking form"
+        elif page_label == "contact-us.html":
             name = "Contact"
 
         new_tag = W.set_attr(tag, "method", "post")
@@ -1703,7 +1707,10 @@ def build_shells(pages, cms, binder, assets):
         html = add_bankers_notes_nav(html, current=(page == "bankers-notes.html"))
         out_rel = extra.get("output", CFG.DIRECTORY_PAGES.get(page, page))
         url = page_url(page)
-        specs = CFG.PAGE_LISTS.get(page, [])
+        # Shell aliases reuse the source page's CMS bindings as well as its
+        # markup. This keeps public utility routes (such as appointment
+        # booking links) free of Webflow's unbound collection placeholders.
+        specs = CFG.PAGE_LISTS.get(page, CFG.PAGE_LISTS.get(source, []))
 
         paginated = [s for s in specs if s.get("paginate")]
         plain = [s for s in specs if not s.get("paginate")]

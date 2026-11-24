@@ -447,18 +447,29 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 </div>
               </div>
             </div>
-            <div id="w-node-b9d7f29b-45e7-4358-14f2-ae1df5d392b0-07308bf1" class="contact-form-wrapper">
-              <div class="contact-form-block w-form">
-                <form id="email-form-2" name="email-form-2" data-name="Email Form 2" method="get" class="contact-form" data-wf-page-id="6a6df2581c0c561f07308bf1" data-wf-element-id="09ee0f4c-12b2-c641-11af-7dcb5b815b9f">
-                  <div data-w-id="95dc377b-781b-0d63-0313-4bf1d17a59e1" style="opacity:0" class="contact-form-grid">
-                    <div class="city"><input class="input-field contact name w-input" maxlength="256" name="name-3" data-name="Name 3" placeholder="Enter your name" type="text" id="name-3"></div>
-                    <div class="city"><input class="input-field contact phone w-input" maxlength="256" name="email-2" data-name="Email 2" placeholder="Phone" type="tel" id="email-2" required=""></div>
-                    <div id="w-node-_95dc377b-781b-0d63-0313-4bf1d17a59e8-07308bf1" class="city"><input class="input-field contact text-area w-input" maxlength="256" name="email-3" data-name="Email 3" placeholder="Message" type="text" id="email-3" required=""></div>
+            <div id="w-node-b9d7f29b-45e7-4358-14f2-ae1df5d392b0-07308bf1" class="contact-form-wrapper appointment-form-wrapper">
+              <div class="contact-form-block appointment-form-block w-form">
+                <p class="appointment-form-kicker">Appointment Request</p>
+                <h2 class="appointment-form-heading">Book Your Appointment</h2>
+                <p class="appointment-form-intro">Choose your preferred location, condition and date. Our hospital team will contact you to confirm the appointment.</p>
+                <form id="appointment-form" name="appointment-form" data-name="Appointment Form" data-appointment-form="true" method="get" class="contact-form appointment-booking-form" data-wf-page-id="6a6df2581c0c561f07308bf1" data-wf-element-id="09ee0f4c-12b2-c641-11af-7dcb5b815b9f" aria-describedby="appointment-form-status">
+                  <input type="hidden" name="_appointment" value="true">
+                  <div data-w-id="95dc377b-781b-0d63-0313-4bf1d17a59e1" style="opacity:0" class="contact-form-grid appointment-form-grid">
+                    <label class="appointment-field-wrap"><span>Patient Full Name <b aria-hidden="true">*</b></span><input class="input-field contact name w-input" maxlength="200" name="Name" data-name="Patient Full Name" placeholder="Enter your full name" autocomplete="name" type="text" required></label>
+                    <label class="appointment-field-wrap"><span>Mobile Number <b aria-hidden="true">*</b></span><input class="input-field contact phone w-input" maxlength="15" name="Phone-Number" data-name="Mobile Number" placeholder="10-digit Indian mobile number" autocomplete="tel" inputmode="tel" type="tel" pattern="(?:\+91[\s-]?)?[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" required></label>
+                    <label class="appointment-field-wrap"><span>Select City <b aria-hidden="true">*</b></span><select class="input-field contact appointment-select w-input" name="City" data-name="Select City" data-appointment-city required><option value="" selected disabled>Select your city</option><option value="Ahmedabad">Ahmedabad</option><option value="Vadodara">Vadodara</option><option value="Rajkot">Rajkot</option><option value="Surat">Surat</option><option value="Jamnagar">Jamnagar</option><option value="Bhavnagar">Bhavnagar</option><option value="Mehsana">Mehsana</option><option value="Anand">Anand</option><option value="Gandhinagar">Gandhinagar</option><option value="Surendranagar">Surendranagar</option><option value="Bharuch">Bharuch</option><option value="Junagadh">Junagadh</option><option value="Himatnagar">Himatnagar</option><option value="Palanpur">Palanpur</option><option value="Nadiad">Nadiad</option><option value="Other City">Other City</option></select></label>
+                    <label class="appointment-field-wrap"><span>Select Disease <b aria-hidden="true">*</b></span><select class="input-field contact appointment-select w-input" name="Disease" data-name="Select Disease" data-appointment-disease required><option value="" selected disabled>Select a disease or condition</option><option value="Knee Pain">Knee Pain</option><option value="Varicose Veins">Varicose Veins</option><option value="Prostate Enlargement">Prostate Enlargement</option><option value="Piles">Piles</option><option value="Heel Pain">Heel Pain</option><option value="Frozen Shoulder">Frozen Shoulder</option><option value="Breast Fibroadenoma">Breast Fibroadenoma</option><option value="Obesity">Obesity</option><option value="Hair Fall">Hair Fall</option><option value="Lymphedema">Lymphedema</option><option value="Tennis Elbow / Golfer’s Elbow">Tennis Elbow / Golfer’s Elbow</option><option value="Vascular Malformation">Vascular Malformation</option><option value="Carpal Tunnel Syndrome">Carpal Tunnel Syndrome</option><option value="Other Health Condition">Other Health Condition</option></select></label>
+                    <label class="appointment-field-wrap"><span>Preferred Appointment Date <b aria-hidden="true">*</b></span><input class="input-field contact appointment-date" name="Date" data-name="Preferred Appointment Date" data-appointment-date type="date" autocomplete="off" required></label>
+                    <label class="appointment-field-wrap"><span>Preferred Appointment Time <em>(optional)</em></span><select class="input-field contact appointment-select" name="Appointment-Time" data-name="Preferred Appointment Time" data-appointment-time><option value="">Select a preferred time</option></select></label>
+                    <label class="appointment-field-wrap appointment-field-wide"><span>Additional Message <em>(optional)</em></span><textarea class="input-field contact text-area appointment-message" maxlength="5000" name="Message" data-name="Additional Message" placeholder="Tell us anything our hospital team should know" id="appointment-message"></textarea></label>
                   </div>
-                  <div class="contact-submit-button-wrapper"><input type="submit" data-wait="Please wait..." class="outline-button w-button" value="Submit"></div>
+                  <p id="appointment-form-status" class="appointment-form-status" data-appointment-status role="status" aria-live="polite">Select a city to see currently configured consultation dates.</p>
+                  <label class="appointment-choice appointment-callback-choice"><input type="checkbox" name="Request-Callback" value="yes" data-appointment-callback><span>I would like the hospital team to call me about the next available date.</span></label>
+                  <label class="appointment-choice appointment-consent-choice"><input type="checkbox" name="Consent" value="yes" data-appointment-consent required><span>I agree to be contacted by Bankers Vascular Centre about this appointment request. <b aria-hidden="true">*</b></span></label>
+                  <div class="contact-submit-button-wrapper appointment-submit-wrapper"><button type="submit" data-wait="Please wait..." class="outline-button w-button appointment-submit-button">Request Appointment</button></div>
                 </form>
                 <div class="success-message-2 w-form-done">
-                  <div class="text-block-37">Thank you! Your submission has been received!</div>
+                  <div class="text-block-37">Thank you! Your appointment request has been received. Our hospital team will contact you shortly to confirm your appointment.</div>
                   <a href="https://api.whatsapp.com/send/?phone=%2B919909908428&amp;text&amp;type=phone_number&amp;app_absent=0" class="button w-button">Talk on WhatsApp <span class="text-span-3">      </span></a>
                 </div>
                 <div class="w-form-fail">
@@ -684,5 +695,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W87P4FV5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!--  End Google Tag Manager (noscript)  -->
   <script src="https://cdn.jsdelivr.net/npm/@flowbase-co/boosters-countup@1.0/dist/countup.min.js"></script>
+  <script src="js/appointment-booking.js" type="text/javascript"></script>
 </body>
 </html>

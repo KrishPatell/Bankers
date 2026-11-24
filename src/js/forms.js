@@ -47,6 +47,14 @@
     var form = event.target;
     if (!form || form.tagName !== "FORM") return;
     if (form.getAttribute("action") !== "/api/contact") return;
+    if (event.defaultPrevented) return;
+    if (form.getAttribute("data-appointment-form") === "true" &&
+        typeof form.__validateAppointment === "function" &&
+        !form.__validateAppointment()) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
 
     event.preventDefault();
     event.stopPropagation();
@@ -64,6 +72,9 @@
     });
     payload._form = form.getAttribute("data-form-name") || "Website form";
     payload._page = form.getAttribute("data-form-page") || document.title;
+    payload._request_id = (window.crypto && typeof window.crypto.randomUUID === "function")
+      ? window.crypto.randomUUID()
+      : String(Date.now()) + "-" + Math.random().toString(36).slice(2);
 
     var buttons = submitButtons(form);
     buttons.forEach(function (b) {

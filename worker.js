@@ -1,4 +1,14 @@
 import { youtubeFeed } from "./api/youtube.js";
+import {
+  APPOINTMENT_CITIES,
+  APPOINTMENT_DISEASES,
+  claimRequest,
+  indianMobileDigits,
+  isAppointmentPayload,
+  isChecked,
+  isFutureOrToday,
+  releaseRequest,
+} from "./api/appointment-config.js";
 
 // Cloudflare Worker for the static site and its single lead-capture endpoint.
 // It runs before static assets so the canonical-origin redirect applies to every
@@ -7,6 +17,7 @@ import { youtubeFeed } from "./api/youtube.js";
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 5;
 const hits = new Map();
+const appointmentRequests = new Map();
 const LEGACY_REDIRECTS = {
   "/departments/platelet-rich-plasma": "/treatment/platelet-rich-plasma",
   "/departments/varicose-vein": "/departments/varicose-veins",
@@ -87,15 +98,36 @@ async function contact(request, env) {
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
   const preferredDate = String(body.Date || "").trim();
+  const preferredTime = String(body["Appointment-Time"] || body.appointmentTime || "").trim();
+  const requestCallback = isChecked(body["Request-Callback"] || body.requestCallback);
+  const consent = isChecked(body.Consent || body.consent);
+  const isAppointment = isAppointmentPayload(body);
+  const requestId = String(body._request_id || request.headers.get("Idempotency-Key") || "").trim();
   const formName = String(body._form || "Website form").trim();
   const pageName = String(body._page || "").trim();
   const digits = phone.replace(/\D/g, "");
+  const indianDigits = indianMobileDigits(phone);
 
   if (!name || name.length > 200) return json({ ok: false, error: "Please enter your name." }, 400);
-  if (phone && (digits.length < 7 || digits.length > 15)) return json({ ok: false, error: "Please enter a valid phone number." }, 400);
+  if (isAppointment && !/^[6-9]\d{9}$/.test(indianDigits)) {
+    return json({ ok: false, error: "Please enter a valid 10-digit Indian mobile number." }, 400);
+  }
+  if (!isAppointment && phone && (digits.length < 7 || digits.length > 15)) return json({ ok: false, error: "Please enter a valid phone number." }, 400);
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ ok: false, error: "Please enter a valid email." }, 400);
-  if (!phone && !email) return json({ ok: false, error: "Please enter a phone number or email address." }, 400);
+  if (!isAppointment && !phone && !email) return json({ ok: false, error: "Please enter a phone number or email address." }, 400);
+  if (isAppointment) {
+    if (!APPOINTMENT_CITIES.includes(city)) return json({ ok: false, error: "Please select a valid city." }, 400);
+    if (!APPOINTMENT_DISEASES.includes(disease)) return json({ ok: false, error: "Please select a valid health condition." }, 400);
+    if (preferredDate && !isFutureOrToday(preferredDate)) return json({ ok: false, error: "Please choose today or a future appointment date." }, 400);
+    if (!preferredDate && !requestCallback) return json({ ok: false, error: "Please select an appointment date or request a callback." }, 400);
+    if (!consent) return json({ ok: false, error: "Please accept the contact consent to continue." }, 400);
+    if (preferredTime.length > 100 || message.length > 5000) return json({ ok: false, error: "Please shorten the appointment details and try again." }, 400);
+  }
   if (!env.RESEND_API_KEY || !env.CONTACT_TO_EMAIL) return json({ ok: false, error: "Form is not configured yet. Please call or message us on WhatsApp." }, 503);
+
+  if (isAppointment && claimRequest(appointmentRequests, requestId)) {
+    return json({ ok: true, duplicate: true });
+  }
 
   const rows = [
     ["Name", name],
@@ -104,6 +136,9 @@ async function contact(request, env) {
     ...(disease ? [["Disease / Treatment", disease]] : []),
     ...(email ? [["Email", email]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),
+    ...(preferredTime ? [["Preferred time", preferredTime]] : []),
+    ...(requestCallback ? [["Callback requested", "Yes"]] : []),
+    ...(isAppointment ? [["Contact consent", "Yes"]] : []),
     ...(message ? [["Message", message]] : []),
     ["Form", formName],
     ...(pageName ? [["Page", pageName]] : []),
@@ -116,16 +151,18 @@ async function contact(request, env) {
         from: env.CONTACT_FROM_EMAIL || "Bankers Vascular Website <onboarding@resend.dev>",
         to: env.CONTACT_TO_EMAIL.split(",").map((value) => value.trim()).filter(Boolean),
         reply_to: email || undefined,
-        subject: `New website enquiry — ${formName}`,
+        subject: `${isAppointment ? "New appointment request" : "New website enquiry"} — ${formName}`,
         html: renderEmail(rows, formName),
         text: rows.map(([label, value]) => `${label}: ${value}`).join("\n"),
       }),
     });
     if (!response.ok) {
+      if (isAppointment) releaseRequest(appointmentRequests, requestId);
       console.error("contact: Resend rejected submission", response.status);
       return json({ ok: false, error: "Could not send right now. Please try again." }, 502);
     }
   } catch (error) {
+    if (isAppointment) releaseRequest(appointmentRequests, requestId);
     console.error("contact: Resend request failed", error);
     return json({ ok: false, error: "Could not send right now. Please try again." }, 502);
   }

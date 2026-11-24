@@ -10,9 +10,21 @@
 // Without RESEND_API_KEY the endpoint returns 503 so the form shows its error
 // state. It must never answer 200 without having delivered the enquiry.
 
+import {
+  APPOINTMENT_CITIES,
+  APPOINTMENT_DISEASES,
+  claimRequest,
+  indianMobileDigits,
+  isAppointmentPayload,
+  isChecked,
+  isFutureOrToday,
+  releaseRequest,
+} from "./appointment-config.js";
+
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 5;
 const hits = new Map();
+const appointmentRequests = new Map();
 
 function rateLimited(ip) {
   const now = Date.now();
@@ -76,12 +88,18 @@ export default async function handler(req, res) {
   const name = String(body.Name || body.name || "").trim();
   const phone = String(body["Phone-Number"] || body.phone || body.mobile || "").trim();
   const city = String(body.City || body.city || "").trim();
+  const disease = String(body.Disease || body.disease || "").trim();
   const email = String(body.Email || body.email || "").trim();
   const message = String(body.Message || body.message || "").trim();
   const qualification = String(body["Medical-Qualification"] || body.qualification || "").trim();
   const specialization = String(body.Specialization || body.specialization || "").trim();
   const trainingProgramme = String(body["Training-Programme"] || body.programme || "").trim();
   const preferredDate = String(body.Date || "").trim();
+  const preferredTime = String(body["Appointment-Time"] || body.appointmentTime || "").trim();
+  const requestCallback = isChecked(body["Request-Callback"] || body.requestCallback);
+  const consent = isChecked(body.Consent || body.consent);
+  const isAppointment = isAppointmentPayload(body);
+  const requestId = String(body._request_id || req.headers["idempotency-key"] || "").trim();
   const formName = String(body._form || "Website form").trim();
   const pageName = String(body._page || "").trim();
 
@@ -91,7 +109,13 @@ export default async function handler(req, res) {
   const digits = phone.replace(/\D/g, "");
   // Some treatment appointment forms request an email and preferred date rather
   // than a phone number. Every enquiry needs one usable return channel.
-  if (phone && (digits.length < 7 || digits.length > 15)) {
+  const indianDigits = indianMobileDigits(phone);
+  if (isAppointment && !/^[6-9]\d{9}$/.test(indianDigits)) {
+    return res
+      .status(400)
+      .json({ ok: false, error: "Please enter a valid 10-digit Indian mobile number." });
+  }
+  if (!isAppointment && phone && (digits.length < 7 || digits.length > 15)) {
     return res
       .status(400)
       .json({ ok: false, error: "Please enter a valid phone number." });
@@ -99,11 +123,31 @@ export default async function handler(req, res) {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     return res.status(400).json({ ok: false, error: "Please enter a valid email." });
   }
-  if (!phone && !email) {
+  if (!isAppointment && !phone && !email) {
     return res.status(400).json({
       ok: false,
       error: "Please enter a phone number or email address.",
     });
+  }
+  if (isAppointment) {
+    if (!APPOINTMENT_CITIES.includes(city)) {
+      return res.status(400).json({ ok: false, error: "Please select a valid city." });
+    }
+    if (!APPOINTMENT_DISEASES.includes(disease)) {
+      return res.status(400).json({ ok: false, error: "Please select a valid health condition." });
+    }
+    if (preferredDate && !isFutureOrToday(preferredDate)) {
+      return res.status(400).json({ ok: false, error: "Please choose today or a future appointment date." });
+    }
+    if (!preferredDate && !requestCallback) {
+      return res.status(400).json({ ok: false, error: "Please select an appointment date or request a callback." });
+    }
+    if (!consent) {
+      return res.status(400).json({ ok: false, error: "Please accept the contact consent to continue." });
+    }
+    if (preferredTime.length > 100 || message.length > 5000) {
+      return res.status(400).json({ ok: false, error: "Please shorten the appointment details and try again." });
+    }
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -116,6 +160,10 @@ export default async function handler(req, res) {
     });
   }
 
+  if (isAppointment && claimRequest(appointmentRequests, requestId)) {
+    return res.status(200).json({ ok: true, duplicate: true });
+  }
+
   const rows = [
     ["Name", name],
     ...(phone ? [["Phone", phone]] : []),
@@ -124,7 +172,11 @@ export default async function handler(req, res) {
     ...(specialization ? [["Specialization", specialization]] : []),
     ...(trainingProgramme ? [["Training programme", trainingProgramme]] : []),
     ...(city ? [["City", city]] : []),
+    ...(disease ? [["Disease / Treatment", disease]] : []),
     ...(preferredDate ? [["Preferred date", preferredDate]] : []),
+    ...(preferredTime ? [["Preferred time", preferredTime]] : []),
+    ...(requestCallback ? [["Callback requested", "Yes"]] : []),
+    ...(isAppointment ? [["Contact consent", "Yes"]] : []),
     ...(message ? [["Message", message]] : []),
     ["Form", formName],
     ...(pageName ? [["Page", pageName]] : []),
@@ -141,13 +193,14 @@ export default async function handler(req, res) {
         from: process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev",
         to: to.split(",").map((s) => s.trim()).filter(Boolean),
         reply_to: email || undefined,
-        subject: `New website enquiry — ${formName}`,
+        subject: `${isAppointment ? "New appointment request" : "New website enquiry"} — ${formName}`,
         html: renderEmail(rows, formName),
         text: rows.map(([k, v]) => `${k}: ${v}`).join("\n"),
       }),
     });
 
     if (!resp.ok) {
+      if (isAppointment) releaseRequest(appointmentRequests, requestId);
       const detail = await resp.text();
       console.error("contact: resend failed", resp.status, detail);
       return res
@@ -155,6 +208,7 @@ export default async function handler(req, res) {
         .json({ ok: false, error: "Could not send right now. Please try again." });
     }
   } catch (err) {
+    if (isAppointment) releaseRequest(appointmentRequests, requestId);
     console.error("contact: resend threw", err);
     return res
       .status(502)

@@ -1,0 +1,78 @@
+{
+  "cities": [
+    { "name": "Ahmedabad", "active": true },
+    { "name": "Vadodara", "active": true },
+    { "name": "Rajkot", "active": true },
+    { "name": "Surat", "active": true },
+    { "name": "Jamnagar", "active": true },
+    { "name": "Bhavnagar", "active": true },
+    { "name": "Mehsana", "active": true },
+    { "name": "Anand", "active": true },
+    { "name": "Gandhinagar", "active": true },
+    { "name": "Surendranagar", "active": true },
+    { "name": "Bharuch", "active": true },
+    { "name": "Junagadh", "active": true },
+    { "name": "Himatnagar", "active": true },
+    { "name": "Palanpur", "active": true },
+    { "name": "Nadiad", "active": true },
+    { "name": "Other City", "active": true }
+  ],
+  "diseases": [
+    "Knee Pain",
+    "Varicose Veins",
+    "Prostate Enlargement",
+    "Piles",
+    "Heel Pain",
+    "Frozen Shoulder",
+    "Breast Fibroadenoma",
+    "Obesity",
+    "Hair Fall",
+    "Lymphedema",
+    "Tennis Elbow / Golfer’s Elbow",
+    "Vascular Malformation",
+    "Carpal Tunnel Syndrome",
+    "Other Health Condition"
+  ],
+  "schedules": {
+    "Ahmedabad": {
+      "dates": [],
+      "timings": ["Monday - Saturday · 08:00 AM - 07:00 PM"],
+      "note": "No Ahmedabad consultation date is currently published. Request a callback and the hospital team will share the next available date."
+    },
+    "Vadodara": {
+      "dates": [],
+      "timings": ["Monday - Saturday · 08:00 AM - 07:00 PM"],
+      "note": "No Vadodara consultation date is currently published. Request a callback and the hospital team will share the next available date."
+    },
+    "Rajkot": {
+      "dates": ["2026-11-20"],
+      "timings": [],
+      "note": "Choose the scheduled OPD date. The hospital team will confirm the consultation timing."
+    },
+    "Surat": {
+      "dates": ["2026-11-27"],
+      "timings": [],
+      "note": "Choose the scheduled OPD date. The hospital team will confirm the consultation timing."
+    },
+    "Mehsana": {
+      "dates": ["2026-11-30"],
+      "timings": [],
+      "note": "Choose the scheduled OPD date. The hospital team will confirm the consultation timing."
+    },
+    "Anand": {
+      "dates": ["2026-11-25"],
+      "timings": [],
+      "note": "Choose the scheduled OPD date. The hospital team will confirm the consultation timing."
+    },
+    "Gandhinagar": {
+      "dates": ["2026-11-21"],
+      "timings": [],
+      "note": "No future Gandhinagar OPD date is currently published. Request a callback for the next schedule."
+    },
+    "Surendranagar": {
+      "dates": ["2026-11-19"],
+      "timings": [],
+      "note": "No future Surendranagar OPD date is currently published. Request a callback for the next schedule."
+    }
+  }
+}
