@@ -34,6 +34,13 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(TOOL_DIR)
+sys.path.insert(0, TOOL_DIR)
+
+import cmsdata
+import wfconfig as CFG
+
 UA = {"User-Agent": "Mozilla/5.0 (compatible; bankersvascular-smoke)"}
 
 failures = []
@@ -139,24 +146,39 @@ def check_cms_pages(base):
 
 
 def check_blog_pagination(base):
+    previous = os.getcwd()
+    try:
+        os.chdir(REPO_ROOT)
+        cms = cmsdata.Collections(CFG.COLLECTIONS, CFG.SITE_URL)
+        total = len(cms.published["blog"])
+    except Exception as exc:
+        return fail("could not load CMS inventory for blog pagination: %s" % exc)
+    finally:
+        os.chdir(previous)
+
+    page_size = 100
+    expected = [min(page_size, total - offset)
+                for offset in range(0, total, page_size)]
     status, html, _ = get(base, "/blog")
     if status != 200:
         return fail("/blog returned %s" % status)
     cards = html.count("blog-archive-item")
-    if cards != 100:
-        fail("/blog shows %d post cards, expected 100" % cards)
+    if cards != expected[0]:
+        fail("/blog shows %d post cards, expected %d from CMS inventory"
+             % (cards, expected[0]))
     if "/blog/page/2" not in html:
         fail("/blog has no link to page 2")
-    for path, want in (("/blog/page/2", 100), ("/blog/page/3", 100),
-                       ("/blog/page/4", 72)):
+    for page, want in enumerate(expected[1:], start=2):
+        path = "/blog/page/%d" % page
         st, body, _ = get(base, path)
         if st != 200:
             fail("%s returned %s" % (path, st))
         elif body.count("blog-archive-item") != want:
-            fail("%s shows %d cards, expected %d"
+            fail("%s shows %d cards, expected %d from CMS inventory"
                  % (path, body.count("blog-archive-item"), want))
     if not any("blog" in f for f in failures):
-        note("/blog paginates correctly: 100 + 100 + 100 + 72 = 372 posts")
+        note("/blog paginates correctly from CMS inventory: %s = %d posts"
+             % (" + ".join(str(value) for value in expected), total))
 
 
 def check_worker_redirects_locally():

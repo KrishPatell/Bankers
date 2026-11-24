@@ -17,7 +17,6 @@ import shutil
 import sys
 import unicodedata
 import urllib.parse
-from datetime import datetime, timezone
 from functools import lru_cache
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -1890,7 +1889,8 @@ def build_shells(pages, cms, binder, assets):
                 if page == "training.html":
                     html = add_training_schema(html)
             write(out_rel, html)
-            written.append((out_rel, url, page not in CFG.NOINDEX_PAGES))
+            lastmod = CFG.SITEMAP_LASTMOD.get(page, CFG.SITEMAP_LASTMOD.get(source))
+            written.append((out_rel, url, page not in CFG.NOINDEX_PAGES, lastmod))
             continue
 
         spec = paginated[0]
@@ -1921,7 +1921,9 @@ def build_shells(pages, cms, binder, assets):
             page_html = add_seo_internal_links(ensure_meta_description(enforce_single_h1(page_html)), purl)
             page_html = add_page_schema(page_html, purl)
             write(rel, page_html)
-            written.append((rel, purl, True))
+            updated = [item.get("_updated") for item in chunk if item.get("_updated")]
+            lastmod = max(updated).strftime("%Y-%m-%d") if updated else None
+            written.append((rel, purl, True, lastmod))
     return written
 
 
@@ -1967,7 +1969,9 @@ def build_details(cms, binder, assets):
             html = render_detail(base, spec, item, cms, binder, assets)
             rel = "%s/%s.html" % (spec["folder"], item.slug)
             write(rel, html)
-            written.append((rel, item.url, True))
+            lastmod = item.get("_updated") or item.get("_date")
+            lastmod = lastmod.strftime("%Y-%m-%d") if lastmod else None
+            written.append((rel, item.url, True, lastmod))
         print("  %-24s %3d pages" % (key, len(items)))
     return written
 
@@ -2081,6 +2085,7 @@ def render_detail(base, spec, item, cms, binder, assets):
         full_title = "%s %s" % (title_txt, tpl_title)
     else:
         full_title = "%s %s" % (title_txt, CFG.BRAND_TITLE)
+    full_title = re.sub(r"\s*\|\s*", " | ", full_title).strip(" |")
     full_title = DETAIL_TITLE_OVERRIDES.get((spec["key"], item.slug), full_title)
     desc = item.get_text("Meta Description", *spec.get("desc", []))
     desc = re.sub(r"<[^>]+>", " ", desc)
@@ -2350,6 +2355,45 @@ def add_article_schema(html, spec, item, assets):
     return html.replace("</head>", tag, 1)
 
 
+def _location_schema_node(key, page_url):
+    location = ENTITY_SCHEMA.LOCATIONS[key]
+    location_type = "Hospital" if key == "ahmedabad" else "MedicalClinic"
+    node = {
+        "@type": location_type,
+        "@id": location["id"],
+        "name": location["name"],
+        "url": page_url,
+        "telephone": location["telephone"],
+        "parentOrganization": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": location["street_address"],
+            "addressLocality": location["city"],
+            "addressRegion": "Gujarat",
+            "postalCode": location["postal_code"],
+            "addressCountry": "IN",
+        },
+    }
+    hours = location.get("opening_hours")
+    if hours:
+        node["openingHoursSpecification"] = [{
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday",
+                           "Friday", "Saturday"],
+            "opens": hours["opens"],
+            "closes": hours["closes"],
+        }]
+    return node
+
+
+def _schema_description(item):
+    if not item:
+        return ""
+    text = item.get_text("Meta Description", "Department Short Details")
+    text = re.sub(r"<[^>]+>", " ", text)
+    return re.sub(r"\s+", " ", htmllib.unescape(text)).strip()[:300]
+
+
 def add_page_schema(html, url, spec=None, item=None):
     """Emit one page-appropriate graph using stable shared entity IDs."""
     crumbs = [{"@type": "ListItem", "position": 1, "name": "Home",
@@ -2404,34 +2448,8 @@ def add_page_schema(html, url, spec=None, item=None):
     }]
     if url == "/":
         locations = []
-        for key, location in ENTITY_SCHEMA.LOCATIONS.items():
-            location_type = "Hospital" if key == "ahmedabad" else "MedicalClinic"
-            location_node = {
-                "@type": location_type,
-                "@id": location["id"],
-                "name": location["name"],
-                "url": canonical_url,
-                "telephone": location["telephone"],
-                "parentOrganization": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
-                "address": {
-                    "@type": "PostalAddress",
-                    "streetAddress": location["street_address"],
-                    "addressLocality": location["city"],
-                    "addressRegion": "Gujarat",
-                    "postalCode": location["postal_code"],
-                    "addressCountry": "IN",
-                },
-            }
-            hours = location.get("opening_hours")
-            if hours:
-                location_node["openingHoursSpecification"] = [{
-                    "@type": "OpeningHoursSpecification",
-                    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday",
-                                   "Friday", "Saturday"],
-                    "opens": hours["opens"],
-                    "closes": hours["closes"],
-                }]
-            locations.append(location_node)
+        for key in ENTITY_SCHEMA.LOCATIONS:
+            locations.append(_location_schema_node(key, canonical_url))
         graph.extend((
             {"@type": "WebSite", "@id": ENTITY_SCHEMA.ENTITY_IDS["website"],
              "url": CFG.SITE_URL + "/", "name": "Bankers Vascular",
@@ -2445,6 +2463,23 @@ def add_page_schema(html, url, spec=None, item=None):
     city = url.rsplit("/", 1)[-1]
     if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")) and city in ENTITY_SCHEMA.LOCATIONS:
         graph[1]["about"] = {"@id": ENTITY_SCHEMA.LOCATIONS[city]["id"]}
+        graph[1]["mainEntity"] = {"@id": ENTITY_SCHEMA.LOCATIONS[city]["id"]}
+        graph.append(_location_schema_node(city, canonical_url))
+    if spec and spec.get("key") == "treatment" and item:
+        procedure_id = canonical_url + "#medical-procedure"
+        procedure = {
+            "@type": "MedicalProcedure",
+            "@id": procedure_id,
+            "name": item.name,
+            "url": canonical_url,
+            "mainEntityOfPage": {"@id": canonical_url + "#webpage"},
+            "provider": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+        }
+        description = _schema_description(item)
+        if description:
+            procedure["description"] = description
+        graph[1]["mainEntity"] = {"@id": procedure_id}
+        graph.append(procedure)
     if spec and spec.get("key") == "blog-author" and item and item.slug == MOHAL_BLOG_AUTHOR_SLUG:
         # Reference the one existing doctor Person rather than creating a
         # second Person for the author archive.
@@ -2604,13 +2639,15 @@ def copy_static(assets):
 
 
 def write_sitemap(written):
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     urls = []
-    for _rel, url, indexable in written:
+    for entry in written:
+        _rel, url, indexable = entry[:3]
+        lastmod = entry[3] if len(entry) > 3 else None
         if not indexable:
             continue
-        urls.append("  <url><loc>%s%s</loc><lastmod>%s</lastmod></url>"
-                    % (CFG.SITE_URL, urllib.parse.quote(url, safe="/-_.~"), today))
+        loc = CFG.SITE_URL + urllib.parse.quote(url, safe="/-_.~")
+        lastmod_tag = "<lastmod>%s</lastmod>" % lastmod if lastmod else ""
+        urls.append("  <url><loc>%s</loc>%s</url>" % (loc, lastmod_tag))
     write("sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

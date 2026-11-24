@@ -10,6 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import sys
 import urllib.parse
+from datetime import datetime
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -42,6 +43,18 @@ def html_files():
 
 def rel(path):
     return os.path.relpath(path, DIST).replace("\\", "/")
+
+
+def clean_url_for_file(relative_path):
+    """Map a generated HTML path to its public clean URL."""
+    relative_path = relative_path.replace("\\", "/")
+    if relative_path == "index.html":
+        return "/"
+    if relative_path.endswith("/index.html"):
+        return "/" + relative_path[:-len("/index.html")]
+    if relative_path.endswith(".html"):
+        return "/" + relative_path[:-len(".html")]
+    return "/" + relative_path
 
 
 # --------------------------------------------------------------------- checks
@@ -209,7 +222,8 @@ def check_meta(pages):
             continue
         m = re.search(r"<title>(.*?)</title>", html, re.S)
         title = (m.group(1).strip() if m else "")
-        if not title or title.startswith("|") or title == "Copy of Bankers Vascular":
+        if (not title or title.startswith("|") or title == "Copy of Bankers Vascular"
+                or title.rstrip().endswith("|")):
             bad_title += 1
             fail("%s: unfilled title %r" % (r, title[:60]))
         c = re.search(r'<link href="([^"]*)" rel="canonical">', html)
@@ -217,7 +231,13 @@ def check_meta(pages):
             bad_canon += 1
             fail("%s: no canonical" % r)
         else:
-            canons[c.group(1)] += 1
+            canonical = c.group(1)
+            canons[canonical] += 1
+            expected = CFG.SITE_URL + clean_url_for_file(r)
+            if canonical != expected:
+                bad_canon += 1
+                fail("%s: canonical %s does not match %s"
+                     % (r, canonical, expected))
     for url, n in canons.items():
         if n > 1:
             dupe += 1
@@ -239,6 +259,106 @@ def check_blog_featured_image_policy(pages, cms):
         fail("%s renders a featured thumbnail on the article page" % url)
     if not bad:
         note("blog pages flow directly into content; thumbnails and author/date blocks stay off-page")
+
+
+def check_jsonld(pages):
+    """Validate page graphs, canonical breadcrumb relationships, and medical nodes."""
+    organization_id = ENTITY_SCHEMA.ENTITY_IDS["organization"]
+    location_by_city = ENTITY_SCHEMA.LOCATIONS
+    noindex_routes = {
+        CFG.SITE_URL + page["url"]
+        for name, page in CFG.EXTRA_SHELL_PAGES.items()
+        if name in CFG.NOINDEX_PAGES
+    }
+    parsed_pages = parsed_scripts = 0
+
+    def types(node):
+        value = node.get("@type", [])
+        return set(value if isinstance(value, list) else [value])
+
+    for path, html in pages.items():
+        relative = rel(path)
+        canonical_match = re.search(r'<link href="([^"]*)" rel="canonical">', html)
+        canonical = canonical_match.group(1) if canonical_match else ""
+        if relative in ("401.html", "404.html") or canonical in noindex_routes:
+            continue
+        raw_scripts = re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
+        if not raw_scripts:
+            fail("%s: no JSON-LD block" % relative)
+            continue
+
+        nodes = []
+        for raw in raw_scripts:
+            try:
+                document = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                fail("%s: invalid JSON-LD: %s" % (relative, exc))
+                continue
+            parsed_scripts += 1
+            nodes.extend(document.get("@graph", [document]))
+        if not nodes:
+            fail("%s: JSON-LD contains no nodes" % relative)
+            continue
+        parsed_pages += 1
+
+        expected = CFG.SITE_URL + clean_url_for_file(relative)
+        if canonical != expected:
+            fail("%s: JSON-LD test cannot resolve canonical %s (expected %s)"
+                 % (relative, canonical, expected))
+
+        webpages = [node for node in nodes if "WebPage" in types(node)]
+        if not webpages:
+            fail("%s: JSON-LD has no WebPage node" % relative)
+        for webpage in webpages:
+            if webpage.get("url") != canonical:
+                fail("%s: WebPage url is not canonical" % relative)
+            breadcrumb = webpage.get("breadcrumb", {}).get("@id")
+            if breadcrumb != canonical + "#breadcrumb":
+                fail("%s: WebPage breadcrumb does not reference canonical page" % relative)
+
+        breadcrumbs = [node for node in nodes if "BreadcrumbList" in types(node)]
+        if not breadcrumbs:
+            fail("%s: missing BreadcrumbList" % relative)
+        else:
+            elements = breadcrumbs[-1].get("itemListElement", [])
+            last_item = elements[-1].get("item") if elements else None
+            if last_item != canonical:
+                fail("%s: final breadcrumb item is %s, expected %s"
+                     % (relative, last_item, canonical))
+
+        parts = clean_url_for_file(relative).strip("/").split("/")
+        if len(parts) == 2 and parts[0] in ("varicose-veins", "non-surgical-knee-pain"):
+            city = parts[1]
+            if city in location_by_city:
+                expected_type = "Hospital" if city == "ahmedabad" else "MedicalClinic"
+                location_id = location_by_city[city]["id"]
+                locations = [node for node in nodes
+                             if node.get("@id") == location_id]
+                if not any(expected_type in types(node) for node in locations):
+                    fail("%s: missing %s location schema" % (relative, expected_type))
+                elif any(node.get("parentOrganization", {}).get("@id") != organization_id
+                         for node in locations):
+                    fail("%s: location schema has no primary organization relationship"
+                         % relative)
+
+        if parts and parts[0] == "treatment" and len(parts) == 2:
+            procedures = [node for node in nodes if "MedicalProcedure" in types(node)]
+            if len(procedures) != 1:
+                fail("%s: expected one MedicalProcedure node, found %d"
+                     % (relative, len(procedures)))
+            else:
+                procedure = procedures[0]
+                if procedure.get("provider", {}).get("@id") != organization_id:
+                    fail("%s: MedicalProcedure provider is not the primary organization"
+                         % relative)
+                if procedure.get("mainEntityOfPage", {}).get("@id") != canonical + "#webpage":
+                    fail("%s: MedicalProcedure is not linked to the canonical WebPage"
+                         % relative)
+
+    if parsed_pages and not failures:
+        note("parsed %d JSON-LD blocks across %d indexable pages; canonical breadcrumbs and medical relationships pass"
+             % (parsed_scripts, parsed_pages))
 
 
 def check_entity_schema(pages):
@@ -282,11 +402,11 @@ def check_entity_schema(pages):
     if organization_nodes != 1 or website_nodes != 1:
         fail("expected one homepage Organization and WebSite node; found %d and %d"
              % (organization_nodes, website_nodes))
-    if set(location_nodes) != location_ids or any(n != 1 for n in location_nodes.values()):
-        fail("expected one structured-data entity for each verified branch; found %s"
+    if set(location_nodes) != location_ids or any(n < 1 for n in location_nodes.values()):
+        fail("expected structured-data entities for each verified branch; found %s"
              % dict(location_nodes))
     if not failures:
-        note("entity schema uses one primary organization, website, and Dr. Mohal Banker profile")
+        note("entity schema uses one primary organization, website, and Dr. Mohal Banker profile with verified branch relationships")
 
 
 def check_forms(pages):
@@ -414,7 +534,7 @@ def check_animations(pages):
              "no invisible sections" % animated_pages)
 
 
-def check_sitemap(pages):
+def check_sitemap(pages, cms):
     p = os.path.join(DIST, "sitemap.xml")
     if not os.path.exists(p):
         return fail("sitemap.xml missing")
@@ -438,7 +558,56 @@ def check_sitemap(pages):
             fail("sitemap contains a non-canonical URL: %s" % loc)
         if any(bad in loc for bad in ("localhost", "staging", ".html", "?")):
             fail("sitemap contains an invalid URL: %s" % loc)
-    note("sitemap.xml lists %d URLs" % len(locs))
+
+    namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    sitemap_dates = {}
+    for node in root.findall("sm:url", namespace):
+        loc = node.findtext("sm:loc", default="", namespaces=namespace)
+        lastmod = node.findtext("sm:lastmod", default="", namespaces=namespace)
+        if not lastmod:
+            fail("sitemap URL has no lastmod: %s" % loc)
+            continue
+        try:
+            sitemap_dates[loc] = datetime.strptime(lastmod, "%Y-%m-%d").date()
+        except ValueError:
+            fail("sitemap URL has invalid lastmod %r: %s" % (lastmod, loc))
+
+    for key, spec in cms.specs.items():
+        folder = spec.get("folder")
+        if not folder:
+            continue
+        for item in cms.published[key]:
+            expected_date = item.get("_updated") or item.get("_date")
+            if not expected_date or not item.url:
+                continue
+            loc = CFG.SITE_URL + item.url
+            if sitemap_dates.get(loc) != expected_date.date():
+                fail("sitemap lastmod mismatch for %s: expected %s, found %s"
+                     % (loc, expected_date.date(), sitemap_dates.get(loc)))
+
+    controlled_routes = {}
+    for page, lastmod in CFG.SITEMAP_LASTMOD.items():
+        if page in CFG.NOINDEX_PAGES:
+            continue
+        extra = CFG.EXTRA_SHELL_PAGES.get(page)
+        if extra:
+            route = extra["url"]
+        elif page == "index.html":
+            route = "/"
+        elif page in CFG.DIRECTORY_PAGES:
+            route = "/" + CFG.DIRECTORY_PAGES[page].rsplit("/", 1)[0]
+        else:
+            route = "/" + page[:-len(".html")]
+        controlled_routes[CFG.SITE_URL + route] = lastmod
+    for loc, expected in controlled_routes.items():
+        if loc in sitemap_dates and sitemap_dates[loc].isoformat() != expected:
+            fail("static sitemap lastmod mismatch for %s: expected %s, found %s"
+                 % (loc, expected, sitemap_dates[loc]))
+
+    if len(set(sitemap_dates.values())) > 1:
+        note("sitemap.xml lists %d URLs with CMS/static lastmod dates" % len(locs))
+    else:
+        fail("sitemap lastmod values are still all identical")
 
 
 def check_encoding():
@@ -503,6 +672,7 @@ def main():
     cms = check_publish_rules(pages)
     check_nav(pages, cms)
     check_meta(pages)
+    check_jsonld(pages)
     check_entity_schema(pages)
     check_blog_featured_image_policy(pages, cms)
     check_forms(pages)
@@ -510,7 +680,7 @@ def main():
     check_meta_pixel_absent(pages)
     check_assets(pages)
     check_animations(pages)
-    check_sitemap(pages)
+    check_sitemap(pages, cms)
     check_encoding()
     check_repo_layout()
     check_cloudflare()

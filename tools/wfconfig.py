@@ -18,6 +18,31 @@ SITE_URL = "https://bankersvascular.com"
 
 BRAND_TITLE = "| Bankers Vascular Centre"
 
+# Last meaningful source/config change for public shell pages, audited against
+# the production commit history. CMS-backed pages use each row's `Updated On`
+# value instead; these dates keep static URLs from inheriting the build date.
+SITEMAP_LASTMOD = {
+    "index.html": "2026-11-23",
+    "about-banker-vascular-center.html": "2026-11-18",
+    "bng-con-2025.html": "2026-10-29",
+    "bng-conference-november-2024.html": "2026-10-29",
+    "cancellation-refund-policy.html": "2026-10-29",
+    "contact-us.html": "2026-11-24",
+    "departments.html": "2026-10-29",
+    "interview-of-patients-after-g-a-e-procedure.html": "2026-10-29",
+    "privacy-policy.html": "2026-10-29",
+    "products.html": "2026-11-02",
+    "training.html": "2026-11-23",
+    "youtube.html": "2026-09-25",
+    "book-appointment.html": "2026-11-24",
+    "book-appointment-ahmedabad.html": "2026-11-24",
+    "book-appointment-vadodara.html": "2026-11-24",
+    "nanofat-for-joint-pain.html": "2026-10-13",
+    "dr-mohal-banker-award.html": "2026-11-18",
+    "bankers-notes.html": "2026-08-13",
+    "services-gujarat.html": "2026-08-22",
+}
+
 
 # --------------------------------------------------------------- collections
 

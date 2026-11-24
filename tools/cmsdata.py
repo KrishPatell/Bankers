@@ -285,6 +285,9 @@ class Collections:
                 r["_collection"] = key
                 r["_url"] = self.item_url(key, slug)
                 r["_date"] = parse_wf_date(r.get("time") or r.get("Created On"))
+                r["_updated"] = parse_wf_date(
+                    r.get("Updated On") or r.get("Published On")
+                    or r.get("Created On"))
                 if slug in withdrawn:
                     dropped.append((slug, "withdrawn by site owner"))
                     continue
