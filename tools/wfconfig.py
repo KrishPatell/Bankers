@@ -342,8 +342,6 @@ PAGE_LISTS = {
          "field_overrides": DOCTOR_CARD_IMAGE_OVERRIDES},
     ],
     "book-appointment.html": [],
-    "book-appointment-ahmedabad.html": [],
-    "book-appointment-vadodara.html": [],
     "bng-conference-november-2024.html": [
         {"items_cls": "doctor-archive-list", "collection": "our-doctors",
          "order": ("Order", "numeric"), "bindings": "doctor-card",

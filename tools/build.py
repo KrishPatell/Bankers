@@ -1409,8 +1409,7 @@ def customise_booking_page(html):
         '', form, count=1, flags=re.S)
     form = re.sub(
         r'<h2 class="appointment-form-heading">.*?</h2>',
-        '<p class="booking-form-card-kicker">Contact Us</p>'
-        '<h2 class="booking-form-card-title">Book Your Appointment</h2>',
+        '<h2 class="booking-form-card-title">Appointment details</h2>',
         form, count=1, flags=re.S)
     form = re.sub(
         r'<p class="appointment-form-intro">.*?</p>',
@@ -1512,23 +1511,6 @@ def customise_booking_page(html):
       <p class="booking-page-gujarati" lang="gu">તમારી અપોઇન્ટમેન્ટ બુક કરો</p>
     </section>'''
 
-    visual_panel = '''<aside class="booking-visual-panel" aria-label="Bankers Vascular Hospital appointment support">
-      <div class="booking-visual-copy">
-        <p class="booking-visual-kicker">A simpler way to reach our team</p>
-        <h2>Let’s plan your consultation.</h2>
-        <p>Tell us where you would like to visit and what you need help with. Our hospital team will contact you to confirm the appointment.</p>
-        <div class="booking-visual-note">
-          <span class="booking-visual-note-icon" aria-hidden="true">✓</span>
-          <span>Guided appointment requests with human support</span>
-        </div>
-      </div>
-      <div class="booking-visual-art" aria-hidden="true">
-        <span class="booking-visual-orbit booking-visual-orbit-one"></span>
-        <span class="booking-visual-orbit booking-visual-orbit-two"></span>
-        <img src="/images/doctors-group-photo-transparent-v2.png" alt="" loading="lazy">
-      </div>
-    </aside>'''
-
     head_end = html.lower().find('</head>')
     body_end = html.lower().rfind('</body>')
     script_start = html.rfind('<script src="https://d3e54')
@@ -1542,8 +1524,7 @@ def customise_booking_page(html):
         '<main class="page-wrapper booking-page-wrapper">'
         '<main class="main-wrapper">' + header + hero +
         '<section class="booking-page-main" aria-label="Appointment booking">'
-        '<div class="booking-page-container booking-page-layout">' + visual_panel +
-        '<div class="booking-form-panel">' + form + '</div></div></section>'
+        '<div class="booking-page-container">' + form + '</div></section>'
         '</main>' + footer + '</main>' + scripts + '</body></html>'
     )
     return head + body
@@ -1862,8 +1843,7 @@ def build_shells(pages, cms, binder, assets):
         if page == "training.html":
             source_html = customise_training(source_html)
         html = prepare_shell(source_html, cms, binder, page)
-        if page in ("book-appointment.html", "book-appointment-ahmedabad.html",
-                    "book-appointment-vadodara.html"):
+        if page == "book-appointment.html":
             html = customise_booking_page(html)
         if page == "nanofat-for-joint-pain.html":
             html = nanofat.customise_shell(html)
