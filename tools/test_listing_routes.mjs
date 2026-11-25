@@ -2,14 +2,16 @@ import assert from "node:assert/strict";
 import worker from "../worker.js";
 
 const listings = ["/blog", "/departments", "/bankers-notes", "/services-gujarat"];
+const canonicalAssetPaths = new Set([...listings, "/products"]);
 const assetRequests = [];
 const env = {
   ASSETS: {
     async fetch(request) {
       assetRequests.push(request);
       const path = new URL(request.url).pathname;
+      const servesDirectoryIndex = canonicalAssetPaths.has(path) || path.endsWith("/");
       return new Response("listing", {
-        status: path.endsWith("/") ? 200 : 307,
+        status: servesDirectoryIndex ? 200 : 307,
         headers: { "Content-Type": "text/html" },
       });
     },
@@ -21,7 +23,7 @@ for (const path of listings) {
     const response = await worker.fetch(new Request(`https://bankersvascular.com${path}`, { method }), env);
     assert.equal(response.status, 200, `${method} ${path} must bypass the asset redirect`);
     const assetRequest = assetRequests.at(-1);
-    assert.equal(new URL(assetRequest.url).pathname, `${path}/`);
+    assert.equal(new URL(assetRequest.url).pathname, path);
     assert.equal(assetRequest.method, method);
   }
 
@@ -36,7 +38,7 @@ for (const path of listings) {
 
 const products = await worker.fetch(new Request("https://bankersvascular.com/products"), env);
 assert.equal(products.status, 200);
-assert.equal(new URL(assetRequests.at(-1).url).pathname, "/products/");
+assert.equal(new URL(assetRequests.at(-1).url).pathname, "/products");
 
 for (const [path, destination] of [
   ["/knee-pain", "/departments/knee-pain"],

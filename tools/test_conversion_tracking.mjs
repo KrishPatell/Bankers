@@ -145,7 +145,10 @@ await test("one server-accepted enquiry produces exactly one GA4/Ads pair", asyn
   assert.equal(f.resetCount, 1);
   assert.equal(f.button.disabled, false);
   const payload = JSON.parse(r.requests[0].body);
-  assert.deepEqual(payload, { ...f.values, _form: "Contact", _page: "Contact page" });
+  const { _request_id: requestId, ...stablePayload } = payload;
+  assert.equal(typeof requestId, "string");
+  assert.ok(requestId.length > 0);
+  assert.deepEqual(stablePayload, { ...f.values, _form: "Contact", _page: "Contact page" });
   assert.equal(r.requests[0].method, "POST");
   checkPrivacy(r.calls);
 });
@@ -168,6 +171,9 @@ await test("two distinct successful submissions produce two event pairs", async 
   const r = runtime(); const f = form();
   for (let i = 0; i < 2; i++) { r.responses.push(response()); submit(r, f); await settle(); }
   assert.equal(r.requests.length, 2);
+  const requestIds = r.requests.map((request) => JSON.parse(request.body)._request_id);
+  assert.equal(new Set(requestIds).size, 2);
+  assert.ok(requestIds.every((id) => typeof id === "string" && id.length > 0));
   assert.deepEqual(r.calls, expectedLead(2));
 });
 
