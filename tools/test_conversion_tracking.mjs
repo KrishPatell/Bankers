@@ -241,7 +241,28 @@ await test("all source templates have no legacy page-load conversion dispatches"
 // The default command always checks the complete generated output too.
 if (!process.argv.includes("--runtime-only")) await test("every generated page keeps standard tags and executes zero inline enquiry events", () => {
   const pages = files(path.join(root, "dist")).filter((f) => f.endsWith(".html"));
-  assert.equal(pages.length, 441);
+  // The sitemap supplies the current indexable page inventory; these four
+  // utility pages are intentionally excluded but must receive the same checks.
+  const dist = path.join(root, "dist");
+  const sitemap = fs.readFileSync(path.join(dist, "sitemap.xml"), "utf8");
+  const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  assert.ok(locations.length > 0, "sitemap must contain page URLs");
+  assert.equal(new Set(locations).size, locations.length, "sitemap URLs must be unique");
+  const actualPages = new Set(pages.map((file) => path.relative(dist, file).split(path.sep).join("/")));
+  const expectedPages = new Set([
+    "401.html", "404.html", "book-appointment/ahmedabad.html", "book-appointment/vadodara.html",
+  ]);
+  for (const location of locations) {
+    const url = new URL(location);
+    assert.equal(url.origin, "https://bankersvascular.com", location);
+    const route = decodeURIComponent(url.pathname).replace(/^\/+|\/+$/g, "");
+    const candidates = route ? [`${route}.html`, `${route}/index.html`] : ["index.html"];
+    const matches = candidates.filter((file) => actualPages.has(file));
+    assert.equal(matches.length, 1, `sitemap URL must map to exactly one generated page: ${location}`);
+    expectedPages.add(matches[0]);
+  }
+  assert.deepEqual([...actualPages].sort(), [...expectedPages].sort(),
+    "generated HTML pages must match the sitemap and excluded utility pages");
   for (const file of pages) {
     const html = fs.readFileSync(file, "utf8");
     assert.equal((html.match(/src="\/js\/enquiry-tracking\.js"/g) || []).length, 1, file);
