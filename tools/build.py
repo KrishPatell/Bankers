@@ -110,6 +110,8 @@ DETAIL_META_OVERRIDES = {
         "Understand why plantar fasciitis symptoms can persist despite conventional care and when to seek a clinical assessment.",
     ("blog", "the-rise-of-minimally-invasive-treatments-why-patients-prefer-them-over-surgery-for-varicose-veins"):
         "An overview of why some patients consider minimally invasive approaches for varicose veins and the questions to discuss with a clinician.",
+    ("our-doctors", "dr-rozil-gandhi"):
+        "Learn about Dr. Rozil Gandhi, an interventional radiologist and Joint Director at Bankers Vascular Centre.",
     ("our-doctors", "dr-dimple"):
         "Learn about Dr. Dimple Parmar, a physiotherapist at Bankers Vascular Centre.",
     ("our-doctors", "dr-janvi"):
@@ -1996,6 +1998,13 @@ def render_detail(base, spec, item, cms, binder, assets):
 
     for b in spec.get("bind", []):
         html = binder._one(html, item, b, item.url) if b["kind"] != "link" else html
+
+    if spec["key"] == "our-doctors" and item.slug in {
+        "dr-rozil-gandhi", "dr-mohal-banker", "dr-dimple",
+    }:
+        html = binder._one(html, item,
+                           {"cls": "breadcrumb-heading-3", "field": "Name", "kind": "text"},
+                           item.url)
 
     # Long blog headlines must remain wholly inside the shared hero, above the
     # breadcrumb.  Mark them here instead of altering the published title or
