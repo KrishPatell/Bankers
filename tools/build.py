@@ -135,6 +135,8 @@ DETAIL_META_OVERRIDES = {
 }
 
 DETAIL_TITLE_OVERRIDES = {
+    ("blog-author", "dr-disha-soni"):
+        "Articles by Dr. Disha Soni | Bankers Vascular Centre",
     ("treatment", "genicular-artery-embolization"):
         "Genicular Artery Embolization | Bankers Vascular Centre",
     ("departments", "bariatric-artery-embolization-for-obesity"):
@@ -822,6 +824,16 @@ def apply_nav(html, cms, binder):
         return html
     for spec in CFG.NAV_LISTS:
         items = order_items(cms, spec)
+        if spec.get("collection") == "departments":
+            nav_names = {"vascular-malformation": "Vascular Malformation",
+                         "tendoachilitis": "Achilles Tendinopathy"}
+            renamed = []
+            for item in items:
+                if item.slug in nav_names:
+                    item = cmsdata.Item(item)
+                    item["Name"] = nav_names[item.slug]
+                renamed.append(item)
+            items = renamed
         html = populate(html, spec, items, binder)
     html = add_standalone_department_nav_link(html)
     return html
@@ -966,6 +978,42 @@ def normalize_form_fields(seg):
     return "".join(out)
 
 
+def add_missing_enquiry_labels(seg):
+    """Name only fields lacking an associated or wrapping label."""
+    labels = list(re.finditer(r'<label\b[^>]*>.*?</label\s*>', seg, re.I | re.S))
+    explicit = {W.get_attr(m.group(0).split(">", 1)[0] + ">", "for") for m in labels}
+    names = {"Name": "Full name", "Phone-Number": "Phone number", "Email": "Email address",
+             "Message": "Message", "Date": "Date"}
+    hidden_style = ("position:absolute;width:1px;height:1px;padding:0;margin:-1px;"
+                    "overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0")
+    out, pos = [], 0
+    for m in re.finditer(r"<(input|textarea|select)\s[^>]*>", seg, re.I):
+        tag = m.group(0)
+        kind = (W.get_attr(tag, "type") or "").lower()
+        name = W.get_attr(tag, "name") or ""
+        field_id = W.get_attr(tag, "id") or ""
+        has_label = (field_id in explicit if field_id else False) or any(
+            label.start() <= m.start() < label.end() for label in labels)
+        if (kind in ("hidden", "submit", "button", "reset") or name == "_gotcha"
+                or has_label or W.get_attr(tag, "aria-label")
+                or W.get_attr(tag, "aria-labelledby")):
+            continue
+        label = (names.get(name) or W.get_attr(tag, "data-name")
+                 or W.get_attr(tag, "placeholder") or name.replace("-", " ")).strip()
+        if not label:
+            continue
+        out.append(seg[pos:m.start()])
+        if field_id:
+            out.append('<label for="%s" style="%s">%s</label>' %
+                       (_esc_attr(field_id), hidden_style, htmllib.escape(label)))
+            out.append(tag)
+        else:
+            out.append(W.set_attr(tag, "aria-label", _esc_attr(label)))
+        pos = m.end()
+    out.append(seg[pos:])
+    return "".join(out)
+
+
 def ensure_submit(seg, page_label):
     """Give the contact form a real submit control.
 
@@ -1037,6 +1085,7 @@ def wire_forms(html, page_label):
 
         seg = new_tag + HONEYPOT + seg[m.end() - fstart:]
         seg = normalize_form_fields(seg)
+        seg = add_missing_enquiry_labels(seg)
         seg, _converted = ensure_submit(seg, page_label)
 
         out.append(html[pos:fstart])
@@ -1350,6 +1399,31 @@ def remove_email_chat_frame(html):
         html = html[:block[0]] + html[block[1]:]
 
 
+def fix_contact_accessibility(html):
+    """Remove directional marks in dial links and identify YouTube icons."""
+    def anchor(match):
+        tag = match.group(0)
+        href = W.get_attr(tag, "href") or ""
+        if href.lower().startswith("tel:"):
+            cleaned = re.sub(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]", "", href)
+            cleaned = re.sub(r"%E2%80%(?:8E|8F|AA|AB|AC|AD|AE)|%E2%81%(?:A6|A7|A8|A9)",
+                             "", cleaned, flags=re.I)
+            if cleaned != href:
+                tag = W.set_attr(tag, "href", cleaned)
+        return tag
+
+    def icon(match):
+        tag = match.group(0)
+        src = W.get_attr(tag, "src") or ""
+        if src.split("?", 1)[0].endswith("/mdi_youtube.svg") and (W.get_attr(tag, "alt") or "").lower() == "twitter":
+            alt = "" if "footer-social-hover-icon" in (W.get_attr(tag, "class") or "") else "YouTube"
+            return W.set_attr(tag, "alt", alt)
+        return tag
+
+    html = re.sub(r"<a\b[^>]*>", anchor, html, flags=re.I)
+    return re.sub(r"<img\b[^>]*>", icon, html, flags=re.I)
+
+
 def prepare_shell(html, cms, binder, page_label):
     """Transforms every page gets, CMS shells and detail templates alike."""
     # Keep the shared desktop and mobile header branding on the current teal
@@ -1370,6 +1444,7 @@ def prepare_shell(html, cms, binder, page_label):
     html = remove_email_chat_frame(html)
     html = rewrite_links(html)
     html = fix_dead_links(html)
+    html = fix_contact_accessibility(html)
     html = normalize_verified_branch_nap(html)
     html = fix_obvious_typos(html)
     html = ensure_direct_ga4(html)

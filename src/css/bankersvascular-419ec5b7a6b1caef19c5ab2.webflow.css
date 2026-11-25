@@ -17194,3 +17194,33 @@ body.training-page-body .about-hero-section.about.frozen.training-hero-compact {
     width: 100%;
   }
 }
+
+/* Keep the contact-page badge within its image without clipping scrollable cards. */
+html[data-wf-page="6a6df2581c0c561f07308bf1"] .wcu-image-wrapper-two > .reviews-fact-block.home-two {
+  left: auto;
+  right: 0;
+  max-width: 100%;
+}
+
+/* Let long city breadcrumbs use the full available mobile width. */
+@media screen and (max-width: 767px) {
+  html[data-wf-page="6a6df2581c0c561f07308c02"] .new-combo .container-21-white {
+    flex-wrap: wrap;
+    column-gap: 8px;
+    row-gap: 4px;
+  }
+  html[data-wf-page="6a6df2581c0c561f07308c02"] .new-combo .container-21-white > .link-block-4:last-child {
+    flex: 0 0 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Prevent the four contact-page statistics from forcing tablet overflow. */
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  html[data-wf-page="6a6df2581c0c561f07308bf1"] .timeline-copy .grid {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
