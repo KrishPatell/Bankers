@@ -1341,6 +1341,15 @@ def add_seo_internal_links(html, url):
 
 # ------------------------------------------------------------------- shell pass
 
+def remove_email_chat_frame(html):
+    """Remove the duplicate hidden Email Form 2 from every generated page."""
+    while True:
+        block = W.block_by_class(html, "ms-chat-email")
+        if not block:
+            return html
+        html = html[:block[0]] + html[block[1]:]
+
+
 def prepare_shell(html, cms, binder, page_label):
     """Transforms every page gets, CMS shells and detail templates alike."""
     # Keep the shared desktop and mobile header branding on the current teal
@@ -1358,6 +1367,7 @@ def prepare_shell(html, cms, binder, page_label):
                   flags=re.I)
     html = remove_template_junk(html)
     html = remove_dead_lists(html)
+    html = remove_email_chat_frame(html)
     html = rewrite_links(html)
     html = fix_dead_links(html)
     html = normalize_verified_branch_nap(html)
