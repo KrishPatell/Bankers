@@ -18,6 +18,7 @@
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/bankersvascular-419ec5b7a6b1caef19c5ab2.webflow.css" rel="stylesheet" type="text/css">
   <link href="css/services-gujarat.css" rel="stylesheet" type="text/css">
+  <link href="css/bankers-google-reviews.css" rel="stylesheet" type="text/css">
   <style>@media (max-width:991px) and (min-width:768px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="f0007497-9a2e-aed6-42a3-2046ac1832f3"] {width:100%;}html.w-mod-js:not(.w-mod-ix) [data-w-id="56fe0065-4750-08aa-5afa-d05d4916e2b3"] {-webkit-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="def45a6c-d256-c8d0-0f0f-1a479ac955d3"] {opacity:0;}}@media (max-width:767px) and (min-width:480px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="f0007497-9a2e-aed6-42a3-2046ac1832f3"] {width:100%;}html.w-mod-js:not(.w-mod-ix) [data-w-id="56fe0065-4750-08aa-5afa-d05d4916e2b3"] {-webkit-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="def45a6c-d256-c8d0-0f0f-1a479ac955d3"] {opacity:0;}}@media (max-width:479px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="f0007497-9a2e-aed6-42a3-2046ac1832f3"] {width:100%;}html.w-mod-js:not(.w-mod-ix) [data-w-id="56fe0065-4750-08aa-5afa-d05d4916e2b3"] {-webkit-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(100%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="def45a6c-d256-c8d0-0f0f-1a479ac955d3"] {opacity:0;}}</style>
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
@@ -630,6 +631,43 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </div>
         </div>
       </section>
+      <section class="bvc-google-reviews" aria-label="Google Reviews">
+        <header class="bvc-gr-header">
+          <div class="bvc-gr-logo">
+            <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" width="108" height="37" alt="Google" loading="lazy" decoding="async">
+          </div>
+          <h2>Google Reviews</h2>
+        </header>
+
+        <div class="bvc-gr-stage" data-stage hidden role="group" aria-label="Review carousel">
+          <article class="bvc-gr-card bvc-gr-left" aria-hidden="true">
+            <p class="bvc-gr-quote" data-quote></p>
+            <p class="bvc-gr-author" data-author></p>
+          </article>
+
+          <article class="bvc-gr-card bvc-gr-active">
+            <div class="bvc-gr-stars" data-stars role="img" aria-label="5 out of 5 stars" hidden></div>
+            <blockquote class="bvc-gr-quote" data-quote></blockquote>
+            <p class="bvc-gr-author" data-author></p>
+          </article>
+
+          <article class="bvc-gr-card bvc-gr-right" aria-hidden="true">
+            <p class="bvc-gr-quote" data-quote></p>
+            <p class="bvc-gr-author" data-author></p>
+          </article>
+        </div>
+
+        <div class="bvc-gr-controls" data-controls hidden>
+          <button type="button" data-previous aria-label="Previous review">←</button>
+          <span class="bvc-gr-position" data-position aria-hidden="true"></span>
+          <button type="button" data-next aria-label="Next review">→</button>
+          <button type="button" data-play>Play</button>
+        </div>
+
+        <p class="bvc-gr-sr" data-status aria-live="polite" aria-atomic="true"></p>
+
+        <a class="bvc-gr-link" href="https://share.google/g7R9DdUawjDISQNm4" target="_blank" rel="noopener noreferrer">View on Google <span aria-hidden="true">↗</span></a>
+      </section>
       <section class="treatment-offer">
         <div class="w-layout-blockcontainer main-container w-container">
           <div class="subtitle-heading-wrapper right">
@@ -1170,6 +1208,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   </main>
   <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=6a6df2581c0c561f07308c10" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
+  <script src="js/bankers-google-reviews.js" type="text/javascript" defer></script>
   <script src="js/patient-videos.js" defer></script>
   <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8182382315648187" crossorigin="anonymous"></script>
   <!--  Google Tag Manager (noscript)  -->

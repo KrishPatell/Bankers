@@ -1,0 +1,209 @@
+.bvc-google-reviews {
+  --bvc-gr-brand: #00687b;
+  --bvc-gr-text: #f5fcff;
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  width: min(94%, 1400px);
+  margin: clamp(28px, 5vw, 72px) auto;
+  padding: clamp(28px, 5vw, 58px) clamp(16px, 4vw, 54px);
+  overflow: hidden;
+  border: 1px solid #215260;
+  border-radius: clamp(20px, 3vw, 32px);
+  background:
+    radial-gradient(ellipse at 50% 57%, #13546480, transparent 65%),
+    #071721;
+  color: var(--bvc-gr-text);
+  text-align: center;
+}
+
+.bvc-google-reviews [hidden] {
+  display: none !important;
+}
+
+.bvc-google-reviews .bvc-gr-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 21px;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.bvc-google-reviews .bvc-gr-logo img {
+  display: block;
+  width: 108px;
+  height: auto;
+}
+
+.bvc-google-reviews .bvc-gr-header h2 {
+  margin: 19px 0 0;
+  color: var(--bvc-gr-text);
+  font-size: clamp(30px, 4.5vw, 50px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.bvc-google-reviews .bvc-gr-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
+  width: min(100%, 1050px);
+  margin: 32px auto 24px;
+  perspective: 1100px;
+  touch-action: pan-y pinch-zoom;
+}
+
+.bvc-google-reviews .bvc-gr-card {
+  grid-area: 1 / 1;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: clamp(22px, 3.5vw, 34px);
+  border: 1px solid #357585;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #174a59, #0c2938 76%);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.bvc-google-reviews .bvc-gr-active {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(65%, 560px);
+  min-height: 250px;
+  box-shadow: 0 0 38px #00c0da40, 0 20px 38px #0007;
+}
+
+.bvc-google-reviews .bvc-gr-left,
+.bvc-google-reviews .bvc-gr-right {
+  width: min(43%, 390px);
+  min-height: 195px;
+  opacity: .6;
+  pointer-events: none;
+}
+
+.bvc-google-reviews .bvc-gr-left {
+  justify-self: start;
+  transform: translateX(2%) rotateY(20deg) scale(.92);
+}
+
+.bvc-google-reviews .bvc-gr-right {
+  justify-self: end;
+  transform: translateX(-2%) rotateY(-20deg) scale(.92);
+}
+
+.bvc-google-reviews .bvc-gr-quote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font-size: clamp(17px, 2vw, 22px);
+  font-style: normal;
+  line-height: 1.5;
+}
+
+.bvc-google-reviews :is(.bvc-gr-left, .bvc-gr-right) .bvc-gr-quote {
+  font-size: 16px;
+}
+
+.bvc-google-reviews .bvc-gr-author {
+  margin: 16px 0 0;
+  color: #afeaf2;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.bvc-google-reviews .bvc-gr-stars {
+  margin-bottom: 12px;
+  color: #ffd06b;
+  font-size: 24px;
+  letter-spacing: .13em;
+  line-height: 1.2;
+}
+
+.bvc-google-reviews .bvc-gr-stars span {
+  display: inline-block;
+}
+
+.bvc-google-reviews .bvc-gr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.bvc-google-reviews .bvc-gr-controls button,
+.bvc-google-reviews .bvc-gr-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #518591;
+  border-radius: 11px;
+  background: #11313f;
+  color: var(--bvc-gr-text);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bvc-google-reviews .bvc-gr-link {
+  margin-top: 19px;
+  background: var(--bvc-gr-brand);
+}
+
+.bvc-google-reviews .bvc-gr-controls button:hover,
+.bvc-google-reviews .bvc-gr-link:hover {
+  background: #175768;
+}
+
+.bvc-google-reviews :focus-visible {
+  outline: 3px solid #ffd06b;
+  outline-offset: 3px;
+}
+
+.bvc-google-reviews .bvc-gr-position {
+  min-width: 54px;
+  color: #c8e7ec;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bvc-google-reviews .bvc-gr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .bvc-google-reviews .bvc-gr-stage {
+    padding-bottom: 12px;
+  }
+
+  .bvc-google-reviews .bvc-gr-left,
+  .bvc-google-reviews .bvc-gr-right {
+    display: none;
+  }
+
+  .bvc-google-reviews .bvc-gr-active {
+    width: min(100%, 540px);
+    min-height: 235px;
+    box-shadow:
+      0 8px 0 -2px #1d5160,
+      0 16px 0 -5px #103849,
+      0 0 24px #00c0da38;
+  }
+}
