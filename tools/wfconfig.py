@@ -31,7 +31,7 @@ SITEMAP_LASTMOD = {
     "departments.html": "2026-10-29",
     "interview-of-patients-after-g-a-e-procedure.html": "2026-10-29",
     "privacy-policy.html": "2026-10-29",
-    "products.html": "2026-11-02",
+    "products.html": "2026-11-26",
     "training.html": "2026-11-23",
     "youtube.html": "2026-09-25",
     "book-appointment.html": "2026-11-24",
@@ -40,9 +40,9 @@ SITEMAP_LASTMOD = {
     "nanofat-for-joint-pain.html": "2026-10-13",
     "dr-mohal-banker-award.html": "2026-11-18",
     "bankers-notes.html": "2026-08-13",
-    # This shell reuses products.html, whose November 2026 OPD plan is the
-    # latest meaningful content dependency as of the production parent.
-    "services-gujarat.html": "2026-11-02",
+    # This shell reuses products.html, whose monthly OPD plan is the latest
+    # meaningful content dependency.
+    "services-gujarat.html": "2026-11-26",
 }
 
 # Routes whose rendered output intentionally reuses another source page.
