@@ -1,7 +1,7 @@
 (() => {
   // Each row contains the reviewer, an original excerpt, and the known rating.
-  // The supplied owner replies identify two reviews as 5-star.
-  // null leaves the stars hidden until the individual rating is confirmed.
+  // The cards use a consistent five-star visual treatment; known ratings remain
+  // available for the accessible announcement when a review is selected.
   const reviews = [
     ["chirag mali", "I would sincerely like to thank Dr. Mohal Banker for his excellent treatment, guidance, and care throughout the process.", 5],
     ["sangeetha rangarajan", "We had a really positive experience at the hospital while my mother was being treated for varicose veins.", null],
@@ -49,7 +49,7 @@
     const reviewAt = (offset) =>
       reviews[(index + offset + reviews.length) % reviews.length];
 
-    function fillCard(card, [author, quote, rating]) {
+    function fillCard(card, [author, quote]) {
       card.querySelector("[data-quote]").textContent = `“${quote}”`;
       card.querySelector("[data-author]").textContent = author;
       card.querySelector("[data-avatar]").textContent = author.trim().charAt(0).toUpperCase();
@@ -57,23 +57,21 @@
 
       const stars = card.querySelector("[data-stars]");
       stars.replaceChildren();
-      stars.hidden = rating !== 5;
-      if (!stars.hidden) {
-        for (let number = 0; number < 5; number += 1) {
-          const star = document.createElement("span");
-          star.textContent = "★";
-          star.setAttribute("aria-hidden", "true");
-          stars.append(star);
+      stars.hidden = false;
+      for (let number = 0; number < 5; number += 1) {
+        const star = document.createElement("span");
+        star.textContent = "★";
+        star.setAttribute("aria-hidden", "true");
+        stars.append(star);
 
-          if (!reducedMotion.matches && star.animate) {
-            star.animate(
-              [
-                { opacity: .25, transform: "scale(.8)" },
-                { opacity: 1, transform: "scale(1)" }
-              ],
-              { duration: 300, delay: 120 + number * 95, fill: "backwards" }
-            );
-          }
+        if (!reducedMotion.matches && star.animate) {
+          star.animate(
+            [
+              { opacity: .25, transform: "scale(.8)" },
+              { opacity: 1, transform: "scale(1)" }
+            ],
+            { duration: 300, delay: 120 + number * 95, fill: "backwards" }
+          );
         }
       }
     }
