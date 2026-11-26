@@ -51,8 +51,8 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
-  gap: clamp(12px, 1.4vw, 18px);
-  width: min(100%, 1120px);
+  gap: clamp(14px, 1.4vw, 22px);
+  width: min(100%, 1540px);
   margin: 20px auto 14px;
   touch-action: pan-y pinch-zoom;
 }
@@ -63,10 +63,10 @@
   position: relative;
   box-sizing: border-box;
   min-width: 0;
-  min-height: 156px;
-  padding: 14px 15px 15px;
+  min-height: 218px;
+  padding: 18px 20px 20px;
   border: 1px solid #e3eaec;
-  border-radius: 12px;
+  border-radius: 16px;
   background: #fff;
   color: #526771;
   box-shadow: 0 5px 14px rgba(23, 72, 86, .12);
@@ -82,7 +82,7 @@
   flex-direction: column;
   justify-content: center;
   width: 100%;
-  min-height: 156px;
+  min-height: 218px;
   border-color: var(--bvc-gr-highlight);
   background: var(--bvc-gr-highlight);
   box-shadow: 0 8px 18px rgba(42, 99, 117, .22);
@@ -94,7 +94,7 @@
 .bvc-google-reviews .bvc-gr-left,
 .bvc-google-reviews .bvc-gr-right {
   width: 100%;
-  min-height: 156px;
+  min-height: 218px;
   opacity: 1;
 }
 
@@ -136,13 +136,9 @@
   border: 0;
   color: inherit;
   font-family: Satoshi, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-style: normal;
-  line-height: 1.45;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  line-height: 1.5;
 }
 
 .bvc-google-reviews .bvc-gr-google-mark {
@@ -158,7 +154,7 @@
   overflow: hidden;
   color: var(--bvc-gr-brand);
   font-family: Satoshi, sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -170,15 +166,15 @@
   margin-top: 2px;
   color: #8b9aa1;
   font-family: Satoshi, sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.2;
 }
 
 .bvc-google-reviews .bvc-gr-stars {
-  min-height: 17px;
+  min-height: 20px;
   margin-bottom: 5px;
   color: #e4a529;
-  font-size: 15px;
+  font-size: 18px;
   letter-spacing: .08em;
   line-height: 1.2;
 }
@@ -263,7 +259,7 @@
 
   .bvc-google-reviews .bvc-gr-active {
     width: min(100%, 540px);
-    min-height: 156px;
+    min-height: 196px;
     box-shadow: 0 8px 18px rgba(42, 99, 117, .22);
   }
 }
