@@ -33,14 +33,14 @@
     const left = root.querySelector(".bvc-gr-left");
     const active = root.querySelector(".bvc-gr-active");
     const right = root.querySelector(".bvc-gr-right");
-    const stars = root.querySelector("[data-stars]");
+    const cards = [left, active, right];
     const position = root.querySelector("[data-position]");
     const status = root.querySelector("[data-status]");
     const play = root.querySelector("[data-play]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     let index = 0;
-    let playing = false;
+    let playing = !reducedMotion.matches;
     let visible = !("IntersectionObserver" in window);
     let timer;
     let motion;
@@ -49,21 +49,15 @@
     const reviewAt = (offset) =>
       reviews[(index + offset + reviews.length) % reviews.length];
 
-    function fillCard(card, [author, quote]) {
+    function fillCard(card, [author, quote, rating]) {
       card.querySelector("[data-quote]").textContent = `“${quote}”`;
       card.querySelector("[data-author]").textContent = author;
-    }
+      card.querySelector("[data-avatar]").textContent = author.trim().charAt(0).toUpperCase();
+      card.querySelector("[data-date]").textContent = "Google review";
 
-    function render(direction = 0, announce = false) {
-      const current = reviewAt(0);
-      fillCard(left, reviewAt(-1));
-      fillCard(active, current);
-      fillCard(right, reviewAt(1));
-      position.textContent = `${index + 1} / ${reviews.length}`;
-
+      const stars = card.querySelector("[data-stars]");
       stars.replaceChildren();
-      stars.hidden = current[2] !== 5;
-
+      stars.hidden = rating !== 5;
       if (!stars.hidden) {
         for (let number = 0; number < 5; number += 1) {
           const star = document.createElement("span");
@@ -82,15 +76,24 @@
           }
         }
       }
+    }
 
+    function render(direction = 0, announce = false) {
+      const current = reviewAt(0);
+      fillCard(left, reviewAt(-1));
+      fillCard(active, current);
+      fillCard(right, reviewAt(1));
+      position.textContent = `${index + 1} / ${reviews.length}`;
+
+      cards.forEach((card) => card.classList.toggle("is-current", card === active));
       motion?.cancel();
       if (direction && !reducedMotion.matches && active.animate) {
         motion = active.animate(
           [
-            { transform: `translateX(${direction * 32}px) scale(.96)`, opacity: .55 },
-            { transform: "translateX(0) scale(1)", opacity: 1 }
+            { transform: `translateY(${direction * 8}px)`, opacity: .72 },
+            { transform: "translateY(0)", opacity: 1 }
           ],
-          { duration: 450, easing: "cubic-bezier(.2,.76,.25,1)" }
+          { duration: 300, easing: "cubic-bezier(.2,.76,.25,1)" }
         );
       }
 
@@ -172,7 +175,7 @@
       if (reducedMotion.matches) {
         playing = false;
         motion?.cancel();
-        stars.querySelectorAll("span").forEach((star) => {
+        root.querySelectorAll("[data-stars] span").forEach((star) => {
           star.getAnimations?.().forEach((animation) => animation.cancel());
         });
       }

@@ -1,19 +1,19 @@
 .bvc-google-reviews {
-  --bvc-gr-brand: #00687b;
-  --bvc-gr-text: #f5fcff;
+  --bvc-gr-brand: #2a6375;
+  --bvc-gr-highlight: #f9e1ca;
+  --bvc-gr-text: #f9e1ca;
   box-sizing: border-box;
   position: relative;
   isolation: isolate;
-  width: min(94%, 1400px);
-  margin: clamp(28px, 5vw, 72px) auto;
-  padding: clamp(28px, 5vw, 58px) clamp(16px, 4vw, 54px);
+  width: 100%;
+  margin: 0;
+  padding: clamp(26px, 3.2vw, 38px) clamp(16px, 4vw, 54px) clamp(24px, 3vw, 32px);
   overflow: hidden;
-  border: 1px solid #215260;
-  border-radius: clamp(20px, 3vw, 32px);
-  background:
-    radial-gradient(ellipse at 50% 57%, #13546480, transparent 65%),
-    #071721;
-  color: var(--bvc-gr-text);
+  border-top: 1px solid rgba(23, 83, 97, .42);
+  border-bottom: 1px solid rgba(23, 83, 97, .42);
+  background: #bddadd;
+  color: #062b43;
+  font-family: Satoshi, "General Sans", sans-serif;
   text-align: center;
 }
 
@@ -25,46 +25,52 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 15px 21px;
-  border-radius: 13px;
+  padding: 7px 12px;
+  border: 1px solid rgba(19, 83, 101, .18);
+  border-radius: 8px;
   background: #fff;
+  box-shadow: 0 5px 14px rgba(23, 72, 86, .1);
 }
 
 .bvc-google-reviews .bvc-gr-logo img {
   display: block;
-  width: 108px;
+  width: 82px;
   height: auto;
 }
 
 .bvc-google-reviews .bvc-gr-header h2 {
-  margin: 19px 0 0;
-  color: var(--bvc-gr-text);
-  font-size: clamp(30px, 4.5vw, 50px);
+  margin: 10px 0 0;
+  color: #062b43;
+  font-family: Satoshi, sans-serif;
+  font-size: clamp(28px, 3.6vw, 42px);
   font-weight: 700;
   line-height: 1.1;
 }
 
 .bvc-google-reviews .bvc-gr-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
-  justify-items: center;
-  width: min(100%, 1050px);
-  margin: 32px auto 24px;
-  perspective: 1100px;
+  gap: clamp(12px, 1.4vw, 18px);
+  width: min(100%, 1120px);
+  margin: 20px auto 14px;
   touch-action: pan-y pinch-zoom;
 }
 
 .bvc-google-reviews .bvc-gr-card {
-  grid-area: 1 / 1;
+  position: relative;
   box-sizing: border-box;
   min-width: 0;
-  padding: clamp(22px, 3.5vw, 34px);
-  border: 1px solid #357585;
-  border-radius: 22px;
-  background: linear-gradient(145deg, #174a59, #0c2938 76%);
+  min-height: 156px;
+  padding: 14px 15px 15px;
+  border: 1px solid #e3eaec;
+  border-radius: 12px;
+  background: #fff;
+  color: #526771;
+  box-shadow: 0 5px 14px rgba(23, 72, 86, .12);
   text-align: left;
   overflow-wrap: anywhere;
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
 }
 
 .bvc-google-reviews .bvc-gr-active {
@@ -72,27 +78,51 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: min(65%, 560px);
-  min-height: 250px;
-  box-shadow: 0 0 38px #00c0da40, 0 20px 38px #0007;
+  width: 100%;
+  min-height: 156px;
+  border-color: var(--bvc-gr-highlight);
+  background: var(--bvc-gr-highlight);
+  box-shadow: 0 8px 18px rgba(42, 99, 117, .22);
+  transform: translateY(-3px);
 }
 
 .bvc-google-reviews .bvc-gr-left,
 .bvc-google-reviews .bvc-gr-right {
-  width: min(43%, 390px);
-  min-height: 195px;
-  opacity: .6;
-  pointer-events: none;
+  width: 100%;
+  min-height: 156px;
+  opacity: 1;
 }
 
-.bvc-google-reviews .bvc-gr-left {
-  justify-self: start;
-  transform: translateX(2%) rotateY(20deg) scale(.92);
+.bvc-google-reviews .bvc-gr-card:hover {
+  border-color: var(--bvc-gr-brand);
+  box-shadow: 0 8px 18px rgba(42, 99, 117, .18);
+  transform: translateY(-2px);
 }
 
-.bvc-google-reviews .bvc-gr-right {
-  justify-self: end;
-  transform: translateX(-2%) rotateY(-20deg) scale(.92);
+.bvc-google-reviews .bvc-gr-card-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-bottom: 7px;
+}
+
+.bvc-google-reviews .bvc-gr-avatar {
+  display: inline-grid;
+  flex: 0 0 32px;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bvc-gr-brand);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.bvc-google-reviews .bvc-gr-card-meta {
+  min-width: 0;
+  flex: 1;
 }
 
 .bvc-google-reviews .bvc-gr-quote {
@@ -100,27 +130,51 @@
   padding: 0;
   border: 0;
   color: inherit;
-  font-size: clamp(17px, 2vw, 22px);
+  font-family: Satoshi, sans-serif;
+  font-size: 12px;
   font-style: normal;
-  line-height: 1.5;
+  line-height: 1.45;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
-.bvc-google-reviews :is(.bvc-gr-left, .bvc-gr-right) .bvc-gr-quote {
-  font-size: 16px;
-}
-
-.bvc-google-reviews .bvc-gr-author {
-  margin: 16px 0 0;
-  color: #afeaf2;
-  font-size: 15px;
+.bvc-google-reviews .bvc-gr-google-mark {
+  flex: 0 0 auto;
+  color: #4285f4;
+  font-family: Arial, sans-serif;
+  font-size: 19px;
   font-weight: 700;
 }
 
+.bvc-google-reviews .bvc-gr-author {
+  margin: 0;
+  overflow: hidden;
+  color: var(--bvc-gr-brand);
+  font-family: Satoshi, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bvc-google-reviews .bvc-gr-date {
+  display: block;
+  margin-top: 2px;
+  color: #8b9aa1;
+  font-family: Satoshi, sans-serif;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
 .bvc-google-reviews .bvc-gr-stars {
-  margin-bottom: 12px;
-  color: #ffd06b;
-  font-size: 24px;
-  letter-spacing: .13em;
+  min-height: 17px;
+  margin-bottom: 5px;
+  color: #e4a529;
+  font-size: 15px;
+  letter-spacing: .08em;
   line-height: 1.2;
 }
 
@@ -144,11 +198,11 @@
   justify-content: center;
   gap: 8px;
   min-width: 44px;
-  min-height: 44px;
-  padding: 8px 14px;
-  border: 1px solid #518591;
+  min-height: 34px;
+  padding: 5px 10px;
+  border: 1px solid var(--bvc-gr-brand);
   border-radius: 11px;
-  background: #11313f;
+  background: var(--bvc-gr-brand);
   color: var(--bvc-gr-text);
   font: inherit;
   text-decoration: none;
@@ -156,24 +210,26 @@
 }
 
 .bvc-google-reviews .bvc-gr-link {
-  margin-top: 19px;
-  background: var(--bvc-gr-brand);
+  margin-top: 10px;
+  background: var(--bvc-gr-highlight);
+  color: var(--bvc-gr-brand);
 }
 
 .bvc-google-reviews .bvc-gr-controls button:hover,
 .bvc-google-reviews .bvc-gr-link:hover {
-  background: #175768;
+  background: var(--bvc-gr-highlight);
+  color: var(--bvc-gr-brand);
 }
 
 .bvc-google-reviews :focus-visible {
-  outline: 3px solid #ffd06b;
+  outline: 3px solid var(--bvc-gr-highlight);
   outline-offset: 3px;
 }
 
 .bvc-google-reviews .bvc-gr-position {
   min-width: 54px;
-  color: #c8e7ec;
-  font-size: 14px;
+  color: var(--bvc-gr-brand);
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -189,7 +245,13 @@
 }
 
 @media (max-width: 767px) {
+  .bvc-google-reviews {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
   .bvc-google-reviews .bvc-gr-stage {
+    grid-template-columns: 1fr;
     padding-bottom: 12px;
   }
 
@@ -200,10 +262,7 @@
 
   .bvc-google-reviews .bvc-gr-active {
     width: min(100%, 540px);
-    min-height: 235px;
-    box-shadow:
-      0 8px 0 -2px #1d5160,
-      0 16px 0 -5px #103849,
-      0 0 24px #00c0da38;
+    min-height: 156px;
+    box-shadow: 0 8px 18px rgba(42, 99, 117, .22);
   }
 }
