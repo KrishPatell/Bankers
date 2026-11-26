@@ -46,6 +46,7 @@
     const extraRight = root.querySelector(".bvc-gr-extra-right");
     const status = root.querySelector("[data-status]");
     const branchLinks = root.querySelector("[data-branch-links]");
+    const emptyState = root.querySelector("[data-empty-state]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     let reviews = [];
@@ -159,9 +160,20 @@
       branchLinks.hidden = !links.length;
     }
 
+    function showEmptyState() {
+      stage.hidden = true;
+      branchLinks.hidden = true;
+      emptyState.hidden = false;
+      root.hidden = false;
+    }
+
     function init(feed) {
       reviews = feed.reviews.filter((review) => review && review.rating === 5 && review.reviewUrl);
-      if (!reviews.length) return;
+      if (!reviews.length) {
+        showEmptyState();
+        return;
+      }
+      emptyState.hidden = true;
       renderBranchLinks(feed.locations);
       stage.hidden = false;
       root.hidden = false;
@@ -212,8 +224,9 @@
     });
 
     fetchFeed().then(init).catch(() => {
-      // Keep the section hidden until a complete, server-synced feed exists.
-      root.hidden = true;
+      // Keep the section visible while the server feed is being configured or
+      // temporarily unavailable; never show unsourced hard-coded reviews.
+      showEmptyState();
     });
   }
 

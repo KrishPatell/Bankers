@@ -51,6 +51,14 @@
   line-height: 1.1;
 }
 
+.bvc-google-reviews .bvc-gr-empty {
+  max-width: 520px;
+  margin: 18px auto 10px;
+  color: #4f707c;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 .bvc-google-reviews .bvc-gr-stage {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
