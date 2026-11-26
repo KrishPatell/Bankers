@@ -33,13 +33,20 @@ class MemoryKV {
 }
 
 function makeFetch(state) {
-  return async (input) => {
+  return async (input, init = {}) => {
     const url = new URL(String(input));
+    const authorization = init.headers?.Authorization || init.headers?.authorization || "";
+    const token = authorization.replace(/^Bearer\s+/i, "");
+    if (authorization) {
+      state.tokens ||= new Set();
+      state.tokens.add(token);
+    }
     if (url.hostname === "mybusinessaccountmanagement.googleapis.com" && url.pathname === "/v1/accounts") {
       return response({ accounts: structuredClone(fixture.accounts) });
     }
     if (url.hostname === "mybusinessbusinessinformation.googleapis.com" && url.pathname === "/v1/accounts/100/locations") {
-      return response({ locations: structuredClone(fixture.locations) });
+      const locations = state.visibleLocationsByToken?.[token] || fixture.locations;
+      return response({ locations: structuredClone(locations) });
     }
     if (url.hostname === "mybusiness.googleapis.com" && url.pathname.endsWith("/reviews")) {
       const locationKey = url.pathname.includes("/ahmedabad-satellite/")
@@ -94,9 +101,13 @@ test("applies new and edited reviews and removes a deleted review on the next co
 
   state.reviews["locations/ahmedabad-satellite"] = state.reviews["locations/ahmedabad-satellite"]
     .filter((review) => review.reviewId !== "ahm-rating-only")
-    .map((review) => review.reviewId === "ahm-edited" && review.updateTime === "2026-11-26T08:00:00Z"
-      ? { ...review, comment: "The edited Google review is now visible." }
-      : review);
+    .map((review) => {
+      if (review.reviewId === "ahm-edited" && review.updateTime === "2026-11-26T08:00:00Z") {
+        return { ...review, comment: "The edited Google review is now visible." };
+      }
+      if (review.reviewId === "ahm-newest") return { ...review, starRating: "FOUR" };
+      return review;
+    });
   state.reviews["locations/vadodara-akota"].push({
     reviewId: "vad-new",
     starRating: "FIVE",
@@ -109,6 +120,7 @@ test("applies new and edited reviews and removes a deleted review on the next co
   const second = await syncGoogleReviews(env(cache), { fetchImpl: makeFetch(state) });
   assert.equal(second.ok, true);
   assert.equal(second.feed.reviews.some((review) => review.id === "ahm-rating-only"), false);
+  assert.equal(second.feed.reviews.some((review) => review.id === "ahm-newest"), false);
   assert.equal(second.feed.reviews.find((review) => review.id === "ahm-edited").comment, "The edited Google review is now visible.");
   assert.equal(second.feed.reviews.some((review) => review.id === "vad-new"), true);
 });
@@ -146,4 +158,44 @@ test("serves the cached feed to the homepage API and rejects writes", async () =
 
   const postResponse = await googleReviewsFeed(new Request("https://bankersvascular.com/api/google-reviews", { method: "POST" }), env(cache));
   assert.equal(postResponse.status, 405);
+});
+
+test("supports separate branch authorizations when one account cannot access both locations", async () => {
+  const cache = new MemoryKV();
+  const state = { reviews: structuredClone(fixture.reviews), failVadodara: false };
+  const result = await syncGoogleReviews({
+    GOOGLE_BUSINESS_PROFILE_AHMEDABAD_ACCESS_TOKEN: "ahmedabad-fixture-token",
+    GOOGLE_BUSINESS_PROFILE_VADODARA_ACCESS_TOKEN: "vadodara-fixture-token",
+    GOOGLE_REVIEWS_CACHE: cache,
+  }, {
+    fetchImpl: makeFetch(state),
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual([...state.tokens].sort(), ["ahmedabad-fixture-token", "vadodara-fixture-token"]);
+  assert.equal(result.feed.locations.length, 2);
+  assert.equal(result.feed.reviews.length, 4);
+});
+
+test("can combine a generic authorization with a branch-specific authorization", async () => {
+  const cache = new MemoryKV();
+  const state = {
+    reviews: structuredClone(fixture.reviews),
+    failVadodara: false,
+    visibleLocationsByToken: {
+      "limited-generic-token": fixture.locations.filter((location) => location.name === "locations/vadodara-akota"),
+    },
+  };
+  const result = await syncGoogleReviews({
+    GOOGLE_BUSINESS_PROFILE_ACCESS_TOKEN: "limited-generic-token",
+    GOOGLE_BUSINESS_PROFILE_AHMEDABAD_ACCESS_TOKEN: "ahmedabad-fixture-token",
+    GOOGLE_REVIEWS_CACHE: cache,
+  }, {
+    fetchImpl: makeFetch(state),
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual([...state.tokens].sort(), ["ahmedabad-fixture-token", "limited-generic-token"]);
+  assert.equal(result.feed.locations[0].locationId, "ahmedabad-satellite");
+  assert.equal(result.feed.locations[1].locationId, "vadodara-akota");
 });

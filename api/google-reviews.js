@@ -165,16 +165,34 @@ async function googleJson(fetchImpl, url, accessToken, init = {}) {
   return body;
 }
 
-async function accessToken(env, fetchImpl) {
-  if (env.GOOGLE_BUSINESS_PROFILE_ACCESS_TOKEN) {
-    return env.GOOGLE_BUSINESS_PROFILE_ACCESS_TOKEN;
-  }
+function credentialNames(branchKey = "") {
+  const suffix = branchKey ? `_${String(branchKey).toUpperCase()}` : "";
+  return {
+    accessToken: `GOOGLE_BUSINESS_PROFILE${suffix}_ACCESS_TOKEN`,
+    clientId: `GOOGLE_BUSINESS_PROFILE${suffix}_CLIENT_ID`,
+    clientSecret: `GOOGLE_BUSINESS_PROFILE${suffix}_CLIENT_SECRET`,
+    refreshToken: `GOOGLE_BUSINESS_PROFILE${suffix}_REFRESH_TOKEN`,
+  };
+}
 
-  const clientId = env.GOOGLE_BUSINESS_PROFILE_CLIENT_ID;
-  const clientSecret = env.GOOGLE_BUSINESS_PROFILE_CLIENT_SECRET;
-  const refreshToken = env.GOOGLE_BUSINESS_PROFILE_REFRESH_TOKEN;
+function hasCredentialSet(env, branchKey = "") {
+  const names = credentialNames(branchKey);
+  return Boolean(
+    env[names.accessToken]
+    || (env[names.clientId] && env[names.clientSecret] && env[names.refreshToken]),
+  );
+}
+
+async function accessToken(env, fetchImpl, branchKey = "") {
+  const names = credentialNames(branchKey);
+  if (env[names.accessToken]) return env[names.accessToken];
+
+  const clientId = env[names.clientId];
+  const clientSecret = env[names.clientSecret];
+  const refreshToken = env[names.refreshToken];
   if (!clientId || !clientSecret || !refreshToken) {
-    throw new GoogleReviewsError("Google Business Profile OAuth credentials are not configured", 503);
+    const label = branchKey ? ` for ${branchKey}` : "";
+    throw new GoogleReviewsError(`Google Business Profile OAuth credentials are not configured${label}`, 503);
   }
 
   const response = await fetchImpl(OAUTH_TOKEN_URL, {
@@ -229,7 +247,7 @@ async function listLocations(fetchImpl, token, account) {
   return locations;
 }
 
-export async function resolveAuthorizedLocations(fetchImpl, token) {
+async function listAuthorizedLocations(fetchImpl, token) {
   const accounts = await listAccounts(fetchImpl, token);
   if (!accounts.length) throw new GoogleReviewsError("The authorized Google account has no Business Profile accounts", 404);
 
@@ -240,23 +258,92 @@ export async function resolveAuthorizedLocations(fetchImpl, token) {
       if (location.name && !allLocations.has(location.name)) allLocations.set(location.name, location);
     }
   }
+  return [...allLocations.values()];
+}
 
-  const resolved = {};
-  for (const branch of BRANCHES) {
-    const matches = [...allLocations.values()].filter((location) => addressMatches(location, branch));
-    if (matches.length !== 1) {
-      throw new GoogleReviewsError(
-        `${branch.label} location could not be uniquely verified from the authorized account (${matches.length} address matches)`,
-        409,
-      );
-    }
-    const resolvedLocation = branchLocation(branch, matches[0]);
-    if (!resolvedLocation) {
-      throw new GoogleReviewsError(`${branch.label} is missing a verified Maps URL or location ID`, 409);
-    }
-    resolved[branch.key] = resolvedLocation;
+function resolveBranchLocation(allLocations, branch) {
+  const matches = allLocations.filter((location) => addressMatches(location, branch));
+  if (matches.length !== 1) {
+    throw new GoogleReviewsError(
+      `${branch.label} location could not be uniquely verified from the authorized account (${matches.length} address matches)`,
+      409,
+    );
   }
-  return resolved;
+  const resolvedLocation = branchLocation(branch, matches[0]);
+  if (!resolvedLocation) {
+    throw new GoogleReviewsError(`${branch.label} is missing a verified Maps URL or location ID`, 409);
+  }
+  return resolvedLocation;
+}
+
+export async function resolveAuthorizedLocations(fetchImpl, token) {
+  const allLocations = await listAuthorizedLocations(fetchImpl, token);
+  return Object.fromEntries(BRANCHES.map((branch) => [
+    branch.key,
+    resolveBranchLocation(allLocations, branch),
+  ]));
+}
+
+async function resolveAuthorizedBranch(fetchImpl, token, branch) {
+  const allLocations = await listAuthorizedLocations(fetchImpl, token);
+  return resolveBranchLocation(allLocations, branch);
+}
+
+async function resolveSyncAuthorization(env, fetchImpl) {
+  let genericError;
+  let genericToken;
+  if (hasCredentialSet(env)) {
+    try {
+      genericToken = await accessToken(env, fetchImpl);
+      const locations = await resolveAuthorizedLocations(fetchImpl, genericToken);
+      return {
+        locations,
+        tokens: Object.fromEntries(BRANCHES.map((branch) => [branch.key, genericToken])),
+      };
+    } catch (error) {
+      // If one authorized account cannot see both branches, try the optional
+      // branch-specific credentials below before failing the complete sync.
+      genericError = error;
+    }
+  }
+
+  const hasAnySeparateCredentials = BRANCHES.some((branch) => hasCredentialSet(env, branch.key));
+  if (genericToken && hasAnySeparateCredentials) {
+    const entries = await Promise.all(BRANCHES.map(async (branch) => {
+      const token = hasCredentialSet(env, branch.key)
+        ? await accessToken(env, fetchImpl, branch.key)
+        : genericToken;
+      const location = await resolveAuthorizedBranch(fetchImpl, token, branch);
+      return { branch, location, token };
+    }));
+    return {
+      locations: Object.fromEntries(entries.map(({ branch, location }) => [branch.key, location])),
+      tokens: Object.fromEntries(entries.map(({ branch, token }) => [branch.key, token])),
+    };
+  }
+
+  const hasSeparateCredentials = BRANCHES.every((branch) => hasCredentialSet(env, branch.key));
+  if (hasSeparateCredentials) {
+    const entries = await Promise.all(BRANCHES.map(async (branch) => {
+      const token = await accessToken(env, fetchImpl, branch.key);
+      const location = await resolveAuthorizedBranch(fetchImpl, token, branch);
+      return { branch, location, token };
+    }));
+    return {
+      locations: Object.fromEntries(entries.map(({ branch, location }) => [branch.key, location])),
+      tokens: Object.fromEntries(entries.map(({ branch, token }) => [branch.key, token])),
+    };
+  }
+
+  if (genericError) throw genericError;
+  const separateNames = BRANCHES.map((branch) => {
+    const names = credentialNames(branch.key);
+    return `${names.accessToken} or ${names.clientId}/${names.clientSecret}/${names.refreshToken}`;
+  }).join("; ");
+  throw new GoogleReviewsError(
+    `Google Business Profile credentials are not configured. Set the generic OAuth trio, or both branch-specific sets: ${separateNames}`,
+    503,
+  );
 }
 
 async function listReviews(fetchImpl, token, location) {
@@ -361,12 +448,11 @@ export async function syncGoogleReviews(env, options = {}) {
   const fetchImpl = options.fetchImpl || fetch;
   const now = options.now || (() => new Date());
   try {
-    const token = await accessToken(env, fetchImpl);
-    const locations = await resolveAuthorizedLocations(fetchImpl, token);
+    const { locations, tokens } = await resolveSyncAuthorization(env, fetchImpl);
     const fetched = await Promise.all(BRANCHES.map(async (branch) => ({
       branch,
       location: locations[branch.key],
-      reviews: await listReviews(fetchImpl, token, locations[branch.key]),
+      reviews: await listReviews(fetchImpl, tokens[branch.key], locations[branch.key]),
     })));
     const normalized = fetched.flatMap(({ location, reviews }) => (
       reviews.map((review) => normalizeReview(review, location)).filter(Boolean)

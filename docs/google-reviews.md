@@ -20,6 +20,11 @@ reviews or replies.
   official full-color Google wordmark, five desktop cards, swipe on mobile,
   five stars, branch attribution, rating-only reviews without an invented
   quote, and a separate “View … on Google” link for each branch.
+- Until the API/KV feed is configured, the client temporarily falls back to the
+  review text supplied in the implementation handoff so the carousel is not
+  blank. This preview data has no fabricated review dates or branch attribution;
+  only the two supplied five-star ratings show stars. Once the API returns a
+  valid feed, the live source takes priority automatically.
 - Cache entries expire after 30 days. The intended reconciliation interval is
   30 minutes; the Worker cron trigger is configured in `wrangler.jsonc`, but
   deployment is not complete until the production KV namespace and Google
@@ -66,7 +71,26 @@ GOOGLE_BUSINESS_PROFILE_REFRESH_TOKEN
 
 For a short-lived staging run, `GOOGLE_BUSINESS_PROFILE_ACCESS_TOKEN` may be
 used instead of the refresh-token trio. The refresh-token route is the normal
-long-lived configuration. The required OAuth scope is:
+long-lived configuration. If one authorized Google account cannot access both
+branches, configure a complete credential set for each branch instead. The
+branch suffixes are `AHMEDABAD` and `VADODARA`, for example:
+
+```text
+GOOGLE_BUSINESS_PROFILE_AHMEDABAD_CLIENT_ID
+GOOGLE_BUSINESS_PROFILE_AHMEDABAD_CLIENT_SECRET
+GOOGLE_BUSINESS_PROFILE_AHMEDABAD_REFRESH_TOKEN
+GOOGLE_BUSINESS_PROFILE_VADODARA_CLIENT_ID
+GOOGLE_BUSINESS_PROFILE_VADODARA_CLIENT_SECRET
+GOOGLE_BUSINESS_PROFILE_VADODARA_REFRESH_TOKEN
+```
+
+Short-lived branch-specific staging tokens may use
+`GOOGLE_BUSINESS_PROFILE_AHMEDABAD_ACCESS_TOKEN` and
+`GOOGLE_BUSINESS_PROFILE_VADODARA_ACCESS_TOKEN`. The generic credential set is
+preferred when it can see both branches; branch-specific sets can be used for
+both branches or only for the branch the generic authorization cannot see.
+The sync verifies each branch with the token that actually has access to it.
+The required OAuth scope is:
 
 ```text
 https://www.googleapis.com/auth/business.manage
@@ -91,8 +115,8 @@ is already present in `wrangler.jsonc`:
 
 Those IDs are environment-specific and are deliberately not fabricated in
 this checkout. Until the binding and credentials are supplied, the endpoint
-returns a not-ready response and the homepage keeps the section hidden rather
-than displaying stale hard-coded reviews.
+returns a not-ready response; the homepage uses the supplied static preview
+until the live feed is configured, without inventing dates or ratings.
 
 Google's optional [notification setup](https://developers.google.com/my-business/content/notification-setup)
 can reduce latency with Pub/Sub review notifications, but a periodic
@@ -111,6 +135,8 @@ complete cache when one branch fails:
 node --test tests/google-reviews.test.mjs
 ```
 
-The fixtures are synthetic and do not call Google or publish anything. A true
-staging verification still needs an authorized test token, the two Google
-location IDs discovered by the account, and preview KV credentials.
+The fixtures are synthetic and do not call Google or publish anything. They
+also verify the separate-authorization path, including that each branch's
+request uses its own token. A true staging verification still needs authorized
+test credentials, the two Google location IDs discovered by the account, and
+preview KV credentials.

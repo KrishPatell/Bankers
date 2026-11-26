@@ -1,4 +1,32 @@
 (() => {
+  const STATIC_REVIEW_URL = "https://www.google.com/maps/search/?api=1&query=Bankers%20Vascular%20Hospital%20Gujarat";
+  const STATIC_REVIEW_FEED = {
+    ok: true,
+    source: "provided-review-preview",
+    locations: [],
+    reviews: [
+      { id: "provided-chirag-mali", author: "chirag mali", comment: "I would sincerely like to thank Dr. Mohal Banker for his excellent treatment, guidance, and care throughout the process.", rating: 5, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-sangeetha-rangarajan", author: "sangeetha rangarajan", comment: "We had a really positive experience at the hospital while my mother was being treated for varicose veins.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-justina-shaduka", author: "Justina Shaduka", comment: "Our experience with Bankers Vascular Hospital has been one of the best medical journeys we have ever had.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-vihar-shah", author: "vihar shah", comment: "I had a very positive experience at the hospital for my varicose vein treatment.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-bhavik-patel", author: "Bhavik Patel", comment: "Excellent hospital with outstanding medical care, hospitality, and facilities.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-unicorn-engineers", author: "Unicorn Engineers", comment: "My brother recently underwent varicose vein ulcer surgery at Banker's Vascular Hospital, and our overall experience was very good.", rating: 5, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-ashutosh-upadhyay", author: "Ashutosh Upadhyay", comment: "The team is caring and dedicated to providing the best treatment and support to me.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-deep-patel", author: "deep patel", comment: "Everything went smoothly, and the doctors and hospital staff were very supportive and caring throughout the treatment.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-mitesh-patel", author: "mitesh patel", comment: "From the very beginning until the end of my treatment, Mitali Rathod supported and helped us every step of the way.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-chef-rajendra-bisht", author: "Chef Rajendra Bisht", comment: "I recently underwent varicose veins treatment at Banker Vascular Hospital, and I am extremely satisfied with my experience.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-v-m", author: "V M", comment: "We recently visited Dr. Mohal Banker for my mother's varicose veins surgery, and once again our experience was excellent.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-daksha-patel", author: "daksha Patel", comment: "From the moment I stepped through the doors, everyone was helpful, supportive and friendly.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-parth-patel", author: "Parth patel", comment: "The doctors were highly professional, caring, and explained everything clearly.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-jiyal-patel", author: "Jiyal Patel", comment: "The doctor listened carefully to my concerns and explained my condition and treatment options in a simple and understandable way.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-geeta-gusain", author: "Geeta Gusain", comment: "I would like to sincerely thank you Banker's Vascular Hospital, Dr. Mohal Banker and Mitali Rathod for my husband's varicose veins treatment.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-vandana-bhavsar", author: "Vandana Bhavsar", comment: "The doctor explained everything clearly and made me feel comfortable throughout the treatment. The staff was also very supportive.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-sandip-patel", author: "Sandip Patel", comment: "The Insurance Department was very helpful and made the claim process smooth and hassle-free.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-hansa-vaja", author: "Hansa Vaja", comment: "The doctor was excellent, and the staff were also very kind, supportive, and professional.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+      { id: "provided-denish-panchani", author: "Denish Panchani", comment: "Dr. Mohal Banker is not only highly skilled and experienced but also very humble, caring, and reassuring throughout the entire treatment process.", rating: null, reviewUrl: STATIC_REVIEW_URL },
+    ],
+  };
+
   function formatReviewAge(value) {
     const timestamp = Date.parse(value || "");
     const elapsed = Date.now() - timestamp;
@@ -84,7 +112,8 @@
 
       const stars = card.querySelector("[data-stars]");
       stars.replaceChildren();
-      stars.hidden = false;
+      stars.hidden = review.rating !== 5;
+      if (stars.hidden) return;
       for (let number = 0; number < 5; number += 1) {
         const star = document.createElement("span");
         star.textContent = "★";
@@ -124,7 +153,8 @@
 
       if (announce && current) {
         const description = current.comment ? ` ${current.comment}` : " No written comment.";
-        status.textContent = `Review ${index + 1} of ${reviews.length}. ${current.author}. 5 out of 5 stars.${description}`;
+        const rating = current.rating === 5 ? " 5 out of 5 stars." : "";
+        status.textContent = `Review ${index + 1} of ${reviews.length}. ${current.author}.${rating}${description}`;
       }
     }
 
@@ -141,7 +171,7 @@
         playing && visible && !document.hidden && !reducedMotion.matches &&
         !stage.matches(":hover") && !root.contains(document.activeElement)
       ) {
-        timer = setTimeout(() => move(1, false), 6500);
+        timer = setTimeout(() => move(1, false), 4500);
       }
     }
 
@@ -168,7 +198,8 @@
     }
 
     function init(feed) {
-      reviews = feed.reviews.filter((review) => review && review.rating === 5 && review.reviewUrl);
+      const isStaticPreview = feed.source === "provided-review-preview";
+      reviews = feed.reviews.filter((review) => review && review.reviewUrl && (isStaticPreview || review.rating === 5));
       if (!reviews.length) {
         showEmptyState();
         return;
@@ -223,11 +254,7 @@
       syncAutoplay();
     });
 
-    fetchFeed().then(init).catch(() => {
-      // Keep the section visible while the server feed is being configured or
-      // temporarily unavailable; never show unsourced hard-coded reviews.
-      showEmptyState();
-    });
+    fetchFeed().then(init).catch(() => init(STATIC_REVIEW_FEED));
   }
 
   function init() {
