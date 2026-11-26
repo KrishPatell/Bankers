@@ -13684,6 +13684,26 @@ figure {
   transform: none !important;
 }
 
+/* Let the shared doctor-profile patient gallery use the full page width while
+   keeping the image proportional on every breakpoint. */
+.paitents .main-container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.paitents .patient,
+.paitents .patient > a,
+.paitents .patient .image-animation-wrapper {
+  width: 100%;
+}
+
+.paitents .patient > a {
+  display: block;
+}
+
 /* Keep large desktop screens at the same visual density as the standard
    desktop design. The exported 1280px/1440px rules enlarged the blog cards
    (and, at 1920px, the main page canvas) enough to resemble browser zoom. */
