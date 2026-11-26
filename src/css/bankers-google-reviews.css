@@ -21,6 +21,10 @@
   display: none !important;
 }
 
+.bvc-google-reviews[hidden] {
+  display: none !important;
+}
+
 .bvc-google-reviews .bvc-gr-logo {
   display: inline-flex;
   align-items: center;
@@ -170,6 +174,18 @@
   line-height: 1.2;
 }
 
+.bvc-google-reviews .bvc-gr-location {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #6e838b;
+  font-family: Satoshi, sans-serif;
+  font-size: 11px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .bvc-google-reviews .bvc-gr-stars {
   min-height: 20px;
   margin-bottom: 5px;
@@ -181,6 +197,21 @@
 
 .bvc-google-reviews .bvc-gr-stars span {
   display: inline-block;
+}
+
+.bvc-google-reviews .bvc-gr-rating-only {
+  margin: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.bvc-google-reviews .bvc-gr-branch-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .bvc-google-reviews .bvc-gr-link {

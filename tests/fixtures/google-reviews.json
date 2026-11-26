@@ -1,0 +1,95 @@
+{
+  "accounts": [
+    { "name": "accounts/100", "type": "LOCATION_GROUP" }
+  ],
+  "locations": [
+    {
+      "name": "locations/ahmedabad-satellite",
+      "title": "Bankers Vascular Hospital",
+      "storefrontAddress": {
+        "addressLines": ["RJP House", "Anand Nagar Road", "Satellite"],
+        "locality": "Ahmedabad",
+        "postalCode": "380015",
+        "regionCode": "IN"
+      },
+      "metadata": {
+        "mapsUri": "https://maps.google.com/?cid=ahmedabad-satellite",
+        "placeId": "ChIJahmedabad"
+      }
+    },
+    {
+      "name": "locations/vadodara-akota",
+      "title": "Bankers Vascular Hospital",
+      "storefrontAddress": {
+        "addressLines": ["Ignite Complex", "Akota"],
+        "locality": "Vadodara",
+        "postalCode": "390007",
+        "regionCode": "IN"
+      },
+      "metadata": {
+        "mapsUri": "https://maps.google.com/?cid=vadodara-akota",
+        "placeId": "ChIJvadodara"
+      }
+    }
+  ],
+  "reviews": {
+    "locations/ahmedabad-satellite": [
+      {
+        "name": "accounts/100/locations/ahmedabad-satellite/reviews/ahm-newest",
+        "reviewId": "ahm-newest",
+        "starRating": "FIVE",
+        "createTime": "2026-11-26T09:00:00Z",
+        "updateTime": "2026-11-26T09:10:00Z",
+        "reviewer": { "displayName": "Ahmedabad Patient" },
+        "comment": "The team explained everything clearly and cared for me throughout."
+      },
+      {
+        "name": "accounts/100/locations/ahmedabad-satellite/reviews/ahm-edited",
+        "reviewId": "ahm-edited",
+        "starRating": "FIVE",
+        "createTime": "2026-11-25T09:00:00Z",
+        "updateTime": "2026-11-25T10:00:00Z",
+        "reviewer": { "displayName": "Edited Ahmedabad Patient" },
+        "comment": "Original review text."
+      },
+      {
+        "name": "accounts/100/locations/ahmedabad-satellite/reviews/ahm-edited",
+        "reviewId": "ahm-edited",
+        "starRating": "FIVE",
+        "createTime": "2026-11-25T09:00:00Z",
+        "updateTime": "2026-11-26T08:00:00Z",
+        "reviewer": { "displayName": "Edited Ahmedabad Patient" },
+        "comment": "Edited review text from Google."
+      },
+      {
+        "name": "accounts/100/locations/ahmedabad-satellite/reviews/ahm-rating-only",
+        "reviewId": "ahm-rating-only",
+        "starRating": "FIVE",
+        "createTime": "2026-11-24T09:00:00Z",
+        "updateTime": "2026-11-24T09:00:00Z",
+        "reviewer": { "displayName": "Ahmedabad Rating Only" },
+        "comment": ""
+      },
+      {
+        "name": "accounts/100/locations/ahmedabad-satellite/reviews/ahm-four",
+        "reviewId": "ahm-four",
+        "starRating": "FOUR",
+        "createTime": "2026-11-26T11:00:00Z",
+        "updateTime": "2026-11-26T11:00:00Z",
+        "reviewer": { "displayName": "Four Star Patient" },
+        "comment": "This must not appear."
+      }
+    ],
+    "locations/vadodara-akota": [
+      {
+        "name": "accounts/100/locations/vadodara-akota/reviews/vad-five",
+        "reviewId": "vad-five",
+        "starRating": "FIVE",
+        "createTime": "2026-11-26T10:00:00Z",
+        "updateTime": "2026-11-26T10:00:00Z",
+        "reviewer": { "displayName": "Vadodara Patient" },
+        "comment": "A smooth and reassuring experience at the Akota branch."
+      }
+    ]
+  }
+}
