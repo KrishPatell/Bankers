@@ -13669,6 +13669,14 @@ figure {
   display: none !important;
 }
 
+/* The shared FAQ image reveal layer can remain as a solid teal block after
+   the Webflow interaction completes. The image itself is the finished
+   presentation, so keep that decorative layer out of the layout on every
+   page that uses the FAQ section. */
+.about-faq-section .image-animation-overlay {
+  display: none !important;
+}
+
 .paitents .subtitle-line,
 .paitents .large-subtitle-text,
 .paitents .section-heading {
