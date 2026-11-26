@@ -29,14 +29,12 @@
     root.dataset.bvcReviewsReady = "true";
 
     const stage = root.querySelector("[data-stage]");
-    const controls = root.querySelector("[data-controls]");
+    const extraLeft = root.querySelector(".bvc-gr-extra-left");
     const left = root.querySelector(".bvc-gr-left");
     const active = root.querySelector(".bvc-gr-active");
     const right = root.querySelector(".bvc-gr-right");
-    const cards = [left, active, right];
-    const position = root.querySelector("[data-position]");
+    const extraRight = root.querySelector(".bvc-gr-extra-right");
     const status = root.querySelector("[data-status]");
-    const play = root.querySelector("[data-play]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     let index = 0;
@@ -50,6 +48,7 @@
       reviews[(index + offset + reviews.length) % reviews.length];
 
     function fillCard(card, [author, quote]) {
+      card.setAttribute("aria-label", `Read ${author}'s review on Google`);
       card.querySelector("[data-quote]").textContent = `“${quote}”`;
       card.querySelector("[data-author]").textContent = author;
       card.querySelector("[data-avatar]").textContent = author.trim().charAt(0).toUpperCase();
@@ -78,12 +77,11 @@
 
     function render(direction = 0, announce = false) {
       const current = reviewAt(0);
+      fillCard(extraLeft, reviewAt(-2));
       fillCard(left, reviewAt(-1));
       fillCard(active, current);
       fillCard(right, reviewAt(1));
-      position.textContent = `${index + 1} / ${reviews.length}`;
-
-      cards.forEach((card) => card.classList.toggle("is-current", card === active));
+      fillCard(extraRight, reviewAt(2));
       motion?.cancel();
       if (direction && !reducedMotion.matches && active.animate) {
         motion = active.animate(
@@ -110,9 +108,6 @@
 
     function syncAutoplay() {
       clearTimeout(timer);
-      play.hidden = reducedMotion.matches;
-      play.textContent = playing ? "Pause" : "Play";
-      play.setAttribute("aria-label", playing ? "Pause automatic reviews" : "Play automatic reviews");
 
       if (
         playing && visible && !document.hidden && !reducedMotion.matches &&
@@ -121,21 +116,6 @@
         timer = setTimeout(() => move(1, false), 6500);
       }
     }
-
-    root.querySelector("[data-previous]").addEventListener("click", () => move(-1, true));
-    root.querySelector("[data-next]").addEventListener("click", () => move(1, true));
-
-    play.addEventListener("click", () => {
-      playing = !playing;
-      syncAutoplay();
-    });
-
-    controls.addEventListener("keydown", (event) => {
-      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-      event.preventDefault();
-      move(event.key === "ArrowRight" ? 1 : -1, true);
-    });
 
     root.addEventListener("focusin", syncAutoplay);
     root.addEventListener("focusout", () => setTimeout(syncAutoplay, 0));
@@ -181,7 +161,6 @@
     });
 
     stage.hidden = false;
-    controls.hidden = false;
     render();
     syncAutoplay();
   }
