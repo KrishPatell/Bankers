@@ -17162,3 +17162,35 @@ body.training-page-body .about-hero-section.about.frozen.training-hero-compact {
     transform: none;
   }
 }
+
+/* Keep the OPD schedule action beside WhatsApp on the home page. */
+.our-reach-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.our-reach-actions .link-block-2-blu,
+.our-reach-actions .link-2,
+.our-reach-actions .background {
+  display: block;
+}
+
+.our-reach-actions .our-reach-opd-button .background {
+  background-color: #007b8b;
+}
+
+@media screen and (max-width: 767px) {
+  .our-reach-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .our-reach-actions .link-block-2-blu,
+  .our-reach-actions .link-2,
+  .our-reach-actions .background {
+    width: 100%;
+  }
+}
