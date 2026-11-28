@@ -1,5 +1,5 @@
 import { youtubeFeed } from "./api/youtube.js";
-import { googleReviewsFeed, syncGoogleReviews } from "./api/google-reviews.js";
+import { googleReviewsFeed } from "./api/google-reviews.js";
 import {
   APPOINTMENT_CITIES,
   APPOINTMENT_DISEASES,
@@ -224,9 +224,6 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
     return env.ASSETS.fetch(request);
-  },
-  async scheduled(controller, env, ctx) {
-    ctx.waitUntil(syncGoogleReviews(env));
   },
 };
 

@@ -6,8 +6,14 @@ reviews or replies.
 
 ## What is implemented
 
-- `worker.js` exposes `GET /api/google-reviews` and runs `syncGoogleReviews`
-  from the Worker scheduled handler.
+- `worker.js` exposes read-only `GET /api/google-reviews`. It reads the
+  `google-reviews-feed-v1` value from the production `GOOGLE_REVIEWS_CACHE` KV
+  binding; the Worker has no Google Reviews cron handler.
+- `scripts/sync-google-reviews.mjs` reuses the server-side location and review
+  reconciliation code, then writes the complete JSON feed to the production
+  KV namespace with Wrangler. It never writes a partial feed.
+- `.github/workflows/sync-google-reviews.yml` runs at `*/30 * * * *` UTC and
+  supports `workflow_dispatch` for the first sync or a manual reconciliation.
 - `api/google-reviews.js` discovers locations from the authorized account, then
   accepts only the two locations whose returned address matches the configured
   Ahmedabad/Satellite and Vadodara/Akota address rules. Google location IDs are
@@ -16,19 +22,18 @@ reviews or replies.
   five-star reviews only, deduplicates by location ID + review ID, applies
   edits, sorts newest first, and replaces the cache only after both branches
   succeed. A partial or failed run leaves the previous cache untouched.
-- The client loads the cached feed without a build or publish, shows the
-  official full-color Google wordmark, five desktop cards, swipe on mobile,
-  five stars, branch attribution, rating-only reviews without an invented
-  quote, and a separate “View … on Google” link for each branch.
-- Until the API/KV feed is configured, the client temporarily falls back to the
-  review text supplied in the implementation handoff so the carousel is not
-  blank. This preview data has no fabricated review dates or branch attribution;
-  only the two supplied five-star ratings show stars. Once the API returns a
-  valid feed, the live source takes priority automatically.
-- Cache entries expire after 30 days. The intended reconciliation interval is
-  30 minutes; the Worker cron trigger is configured in `wrangler.jsonc`, but
-  deployment is not complete until the production KV namespace and Google
-  credentials are approved and configured.
+- The existing client keeps the official full-color Google wordmark, five
+  desktop cards, mobile swipe, autoplay, five-star rendering, branch
+  attribution, review ages, and “View on Google” links. It loads the cached
+  feed without a site build or publish.
+- Until the API/KV feed is configured, the client temporarily falls back to
+  the review text supplied in the implementation handoff so the carousel is
+  not blank. This preview has no fabricated review dates or branch attribution;
+  only the two supplied five-star ratings show stars. A valid API feed takes
+  priority automatically.
+- Cache entries expire after 30 days. The GitHub Action reconciles every 30
+  minutes, so new reviews, edits, rating changes, and deletions update the
+  homepage without a Webflow publish or Git push.
 
 ## Google policy choice
 
@@ -56,12 +61,24 @@ clean, branch-verifiable Maps identity. It is not used as an API endpoint or
 as proof of either branch. The server derives each branch's visitor link from
 the authorized location metadata instead.
 
-## Required staging/production configuration
+## Required Google OAuth setup
 
-Create or use a Google Cloud project with access approved for the Business
-Profile APIs, enable Account Management, Business Information, and the
-Reviews API, and authorize an owner/manager of both verified locations. Store
-these as server-side Worker secrets/variables; never put them in `src/`:
+Use a Google Cloud project owned by the business or its authorized operator:
+
+1. In **Google Cloud Console → APIs & Services → Library**, enable the
+   Account Management API, Business Profile Information API, and the Business
+   Profile Reviews API used by the project.
+2. In **OAuth consent screen**, configure the app and add the scope
+   `https://www.googleapis.com/auth/business.manage`.
+3. If the consent screen is External and still in Testing, add the same Google
+   manager email as a test user. That email must be a verified Owner or Manager
+   of both the Ahmedabad Satellite and Vadodara Akota profiles.
+4. Create an OAuth client and complete a one-time authorization-code flow with
+   offline access (`access_type=offline`, with consent when a refresh token is
+   needed). Keep the refresh token private; do not paste it into chat, commit
+   it, or print it in an Action log.
+
+The normal single-account GitHub Secrets are:
 
 ```text
 GOOGLE_BUSINESS_PROFILE_CLIENT_ID
@@ -69,11 +86,8 @@ GOOGLE_BUSINESS_PROFILE_CLIENT_SECRET
 GOOGLE_BUSINESS_PROFILE_REFRESH_TOKEN
 ```
 
-For a short-lived staging run, `GOOGLE_BUSINESS_PROFILE_ACCESS_TOKEN` may be
-used instead of the refresh-token trio. The refresh-token route is the normal
-long-lived configuration. If one authorized Google account cannot access both
-branches, configure a complete credential set for each branch instead. The
-branch suffixes are `AHMEDABAD` and `VADODARA`, for example:
+The workflow also supports separate authorizations if the same email cannot
+see both branches:
 
 ```text
 GOOGLE_BUSINESS_PROFILE_AHMEDABAD_CLIENT_ID
@@ -84,25 +98,36 @@ GOOGLE_BUSINESS_PROFILE_VADODARA_CLIENT_SECRET
 GOOGLE_BUSINESS_PROFILE_VADODARA_REFRESH_TOKEN
 ```
 
-Short-lived branch-specific staging tokens may use
-`GOOGLE_BUSINESS_PROFILE_AHMEDABAD_ACCESS_TOKEN` and
-`GOOGLE_BUSINESS_PROFILE_VADODARA_ACCESS_TOKEN`. The generic credential set is
-preferred when it can see both branches; branch-specific sets can be used for
-both branches or only for the branch the generic authorization cannot see.
-The sync verifies each branch with the token that actually has access to it.
-The required OAuth scope is:
+Short-lived access-token variants are supported for controlled staging only:
+`GOOGLE_BUSINESS_PROFILE_ACCESS_TOKEN`,
+`GOOGLE_BUSINESS_PROFILE_AHMEDABAD_ACCESS_TOKEN`, and
+`GOOGLE_BUSINESS_PROFILE_VADODARA_ACCESS_TOKEN`.
+
+## Required GitHub and Cloudflare setup
+
+Add these GitHub repository Secrets under **Settings → Secrets and variables →
+Actions**:
 
 ```text
-https://www.googleapis.com/auth/business.manage
+GOOGLE_BUSINESS_PROFILE_CLIENT_ID
+GOOGLE_BUSINESS_PROFILE_CLIENT_SECRET
+GOOGLE_BUSINESS_PROFILE_REFRESH_TOKEN
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+CLOUDFLARE_KV_NAMESPACE_ID
 ```
 
-Create separate preview and production Cloudflare KV namespaces, then add the
-binding to the approved deployment configuration. The 30-minute cron trigger
-is already present in `wrangler.jsonc`:
+`CLOUDFLARE_API_TOKEN` needs the account's **Workers KV Storage Edit** access.
+`CLOUDFLARE_KV_NAMESPACE_ID` must be the production namespace that is bound to
+the Worker as `GOOGLE_REVIEWS_CACHE`. The Action uses Wrangler with
+`--remote`, `--path`, and a 30-day expiration; it does not expose review text
+or credentials in the log.
+
+The Worker binding must also exist in the approved Cloudflare configuration.
+Once the real IDs are known, the deployment config should contain:
 
 ```jsonc
 {
-  "triggers": { "crons": ["*/30 * * * *"] },
   "kv_namespaces": [
     {
       "binding": "GOOGLE_REVIEWS_CACHE",
@@ -113,30 +138,33 @@ is already present in `wrangler.jsonc`:
 }
 ```
 
-Those IDs are environment-specific and are deliberately not fabricated in
-this checkout. Until the binding and credentials are supplied, the endpoint
-returns a not-ready response; the homepage uses the supplied static preview
-until the live feed is configured, without inventing dates or ratings.
+The IDs are deliberately not fabricated in this checkout. Without the
+production binding, the Worker endpoint remains HTTP 503 even if the Action
+successfully writes a KV namespace.
 
-Google's optional [notification setup](https://developers.google.com/my-business/content/notification-setup)
-can reduce latency with Pub/Sub review notifications, but a periodic
-reconciliation is still required to catch edits and deletions. The current
-implementation uses the simpler 30-minute reconciliation and does not create
-or change any live Pub/Sub or Business Profile settings.
+## First sync and verification
 
-## Staging test command
+After the Secrets and binding are configured:
 
-The fixture suite covers both branch address resolution, a new five-star
-review, exclusion of a four-star review, location+review deduplication,
-rating-only reviews, edits, deletions, cached API reads, and preservation of a
-complete cache when one branch fails:
+1. Open **Actions → Sync Google Reviews → Run workflow**.
+2. Check the run summary for both verified branch location IDs, addresses, Maps
+   URLs, sync time, and eligible five-star review count. The summary never
+   prints credentials or review text.
+3. Confirm `https://bankersvascular.com/api/google-reviews` returns HTTP 200.
+4. Confirm the homepage loads the cards from the cache without a new build or
+   publish. The scheduled run repeats every 30 minutes thereafter.
+
+For local validation, `node scripts/sync-google-reviews.mjs --dry-run` performs
+the Google reconciliation and validates the feed without writing Cloudflare
+KV. The fixture suite covers both branch address resolution, new reviews,
+exclusion of a four-star review, deduplication, rating-only reviews, edits,
+deletions, cached API reads, partial-failure preservation, and separate
+authorizations:
 
 ```text
 node --test tests/google-reviews.test.mjs
 ```
 
-The fixtures are synthetic and do not call Google or publish anything. They
-also verify the separate-authorization path, including that each branch's
-request uses its own token. A true staging verification still needs authorized
-test credentials, the two Google location IDs discovered by the account, and
-preview KV credentials.
+The fixtures are synthetic and do not call Google or publish anything. A true
+staging verification still needs authorized test credentials, the two Google
+location IDs discovered by the account, and preview KV credentials.
