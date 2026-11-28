@@ -13779,7 +13779,7 @@ figure {
 
 .seo-location-section {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, .9fr) minmax(380px, 1.1fr);
   gap: 28px;
   align-items: stretch;
   margin-top: 42px;
@@ -13788,6 +13788,10 @@ figure {
   border-radius: 22px;
   background: #fff;
   box-shadow: 0 12px 32px rgba(18, 65, 84, .09);
+}
+
+.seo-location-section--without-map {
+  grid-template-columns: 1fr;
 }
 
 .seo-location-copy {

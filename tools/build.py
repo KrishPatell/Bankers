@@ -197,6 +197,13 @@ CITY_LOCATION_DATA = {
 
 CITY_LOCATION_PHONES = ("9909908428", "9909903449")
 
+# Ahmedabad already has the main About Hospital map above the related links.
+# Keep the lower SEO location map on the other city pages, including Surat.
+SEO_LOCATION_MAP_REMOVAL_URLS = frozenset((
+    "/varicose-veins/ahmedabad",
+    "/non-surgical-knee-pain/ahmedabad",
+))
+
 # These two city landing pages already contain the shared contact/map block in
 # their Webflow templates. Keep their branch details route-specific instead of
 # adding the generic SEO location module a second time.
@@ -1355,8 +1362,12 @@ def add_seo_internal_links(html, url):
     )
     if location_data:
         query = urllib.parse.quote_plus("%s, %s" % (location_data["name"], location_data["address"]))
+        location_section_class = (
+            "seo-location-section seo-location-section--without-map"
+            if url in SEO_LOCATION_MAP_REMOVAL_URLS else "seo-location-section"
+        )
         location = (
-            '<section class="seo-location-section" aria-label="%s">'
+            '<section class="%s" aria-label="%s">'
             '<div class="seo-location-copy"><p class="seo-location-eyebrow">%s</p>'
             '<h2>%s</h2><p>Visit <strong>%s</strong> at %s.</p>'
             '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=%s" '
@@ -1364,12 +1375,21 @@ def add_seo_internal_links(html, url):
             '<p>Call <a href="tel:+91%s">%s</a> or '
             '<a href="tel:+91%s">%s</a> to request an appointment.</p></div>'
             '</section>' % tuple(htmllib.escape(value) for value in (
-                location_data["eyebrow"], location_data["eyebrow"], location_data["heading"],
+                location_section_class, location_data["eyebrow"], location_data["eyebrow"],
+                location_data["heading"],
                 location_data["name"], location_data["address"], query,
                 CITY_LOCATION_PHONES[0], CITY_LOCATION_PHONES[0],
                 CITY_LOCATION_PHONES[1], CITY_LOCATION_PHONES[1],
             ))
         )
+        if url not in SEO_LOCATION_MAP_REMOVAL_URLS:
+            location_map = (
+                '<div class="seo-location-map"><iframe loading="lazy" title="%s" '
+                'src="https://www.google.com/maps?q=%s&amp;output=embed" '
+                'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
+                % (htmllib.escape(location_data["name"]), htmllib.escape(query))
+            )
+            location = location.replace("</section>", location_map + "</section>", 1)
         hours = confirmed_location_hours(url)
         if hours:
             hours_markup = (
