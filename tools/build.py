@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import cmsdata
 import nanofat
+import opd_locations
 import schema as ENTITY_SCHEMA
 import wfconfig as CFG
 import wfhtml as W
@@ -171,11 +172,16 @@ CITY_LOCATION_DATA = {
     },
     "surat": {
         "eyebrow": "Surat consultation location",
-        "heading": "Visit us at Gastron Hospital",
-        "name": "Gastron Hospital - By Dr Vimal Dhaduk",
-        "address": "202, Ayush Doctor House Station to Lal Darwaja Station Road, Lal Darwaja, Surat, Gujarat 395003",
+        # Offline last-verified fallback.  The build-time OPD sync replaces
+        # these fields from the shared sheet whenever a Surat row is present.
+        "heading": "Visit us at Metro Hospital",
+        "name": "Metro Hospital",
+        "address": "Vasupujya Empire 11, 304, TGB Cir, TGB, Adajan Gam, Adajan, Surat, Gujarat 395009",
         "city": "Surat",
-        "postal_code": "395003",
+        "postal_code": "395009",
+        "map_url": "https://www.google.com/maps/place/Metro+Hospital+-+Surat/@21.1944411,72.7840487,17z/data=!3m1!4b1!4m6!3m5!1s0x3be04d00597a9a6b:0x520d8eb1445acdd2!8m2!3d21.1944361!4d72.786629!16s%2Fg%2F11lm_q7k4c?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+        "source_location_id": "surat-metro",
+        "_opd_synced": True,
     },
     "vadodara": {
         "eyebrow": "Vadodara branch",
@@ -257,6 +263,30 @@ warnings = []
 
 def warn(msg):
     warnings.append(msg)
+
+
+def sync_opd_locations():
+    """Apply shared OPD venue details before any page is rendered.
+
+    Ahmedabad and Vadodara are deliberately not in the synchronization rules.
+    The other four routes retain their existing verified fallback unless the
+    master source identifies a material venue change.  This keeps a missing
+    monthly OPD row from erasing a location page.
+    """
+    global CITY_LOCATION_DATA
+    CITY_LOCATION_DATA, report = opd_locations.sync_location_data(
+        os.path.join(SRC, "products.html"), CITY_LOCATION_DATA)
+    if report.get("source_error"):
+        warn("OPD location sync used fallback: %s" % report["source_error"])
+    for issue in report.get("issues", ()):
+        warn("OPD location sync: %s" % issue)
+    print("OPD location source: %s" % report["source"])
+    for city, name, address in report.get("updates", ()):
+        print("  synced %-10s %s — %s" % (city, name, address))
+    for city, reason in report.get("preserved", ()):
+        if city in ("rajkot", "bhavnagar", "rajasthan"):
+            print("  preserved %-10s (%s)" % (city, reason))
+    return report
 
 
 # --------------------------------------------------------------- URL rewriting
@@ -1366,28 +1396,33 @@ def add_seo_internal_links(html, url):
             "seo-location-section seo-location-section--without-map"
             if url in SEO_LOCATION_MAP_REMOVAL_URLS else "seo-location-section"
         )
+        directions_url = location_data.get("map_url") or (
+            "https://www.google.com/maps/search/?api=1&query=%s" % query)
         location = (
             '<section class="%s" aria-label="%s">'
             '<div class="seo-location-copy"><p class="seo-location-eyebrow">%s</p>'
             '<h2>%s</h2><p>Visit <strong>%s</strong> at %s.</p>'
-            '<a class="seo-location-button" href="https://www.google.com/maps/search/?api=1&amp;query=%s" '
+            '<a class="seo-location-button" href="%s" '
             'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a>'
             '<p>Call <a href="tel:+91%s">%s</a> or '
             '<a href="tel:+91%s">%s</a> to request an appointment.</p></div>'
             '</section>' % tuple(htmllib.escape(value) for value in (
                 location_section_class, location_data["eyebrow"], location_data["eyebrow"],
                 location_data["heading"],
-                location_data["name"], location_data["address"], query,
+                location_data["name"], location_data["address"], directions_url,
                 CITY_LOCATION_PHONES[0], CITY_LOCATION_PHONES[0],
                 CITY_LOCATION_PHONES[1], CITY_LOCATION_PHONES[1],
             ))
         )
         if url not in SEO_LOCATION_MAP_REMOVAL_URLS:
+            embed_url = location_data.get("map_embed_url") or (
+                "https://www.google.com/maps?q=%s&output=embed" % query)
             location_map = (
                 '<div class="seo-location-map"><iframe loading="lazy" title="%s" '
-                'src="https://www.google.com/maps?q=%s&amp;output=embed" '
-                'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
-                % (htmllib.escape(location_data["name"]), htmllib.escape(query))
+                'src="%s" referrerpolicy="no-referrer-when-downgrade" '
+                'allowfullscreen></iframe></div>'
+                % (htmllib.escape(location_data["name"], quote=True),
+                   htmllib.escape(embed_url, quote=True))
             )
             location = location.replace("</section>", location_map + "</section>", 1)
         hours = confirmed_location_hours(url)
@@ -2496,6 +2531,40 @@ def _location_schema_node(key, page_url):
     return node
 
 
+def _opd_location_schema_node(city, page_url):
+    """Describe a visiting OPD venue without presenting it as a branch."""
+    location = CITY_LOCATION_DATA.get(city)
+    if not location or not location.get("_opd_synced"):
+        return None
+    location_id = location.get("source_location_id") or "opd-%s" % city
+    address = location.get("address", "")
+    region = "Rajasthan" if "rajasthan" in address.lower() else "Gujarat"
+    map_url = location.get("map_url")
+    if not map_url:
+        query = urllib.parse.quote_plus("%s, %s" % (location["name"], address))
+        map_url = "https://www.google.com/maps/search/?api=1&query=%s" % query
+    return {
+        "@type": "Place",
+        "@id": "%s/#%s" % (CFG.SITE_URL, location_id),
+        "name": location["name"],
+        "description": (
+            "Visiting OPD consultation location for Bankers Vascular Centre; "
+            "availability follows the published OPD schedule."
+        ),
+        "url": CFG.SITE_URL + page_url,
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": address,
+            "addressLocality": location.get("city", ""),
+            "addressRegion": region,
+            "postalCode": location.get("postal_code", ""),
+            "addressCountry": "IN",
+        },
+        "hasMap": map_url,
+        "containedInPlace": {"@id": ENTITY_SCHEMA.ENTITY_IDS["organization"]},
+    }
+
+
 def _schema_description(item):
     if not item:
         return ""
@@ -2575,6 +2644,10 @@ def add_page_schema(html, url, spec=None, item=None):
         graph[1]["about"] = {"@id": ENTITY_SCHEMA.LOCATIONS[city]["id"]}
         graph[1]["mainEntity"] = {"@id": ENTITY_SCHEMA.LOCATIONS[city]["id"]}
         graph.append(_location_schema_node(city, canonical_url))
+    if url.startswith(("/varicose-veins/", "/non-surgical-knee-pain/")):
+        opd_location = _opd_location_schema_node(city, url)
+        if opd_location:
+            graph.append(opd_location)
     if spec and spec.get("key") == "treatment" and item:
         procedure_id = canonical_url + "#medical-procedure"
         procedure = {
@@ -2772,6 +2845,7 @@ def main():
 
     global PAGE_URLS, PAGINATION_TEMPLATE
     os.chdir(ROOT)
+    sync_opd_locations()
 
     import assets as assets_mod
     assets = assets_mod.AssetMap(skip_download=args.skip_assets)
