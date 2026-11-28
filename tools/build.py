@@ -1363,15 +1363,11 @@ def add_seo_internal_links(html, url):
             'target="_blank" rel="noopener">Get directions <span aria-hidden="true">↗</span></a>'
             '<p>Call <a href="tel:+91%s">%s</a> or '
             '<a href="tel:+91%s">%s</a> to request an appointment.</p></div>'
-            '<div class="seo-location-map"><iframe loading="lazy" title="%s" '
-            'src="https://www.google.com/maps?q=%s&amp;output=embed" '
-            'referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
             '</section>' % tuple(htmllib.escape(value) for value in (
                 location_data["eyebrow"], location_data["eyebrow"], location_data["heading"],
                 location_data["name"], location_data["address"], query,
                 CITY_LOCATION_PHONES[0], CITY_LOCATION_PHONES[0],
                 CITY_LOCATION_PHONES[1], CITY_LOCATION_PHONES[1],
-                location_data["name"], query,
             ))
         )
         hours = confirmed_location_hours(url)
